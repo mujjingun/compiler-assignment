@@ -1,9 +1,10 @@
 all:
 	flex tiny.l
-	gcc -o compiler main.c utils.c ./lex.yy.c
+	gcc -o compiler main.c utils.c lex.yy.c
 
 test: all
-	./compiler
+	./compiler test_files/test1.tny
+	./compiler test_files/test2.tny
 
 clean:
 	rm ./compiler
