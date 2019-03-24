@@ -1,2 +1,7 @@
 build/
 *.user
+*.out
+*.log
+*.aux
+*.pdf
+*.gz

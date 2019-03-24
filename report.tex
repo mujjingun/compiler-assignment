@@ -1,0 +1,78 @@
+\documentclass[a4paper, 10pt]{oblivoir}
+
+\usepackage{fapapersize}
+\usefapapersize{210mm, 297mm, 30mm, 30mm, 30mm, 30mm}
+
+\usepackage[hangul]{kotex}
+\usepackage{indentfirst}
+\usepackage{makecell}
+
+\usepackage{tikz}
+\usetikzlibrary{graphs, graphdrawing}
+\usegdlibrary{layered}
+
+\title{컴파일러 프로젝트 1 결과보고서}
+\author{박건}
+\date{2019년 3월 24일}
+
+\begin{document}
+
+\maketitle
+
+\vspace*{\fill}
+
+\begin{center}
+\begin{tabular}{ l l }
+과목명 & [CSE4120] 기초 컴파일러 구성 \\
+담당교수 & 서강대학교 컴퓨터공학과 정성원 \\
+개발자 & 박건 \\
+개발기간 & 2019.3.24 - 2019.3.24 \\
+\end{tabular}
+\end{center}
+
+\vspace*{\fill}
+
+\pagebreak
+
+\begin{tabular}{ l l }
+프로젝트 제목: & \makecell{Design and Development of Compiler for C- Language: \\
+Phase 1: Design and Implementation of Lexical Analyzer} \\
+제출일: & 2019. 3. 24.\\
+개발자: & 박건 \\
+\end{tabular}
+
+\section{개발 목표}
+C- Language의 Lexical Analyzer를 구현한다. C- Language는 C Language를 간소화한 언어이다.
+
+\section{개발 범위 및 내용}
+\subsection{개발 범위}
+Lexical Analyzer는 Input Character들을 Token으로 쪼개는 역할을 하며, 동시에 Comment를 제거하는 기능을 한다.
+
+\subsection{개발 내용}
+\texttt{flex}를 이용하여 C- Language의 Lexical Analyzer를 구현한다.
+
+\section{추진 일정 및 개발 방법}
+\subsection{추진 일정}
+3월 24일: 개발, 결과 보고서 작성
+3월 27일: 과제 제출
+
+\subsection{개발 방법}
+Linux Desktop 환경에서 Qt Creator IDE를 이용하여 개발한다.
+
+\section{연구 결과}
+\tikz \graph [layered layout]
+{
+C1 -> {C2, C4, C5},
+C2 ->[densely dashed] {C4, C5},
+C3 ->[densely dashed] {C4, C5},
+C5 -> {C7, C8},
+C4 -> C8,
+C7 -> C8
+};
+
+
+\section{기타}
+
+
+
+\end{document}
