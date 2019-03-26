@@ -1,6 +1,6 @@
 all:
 	flex tiny.l
-	gcc -o compiler main.c utils.c lex.yy.c
+	gcc -Wall -Wextra -std=c99 -o compiler main.c utils.c lex.yy.c
 
 test: all
 	./compiler test_files/test1.tny

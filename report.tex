@@ -9,7 +9,7 @@
 \usepackage{listings}
 
 \usepackage{tikz}
-\usetikzlibrary{graphs, graphdrawing}
+\usetikzlibrary{graphs, graphdrawing, automata,positioning}
 \usegdlibrary{layered, force}
 \lstset{language=C, basicstyle=\footnotesize}
 
@@ -284,7 +284,66 @@ Reentrant mode를 사용하면 \texttt{flex}를 사용하는 방식이 조금 �
     }
 \end{lstlisting}
 
-\section{기타}
+위와 같이 여러 파일을 처리할 때 Global state를 초기화하는 대신 \texttt{yylex\_init()}을 이용하여 state를 할당 및 초기화 하고 \texttt{struct Scanner}로 모듈화되어 멀티스레딩이나 프로젝트 크기가 커져도 유지관리를 쉽게 할 수 있다.
 
+Comment 파싱은 아래와 같은 NFA를 구상한 다음 C코드로 구현하였다.
+
+\begin{figure}
+\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto] 
+   \node[state,initial] (s3) {}; 
+   \node[state] (s2)[right=of s3] {}; 
+   \node[state] (s1)[right=of s2] {}; 
+   \node[state] (s)[right=of s1] {}; 
+   \node[state, accepting] (q_1) [right=of s] {}; 
+   \node[state] (q_2) [below=of s] {error}; 
+   
+   \path[->] 
+   	 (s) edge node {/} (q_1)
+   	 (s) edge [loop, swap] node {*} (s)
+   	 (s3) edge node {/} (s2)
+   	 (s2) edge node {*} (s1)
+   	 (s1) edge [bend left] node {*} (s)
+   	 (s) edge [bend left] node {\Sigma} (s1)
+   	 (s1) edge [loop, swap] node {\Sigma} (s1)
+   	 (s1) edge node [swap] {<<EOF>>} (q_2)
+   	 (s) edge node {<<EOF>>} (q_2);
+\end{tikzpicture}
+\caption{Comment parser}
+\end{figure}
+
+\begin{lstlisting}[caption=Segment of tiny.l, frame=single]
+"/*"        {
+    int c;
+    while (1) {
+        c = input(yyscanner);
+        if (c == 0) {
+            yyextra->error_msg = "Comment error";
+            return ERROR;
+        }
+        if (c == '\n') {
+            yylineno++;
+        }
+        while (c == '*') {
+            c = input(yyscanner);
+            if (c == 0) {
+                yyextra->error_msg = "Comment error";
+                return ERROR;
+            }
+            if (c == '\n') {
+                yylineno++;
+            }
+            if (c == '/') {
+                goto ignore;
+            }
+        }
+    }
+ignore:
+    ;
+}
+\end{lstlisting}
+
+\section{기타}
+\subsection{자체 평가}
+\texttt{flex}의 Reentrant mode를 사용하여 구조적으로 프로그램을 작성했고, 여러 파일을 한꺼번에 입력할 수 있다는 점에서 다른 사람과 구별된다고 생각한다. 또한 Comment parsing을 위해 NFA를 구상했다는 점에서 창의적으로 문제를 해결했다고 할 만하다.
 
 \end{document}
