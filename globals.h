@@ -32,11 +32,11 @@
     WRAP(ID)            \
     WRAP(NUM)
 
-#define WRAP(x) x,
 enum Token {
+#define WRAP(x) x,
     TOKENS
-};
 #undef WRAP
+};
 
 const char* enum_to_string(enum Token t);
 

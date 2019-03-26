@@ -1,27 +1,29 @@
-/* A program to perform selection sort on a 10element array. */
+int arr[100];
+/* binary search routine */
 
-int x[10];
-
-/* A
- * Multiline
- * Comment
- *
- */
-int minloc(int a[], int low, int high)
+int binarysearch(int x)
 {
-    int i;
-    int x;
-    int k;
-    k = low;
-    x = a[low];
-    i = low + 1;
-    while (i < high) {
-        if (a[i] < x) {
-            x = a[i];
-            k = i;
-        }
-        i = i + 1;
+    int left = 0, right = 100;
+    int mid;
+
+    while(left <= right)
+    {
+        mid = (left + right) / 2;
+        if(mid == x) return mid;
+        else if(mid < x) left = mid + 1;
+        else right = mid - 1;
     }
-    return k;
+    return -1;
 }
-/* *********/
+
+int main(void)
+{
+    int i, goal, res;
+    for(i = 0; i < 100; i++)
+    {
+        arr[i] = i;
+    }
+    goal = 100;
+    res = binarysearch(goal);
+    return 0;
+}

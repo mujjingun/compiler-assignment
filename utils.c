@@ -2,12 +2,12 @@
 
 const char* enum_to_string(enum Token t)
 {
+    switch (t) {
 #define WRAP(x) \
     case x:     \
         return #x;
-    switch (t) {
         TOKENS
-    }
 #undef WRAP
+    }
     return "Unknown";
 }

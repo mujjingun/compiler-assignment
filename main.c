@@ -6,7 +6,7 @@
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        printf("Usage: %s <program.c>\n", argv[0]);
+        printf("Usage: %s <source> [<source2> ...]\n", argv[0]);
         return 0;
     }
 
