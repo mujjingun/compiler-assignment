@@ -2,9 +2,6 @@
 
 #include "globals.h"
 
-int lineno = 1;
-const char* error_msg = "";
-
 %}
 %option reentrant
 %option noyywrap
@@ -78,6 +75,9 @@ ignore:
     ;
 }
 
+{letter}+{number} { yyextra->error_msg = "Invalid identifier"; return ERROR; }
+{number}{letter}+ { yyextra->error_msg = "Invalid identifier"; return ERROR; }
+
 {identifier} { return ID; }
 {number}     { return NUM; }
 
@@ -86,7 +86,7 @@ ignore:
 {whitespace} {}
 
 .           {
-    error_msg = "Unknown token";
+    yyextra->error_msg = "Unknown token";
     return ERROR;
 }
 
