@@ -53,7 +53,7 @@ whitespace  (" "|\t)+
     int c;
     while (1) {
         c = input(yyscanner);
-        if (c == 0) {
+        if (c == 0 || c == EOF) {
             yyextra->error_msg = "Comment error";
             return ERROR;
         }
@@ -62,7 +62,7 @@ whitespace  (" "|\t)+
         }
         while (c == '*') {
             c = input(yyscanner);
-            if (c == 0) {
+            if (c == 0 || c == EOF) {
                 yyextra->error_msg = "Comment error";
                 return ERROR;
             }
