@@ -2,6 +2,12 @@
 
 #include "globals.h"
 #include "lex.yy.h"
+#include "scan.h"
+
+void yyerror(yyscan_t scanner, char const* s)
+{
+    fprintf(stderr, "Parse error(%d): %s\n", yyget_lineno(scanner), s);
+}
 
 int main(int argc, char* argv[])
 {
@@ -30,21 +36,14 @@ int main(int argc, char* argv[])
         yyset_in(fp, scanner.flex);
         yyset_extra(&scanner, scanner.flex);
 
-        puts(" line number    token         lexeme    ");
-        puts("-----------------------------------------");
-
-        enum Token result;
-        do {
-            result = yylex(scanner.flex);
-            printf("%4d            ", yyget_lineno(scanner.flex));
-            printf("%-10s  ", enum_to_string(result));
-            if (result == ERROR) {
-                printf("%s\n", scanner.error_msg);
-            }
-            else {
-                printf("%s\n", yyget_text(scanner.flex));
-            }
-        } while (result != ENDOFFILE);
+        int parse_result = yyparse(scanner.flex);
+        if (parse_result != 0) {
+            fprintf(stderr, "Error: Parse failed\n");
+        }
+        else {
+            printTree(scanner.tree);
+            freeNodeCascade(scanner.tree);
+        }
 
         yylex_destroy(scanner.flex);
 

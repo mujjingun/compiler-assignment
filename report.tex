@@ -69,6 +69,18 @@ Linux Desktop 환경에서 Qt Creator IDE를 이용하여 개발한다.
 "\texttt{lex.yy.h}" -> {"\texttt{main.c}"}
 };
 
+\tikz \graph [layered layout]
+{
+"\texttt{main()}" -> {"\texttt{assemble()}", "\texttt{type()}", "\texttt{symbol()}"},
+"\texttt{assemble()}" -> {"\texttt{first\_pass()}", "\texttt{symtab\_init()}"},
+"\texttt{assemble()}" -> [minimum layers=3] {"\texttt{second\_pass()}"},
+"\texttt{first\_pass()}" -> {"\texttt{parse\_line()}", "\texttt{calc\_ins\_length()}", "\texttt{symtab\_find()}", "\texttt{symtab\_insert()}"},
+"\texttt{second\_pass()}" -> {"\texttt{switch\_extension()}", "\texttt{parse\_im\_line()}", "\texttt{assemble\_ins()}"},
+"\texttt{parse\_im\_line()}" -> {"\texttt{parse\_line()}"},
+"\texttt{symbol()}" -> {"\texttt{print\_symtab\_list\_sorted()}"},
+
+};
+
 \begin{itemize}
 \item \texttt{tiny.l} -- \texttt{flex} Input file. 토큰들의 Regular expression 정의와 Comment parsing 알고리즘이 들어간다.
 \item \texttt{globals.h} -- \texttt{enum Token}의 정의와 Enumeration 값을 문자열로 바꿔 주는 \texttt{enum\_to\_string()} 함수 선언, \texttt{struct Scanner}의 정의가 들어간다.

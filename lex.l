@@ -1,13 +1,17 @@
 %{
-
 #include "globals.h"
+#include "scan.h"
 
+// workaround for warning
+int fileno(FILE *stream);
 %}
+
 %option reentrant
-%option noyywrap
+%option bison-bridge
 %option extra-type="struct Scanner *"
 %option header-file="lex.yy.h"
 %option outfile="lex.yy.c"
+%option nounput
 
 letter      [a-zA-Z]
 digit       [0-9]
@@ -18,7 +22,7 @@ whitespace  (" "|\t)+
 
 %%
 
-<<EOF>>     { return ENDOFFILE; }
+<<EOF>>     { return 0; }
 
 "if"        { return IF; }
 "else"      { return ELSE; }
@@ -78,8 +82,15 @@ ignore:
 {letter}+{number} { yyextra->error_msg = "Invalid identifier"; return ERROR; }
 {number}{letter}+ { yyextra->error_msg = "Invalid identifier"; return ERROR; }
 
-{identifier} { return ID; }
-{number}     { return NUM; }
+{identifier} {
+    yylval->node = makeIdNode(yytext);
+    return ID;
+}
+
+{number}     {
+    yylval->node = makeConstNode(atoi(yytext));
+    return NUM;
+}
 
 {newline}    { yylineno++; }
 
@@ -91,3 +102,8 @@ ignore:
 }
 
 %%
+
+int yywrap(yyscan_t scanner) {
+    (void)scanner;
+    return 1;
+}
