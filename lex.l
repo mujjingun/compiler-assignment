@@ -83,12 +83,14 @@ ignore:
 {number}{letter}+ { yyextra->error_msg = "Invalid identifier"; return ERROR; }
 
 {identifier} {
-    yylval->node = makeIdNode(yytext);
+    char* buf = malloc(strlen(yytext) + 1);
+    strcpy(buf, yytext);
+    yylval->name = buf;
     return ID;
 }
 
 {number}     {
-    yylval->node = makeConstNode(atoi(yytext));
+    yylval->num = atoi(yytext);
     return NUM;
 }
 

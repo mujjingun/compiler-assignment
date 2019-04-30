@@ -61,19 +61,26 @@ struct NodeRec {
     enum NodeKind kind;
     union {
         int num;
-        char *name;
+        char* name;
         enum OpKind op;
         struct {
+            char* name;
             enum TypeKind type;
             bool is_array;
         } param;
-        enum TypeKind return_type;
+        struct {
+            enum TypeKind return_type;
+            char* name;
+        } func;
         struct {
             enum TypeKind type;
+            char* name;
             bool is_array;
             int array_size;
         } var;
     } value;
+
+    int lineno;
 
     int num_children;
     Node* children;
@@ -82,32 +89,32 @@ struct NodeRec {
 void addChildToNode(Node node, Node newchild);
 
 // expressions
-Node makeConstNode(int num);
-Node makeIdNode(const char* name);
-Node makeIndexNode(Node var, Node index);
-Node makeCallNode(Node func, Node args);
-Node makeArgsNode(void);
-Node makeBinOpNode(enum OpKind op, Node lhs, Node rhs);
-Node makeAssignNode(Node lhs, Node rhs);
+Node makeConstNode(int lineno, int num);
+Node makeVarNode(int lineno, char* name);
+Node makeIndexNode(int lineno, char* id, Node index);
+Node makeCallNode(int lineno, char* func, Node args);
+Node makeArgsNode(int lineno);
+Node makeBinOpNode(int lineno, enum OpKind op, Node lhs, Node rhs);
+Node makeAssignNode(int lineno, Node lhs, Node rhs);
 
 // statements
-Node makeReturnNode(void);
-Node makeWhileNode(Node cond, Node body);
-Node makeIfNode(Node cond, Node body);
-Node makeExprStmt(Node expr);
+Node makeReturnNode(int lineno);
+Node makeWhileNode(int lineno, Node cond, Node body);
+Node makeIfNode(int lineno, Node cond, Node body);
+Node makeExprStmt(int lineno, Node expr);
 
-Node makeStmtListNode(void);
-Node makeCompoundStatement(void);
+Node makeStmtListNode(int lineno);
+Node makeCompoundStatement(int lineno);
 
 // declarations
-Node makeParamListNode(void);
-Node makeParamNode(enum TypeKind type, bool is_array, Node id);
+Node makeParamListNode(int lineno);
+Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id);
 
-Node makeFunctionNode(enum TypeKind return_type, Node id, Node params, Node body);
-Node makeVarDeclNode(enum TypeKind type, Node id);
-Node makeArrayDeclNode(enum TypeKind type, int num, Node id);
+Node makeFunctionNode(int lineno, enum TypeKind return_type, char* id, Node params, Node body);
+Node makeVarDeclNode(int lineno, enum TypeKind type, char* id);
+Node makeArrayDeclNode(int lineno, enum TypeKind type, int num, char* id);
 
-Node makeDeclListNode(void);
+Node makeDeclListNode(int lineno);
 
 // free
 void freeNode(Node node);

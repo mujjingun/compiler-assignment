@@ -17,7 +17,6 @@ int main(int argc, char* argv[])
     }
 
     for (int i = 1; i < argc; ++i) {
-
         FILE* fp;
         if ((fp = fopen(argv[i], "r")) == NULL) {
             fprintf(stderr, "Error: Cannot open file \"%s\"\n", argv[i]);
