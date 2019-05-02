@@ -62,7 +62,8 @@ void addChildToNode(Node node, Node newChild)
 
 Node makeConstNode(int lineno, int num)
 {
-    Node node = allocNode(lineno, NodeConst, 0);
+    Node node = allocNode(lineno, NodeExpr, 0);
+    node->expr = NodeConst;
     node->value.num = num;
 
     return node;
@@ -70,7 +71,8 @@ Node makeConstNode(int lineno, int num)
 
 Node makeVarNode(int lineno, char* name)
 {
-    Node node = allocNode(lineno, NodeId, 0);
+    Node node = allocNode(lineno, NodeExpr, 0);
+    node->expr = NodeId;
     node->value.name = name;
 
     return node;
@@ -78,7 +80,8 @@ Node makeVarNode(int lineno, char* name)
 
 Node makeIndexNode(int lineno, char* id, Node index)
 {
-    Node node = allocNode(lineno, NodeIndex, 1);
+    Node node = allocNode(lineno, NodeExpr, 1);
+    node->expr = NodeIndex;
     node->value.name = id;
 
     node->children[0] = index;
@@ -88,7 +91,8 @@ Node makeIndexNode(int lineno, char* id, Node index)
 
 Node makeCallNode(int lineno, char* func, Node args)
 {
-    Node node = allocNode(lineno, NodeCall, 1);
+    Node node = allocNode(lineno, NodeExpr, 1);
+    node->expr = NodeCall;
     node->value.name = func;
 
     node->children[0] = args;
@@ -98,12 +102,16 @@ Node makeCallNode(int lineno, char* func, Node args)
 
 Node makeArgsNode(int lineno)
 {
-    return allocNode(lineno, NodeArgs, 0);
+    Node node = allocNode(lineno, NodeExpr, 0);
+    node->expr = NodeArgs;
+
+    return node;
 }
 
 Node makeBinOpNode(int lineno, enum OpKind op, Node lhs, Node rhs)
 {
-    Node node = allocNode(lineno, NodeBinOp, 2);
+    Node node = allocNode(lineno, NodeExpr, 2);
+    node->expr = NodeBinOp;
     node->children[0] = lhs;
     node->children[1] = rhs;
     node->value.op = op;
@@ -113,7 +121,8 @@ Node makeBinOpNode(int lineno, enum OpKind op, Node lhs, Node rhs)
 
 Node makeAssignNode(int lineno, Node lhs, Node rhs)
 {
-    Node node = allocNode(lineno, NodeAssign, 2);
+    Node node = allocNode(lineno, NodeExpr, 2);
+    node->expr = NodeAssign;
     node->children[0] = lhs;
     node->children[1] = rhs;
 
@@ -122,12 +131,16 @@ Node makeAssignNode(int lineno, Node lhs, Node rhs)
 
 Node makeReturnNode(int lineno)
 {
-    return allocNode(lineno, NodeReturn, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeReturn;
+
+    return node;
 }
 
 Node makeWhileNode(int lineno, Node cond, Node body)
 {
-    Node node = allocNode(lineno, NodeWhile, 2);
+    Node node = allocNode(lineno, NodeStmt, 2);
+    node->stmt = NodeWhile;
     node->children[0] = cond;
     node->children[1] = body;
 
@@ -136,7 +149,8 @@ Node makeWhileNode(int lineno, Node cond, Node body)
 
 Node makeIfNode(int lineno, Node cond, Node body)
 {
-    Node node = allocNode(lineno, NodeIf, 2);
+    Node node = allocNode(lineno, NodeStmt, 2);
+    node->stmt = NodeIf;
     node->children[0] = cond;
     node->children[1] = body;
 
@@ -145,7 +159,8 @@ Node makeIfNode(int lineno, Node cond, Node body)
 
 Node makeExprStmt(int lineno, Node expr)
 {
-    Node node = allocNode(lineno, NodeExprStmt, 1);
+    Node node = allocNode(lineno, NodeStmt, 1);
+    node->stmt = NodeExprStmt;
     node->children[0] = expr;
 
     return node;
@@ -153,22 +168,31 @@ Node makeExprStmt(int lineno, Node expr)
 
 Node makeStmtListNode(int lineno)
 {
-    return allocNode(lineno, NodeStmtList, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeStmtList;
+    return node;
 }
 
 Node makeCompoundStatement(int lineno)
 {
-    return allocNode(lineno, NodeCompoundStmt, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeCompoundStmt;
+
+    return node;
 }
 
 Node makeParamListNode(int lineno)
 {
-    return allocNode(lineno, NodeParamList, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeParamList;
+
+    return node;
 }
 
 Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id)
 {
-    Node node = allocNode(lineno, NodeParam, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeParam;
     node->value.param.name = id;
     node->value.param.type = type;
     node->value.param.is_array = is_array;
@@ -178,7 +202,8 @@ Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id)
 
 Node makeFunctionNode(int lineno, enum TypeKind return_type, char* id, Node params, Node body)
 {
-    Node node = allocNode(lineno, NodeFunction, 2);
+    Node node = allocNode(lineno, NodeStmt, 2);
+    node->stmt = NodeFunction;
     node->value.func.return_type = return_type;
     node->value.func.name = id;
 
@@ -190,7 +215,8 @@ Node makeFunctionNode(int lineno, enum TypeKind return_type, char* id, Node para
 
 Node makeVarDeclNode(int lineno, enum TypeKind type, char* id)
 {
-    Node node = allocNode(lineno, NodeVar, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeVar;
     node->value.var.type = type;
     node->value.var.is_array = false;
     node->value.var.name = id;
@@ -200,7 +226,8 @@ Node makeVarDeclNode(int lineno, enum TypeKind type, char* id)
 
 Node makeArrayDeclNode(int lineno, enum TypeKind type, int num, char* id)
 {
-    Node node = allocNode(lineno, NodeVar, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeVar;
     node->value.var.type = type;
     node->value.var.is_array = true;
     node->value.var.array_size = num;
@@ -211,24 +238,30 @@ Node makeArrayDeclNode(int lineno, enum TypeKind type, int num, char* id)
 
 Node makeDeclListNode(int lineno)
 {
-    return allocNode(lineno, NodeDeclList, 0);
+    Node node = allocNode(lineno, NodeStmt, 0);
+    node->stmt = NodeDeclList;
+
+    return node;
 }
 
 void freeNode(Node node)
 {
-    if (node->kind == NodeId
-        || node->kind == NodeIndex
-        || node->kind == NodeCall) {
-        free(node->value.name);
-    }
-    if (node->kind == NodeVar) {
-        free(node->value.var.name);
-    }
-    if (node->kind == NodeParam) {
-        free(node->value.param.name);
-    }
-    if (node->kind == NodeFunction) {
-        free(node->value.func.name);
+    if (node->kind == NodeExpr) {
+        if (node->expr == NodeId
+            || node->expr == NodeIndex
+            || node->expr == NodeCall) {
+            free(node->value.name);
+        }
+    } else {
+        if (node->stmt == NodeVar) {
+            free(node->value.var.name);
+        }
+        if (node->stmt == NodeParam) {
+            free(node->value.param.name);
+        }
+        if (node->stmt == NodeFunction) {
+            free(node->value.func.name);
+        }
     }
 
     free(node->children);

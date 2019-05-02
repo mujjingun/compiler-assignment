@@ -12,6 +12,11 @@ struct Scanner {
 };
 
 enum NodeKind {
+    NodeStmt,
+    NodeExpr
+};
+
+enum ExprKind {
     NodeConst,
     NodeId,
     NodeIndex,
@@ -19,7 +24,9 @@ enum NodeKind {
     NodeArgs,
     NodeBinOp,
     NodeAssign,
+};
 
+enum StmtKind {
     NodeReturn,
     NodeWhile,
     NodeIf,
@@ -57,7 +64,13 @@ enum TypeKind {
 const char* typeToString(enum TypeKind t);
 
 struct NodeRec {
+
+    union {
+        enum ExprKind expr;
+        enum StmtKind stmt;
+    };
     enum NodeKind kind;
+
     union {
         int num;
         char* name;
