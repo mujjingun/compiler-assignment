@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "lex.yy.h"
 #include "scan.h"
+#include "util.h"
 
 void yyerror(yyscan_t scanner, char const* s)
 {
@@ -38,8 +39,7 @@ int main(int argc, char* argv[])
         int parse_result = yyparse(scanner.flex);
         if (parse_result != 0) {
             fprintf(stderr, "Error: Parse failed\n");
-        }
-        else {
+        } else {
             printTree(scanner.tree);
             freeNodeCascade(scanner.tree);
         }

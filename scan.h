@@ -120,7 +120,4 @@ Node makeDeclListNode(int lineno);
 void freeNode(Node node);
 void freeNodeCascade(Node node);
 
-// print
-void printTree(Node node);
-
 #endif // SCAN_H
