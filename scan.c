@@ -269,14 +269,14 @@ static void printSubTree(Node node, int level)
         break;
 
     case NodeIndex:
-        iprintf(level, "Index\n");
+        iprintf(level, "Index id: %s\n", node->value.name);
         for (int i = 0; i < node->num_children; ++i) {
             printSubTree(node->children[i], level + 1);
         }
         break;
 
     case NodeCall:
-        iprintf(level, "Call\n");
+        iprintf(level, "Call id: %s\n", node->value.name);
         for (int i = 0; i < node->num_children; ++i) {
             printSubTree(node->children[i], level + 1);
         }
@@ -346,9 +346,15 @@ static void printSubTree(Node node, int level)
         break;
 
     case NodeParam:
-        iprintf(level, "Parameter id : %s\tType : %s\n",
-            node->value.param.name,
-            typeToString(node->value.param.type));
+        if (node->value.param.is_array) {
+            iprintf(level, "Parameter id : %s\tType : %s[]\n",
+                node->value.param.name,
+                typeToString(node->value.param.type));
+        } else {
+            iprintf(level, "Parameter id : %s\tType : %s\n",
+                node->value.param.name,
+                typeToString(node->value.param.type));
+        }
         break;
 
     case NodeFunction:
@@ -364,10 +370,16 @@ static void printSubTree(Node node, int level)
         break;
 
     case NodeVar:
-        iprintf(level, "Variable\n");
-        iprintf(level + 1, "id : %s\tType : %s\n",
-            node->value.var.name,
-            typeToString(node->value.var.type));
+        if (node->value.var.is_array) {
+            iprintf(level, "Variable id : %s\tType : %s[%d]\n",
+                node->value.var.name,
+                typeToString(node->value.var.type),
+                node->value.var.array_size);
+        } else {
+            iprintf(level, "Variable id : %s\tType : %s\n",
+                node->value.var.name,
+                typeToString(node->value.var.type));
+        }
         break;
 
     case NodeDeclList:

@@ -1,11 +1,8 @@
-/* comment /* asdf *****/
+int x[10];
 
-/* com**
-
-   /
-
-
-   ment*/
-
-/* comerrorb *
-
+int minloc( int a[], int low, int high )
+{
+    int i; int x; int k;
+    k = low;
+    x = a[low;
+}
