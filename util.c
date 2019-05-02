@@ -160,8 +160,12 @@ static void printSubTree(Node node, int level)
 
     case NodeParamList:
         iprintf(level, "Parameters\n");
-        for (int i = 0; i < node->num_children; ++i) {
-            printSubTree(node->children[i], level + 1);
+        if (node->num_children == 0) {
+            iprintf(level + 1, "(Void)\n");
+        } else {
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTree(node->children[i], level + 1);
+            }
         }
         break;
 

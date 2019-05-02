@@ -31,7 +31,7 @@ add_custom_target(bison DEPENDS ${BISON_OUTPUTS})
 add_executable(${PROJECT_NAME}
     "main.c"
     "scan.c"
-    "utils.c"
+    "util.c"
     ${LEX_SOURCE}
     ${BISON_SOURCE}
 )

@@ -28,6 +28,8 @@
 %token ASSIGN SEMICOLON COMMA
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ID NUM
 
+%right RPAREN ELSE
+
 %type<node> var factor expression call args arg_list simple_expression additive_expression term
 %type<node> return_stmt iteration_stmt selection_stmt expression_stmt statement statement_list
 %type<node> compound_stmt local_declarations var_declaration

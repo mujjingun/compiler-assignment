@@ -7,6 +7,7 @@ int y[123];
 int gcd(int u[], int v)
 {
     if (v == 0) return u;
+    if(v == 1) return u;
     else return gcd(v, u - u / v * v);
     /* u - u/v * v == u mod v */
 }
