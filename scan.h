@@ -17,28 +17,28 @@ enum NodeKind {
 };
 
 enum ExprKind {
-    NodeConst,
-    NodeId,
-    NodeIndex,
-    NodeCall,
-    NodeArgs,
-    NodeBinOp,
-    NodeAssign,
+    ExprConst,
+    ExprId,
+    ExprIndex,
+    ExprCall,
+    ExprArgs,
+    ExprBinOp,
+    ExprAssign,
 };
 
 enum StmtKind {
-    NodeReturn,
-    NodeWhile,
-    NodeIf,
-    NodeExprStmt,
+    StmtReturn,
+    StmtWhile,
+    StmtIf,
+    StmtExprStmt,
 
-    NodeStmtList,
-    NodeCompoundStmt,
-    NodeParamList,
-    NodeParam,
-    NodeFunction,
-    NodeVar,
-    NodeDeclList,
+    StmtStmtList,
+    StmtCompoundStmt,
+    StmtParamList,
+    StmtParam,
+    StmtFunction,
+    StmtVar,
+    StmtDeclList,
 };
 
 enum OpKind {

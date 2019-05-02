@@ -82,43 +82,43 @@ static void printSubTree(Node node, int level)
 {
     if (node->kind == NodeExpr) {
         switch (node->expr) {
-        case NodeConst:
+        case ExprConst:
             iprintf(level, "Const : %d\n", node->value.num);
             break;
 
-        case NodeId:
+        case ExprId:
             iprintf(level, "Id : %s\n", node->value.name);
             break;
 
-        case NodeIndex:
+        case ExprIndex:
             iprintf(level, "Index id: %s\n", node->value.name);
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeCall:
+        case ExprCall:
             iprintf(level, "Call id: %s\n", node->value.name);
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeArgs:
+        case ExprArgs:
             iprintf(level, "Arguments\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeBinOp:
+        case ExprBinOp:
             iprintf(level, "Op %s\n", opToString(node->value.op));
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeAssign:
+        case ExprAssign:
             iprintf(level, "Assign\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
@@ -127,41 +127,41 @@ static void printSubTree(Node node, int level)
         }
     } else {
         switch (node->stmt) {
-        case NodeReturn:
+        case StmtReturn:
             iprintf(level, "Return\n");
             printSubTree(node->children[0], level + 1);
             break;
 
-        case NodeWhile:
+        case StmtWhile:
             iprintf(level, "While\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeIf:
+        case StmtIf:
             iprintf(level, "If\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeExprStmt:
+        case StmtExprStmt:
             printSubTree(node->children[0], level);
             break;
 
-        case NodeStmtList:
+        case StmtStmtList:
             // this should not appear
             break;
 
-        case NodeCompoundStmt:
+        case StmtCompoundStmt:
             iprintf(level, "Compound Statement\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
             }
             break;
 
-        case NodeParamList:
+        case StmtParamList:
             iprintf(level, "Parameters\n");
             if (node->num_children == 0) {
                 iprintf(level + 1, "(Void)\n");
@@ -172,7 +172,7 @@ static void printSubTree(Node node, int level)
             }
             break;
 
-        case NodeParam:
+        case StmtParam:
             if (node->value.param.is_array) {
                 iprintf(level, "Parameter id : %s\tType : %s[]\n",
                     node->value.param.name,
@@ -184,7 +184,7 @@ static void printSubTree(Node node, int level)
             }
             break;
 
-        case NodeFunction:
+        case StmtFunction:
             iprintf(level, "Function id : %s\tType : %s\n",
                 node->value.func.name,
                 typeToString(node->value.func.return_type));
@@ -196,7 +196,7 @@ static void printSubTree(Node node, int level)
             printSubTree(node->children[1], level + 1);
             break;
 
-        case NodeVar:
+        case StmtVar:
             if (node->value.var.is_array) {
                 iprintf(level, "Variable id : %s\tType : %s[%d]\n",
                     node->value.var.name,
@@ -209,7 +209,7 @@ static void printSubTree(Node node, int level)
             }
             break;
 
-        case NodeDeclList:
+        case StmtDeclList:
             iprintf(level, "Syntax Tree:\n");
             for (int i = 0; i < node->num_children; ++i) {
                 printSubTree(node->children[i], level + 1);
