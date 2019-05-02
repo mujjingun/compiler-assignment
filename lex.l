@@ -55,7 +55,7 @@ whitespace  (" "|\t)+
     while (1) {
         c = input(yyscanner);
         if (c == 0 || c == EOF) {
-            yyextra->error_msg = "Comment error";
+            yyerror(yyscanner, "Comment error");
             return ERROR;
         }
         if (c == '\n') {
@@ -64,7 +64,7 @@ whitespace  (" "|\t)+
         while (c == '*') {
             c = input(yyscanner);
             if (c == 0 || c == EOF) {
-                yyextra->error_msg = "Comment error";
+                yyerror(yyscanner, "Comment error");
                 return ERROR;
             }
             if (c == '\n') {
@@ -79,8 +79,8 @@ ignore:
     ;
 }
 
-{letter}+{number} { yyextra->error_msg = "Invalid identifier"; return ERROR; }
-{number}{letter}+ { yyextra->error_msg = "Invalid identifier"; return ERROR; }
+{letter}+{number} { yyerror(yyscanner, "Invalid identifier"); return ERROR; }
+{number}{letter}+ { yyerror(yyscanner, "Invalid identifier"); return ERROR; }
 
 {identifier} {
     char* buf = malloc(strlen(yytext) + 1);
@@ -99,7 +99,7 @@ ignore:
 {whitespace} {}
 
 .           {
-    yyextra->error_msg = "Unknown token";
+    yyerror(yyscanner, "Unknown token");
     return ERROR;
 }
 

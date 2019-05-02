@@ -8,7 +8,6 @@ typedef struct NodeRec* Node;
 // scanner
 struct Scanner {
     void* flex;
-    const char* error_msg;
     Node tree;
 };
 
