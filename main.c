@@ -13,11 +13,18 @@ void yyerror(yyscan_t scanner, char const* s)
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        printf("Usage: %s <source> [<source2> ...]\n", argv[0]);
+        printf("Usage: %s [--latex] <source> [<source2> ...]\n", argv[0]);
         return 0;
     }
 
-    for (int i = 1; i < argc; ++i) {
+    int printLatex = 0;
+    int i = 1;
+    if (strcmp(argv[1], "--latex") == 0) {
+        printLatex = 1;
+        i = 2;
+    }
+
+    for (; i < argc; ++i) {
         FILE* fp;
         if ((fp = fopen(argv[i], "r")) == NULL) {
             fprintf(stderr, "Error: Cannot open file \"%s\"\n", argv[i]);
@@ -40,7 +47,11 @@ int main(int argc, char* argv[])
         if (parse_result != 0) {
             fprintf(stderr, "Error: Parse failed\n");
         } else {
-            printTree(scanner.tree);
+            if (printLatex) {
+                printTreeLatex(scanner.tree);
+            } else {
+                printTree(scanner.tree);
+            }
             freeNodeCascade(scanner.tree);
         }
 

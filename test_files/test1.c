@@ -2,7 +2,6 @@
    Algorithm to compute gcd. */
 
 int x[20];
-int y[123];
 
 int gcd(int u[], int v)
 {

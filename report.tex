@@ -7,11 +7,13 @@
 \usepackage{indentfirst}
 \usepackage{makecell}
 \usepackage{listings}
+\usepackage{pdflscape}
 
 \usepackage{tikz}
 \usetikzlibrary{graphs, graphdrawing, automata,positioning}
 \usegdlibrary{layered, force}
 \lstset{language=C, basicstyle=\footnotesize}
+\usepackage{forest}
 
 \title{컴파일러 프로젝트 2 결과보고서}
 \author{박건}
@@ -290,10 +292,101 @@ Syntax Tree:
 파싱 도중 에러가 생겼을 경우 \texttt{yyerror()}가 호출되는데, 여기서 상세한 에러 메시지를 출력하기 위해서 \texttt{bison}에 옵션 \texttt{\%define parse.error verbose}를 넘겨주었다.
 
 \subsection{시험 내용}
-교재에 있는 C- Language 예제 코드 2가지를 입력해 시험했다. 또한 Syntax error를 일으키는 코드를 만들어 line number를 포함한 에러 메시지가 제대로 나오는지 확인했다. 
+프로그램 실행 방법은 다음과 같다.
+\begin{lstlisting}[frame=single]
+$ make
+$ ./20171634 errorfree.c
+\end{lstlisting}
+
+교재에 있는 C- Language 예제 코드 2가지를 입력해 시험하고, 또한 예제 파일 \texttt{errorfree.c}와 \texttt{error.c}를 만들어 시험했다. \texttt{error.c}는 Syntax 에러를 일으키는 코드로, line number를 포함한 에러 메시지가 제대로 나오는지 확인했다. 
 
 \section{기타}
 \subsection{자체 평가}
 \texttt{bison}과 \texttt{flex}의 Reentrant mode를 사용하여 구조적으로 프로그램을 작성했고, 여러 파일을 한꺼번에 입력할 수 있다는 점에서 다른 사람과 구별된다고 생각한다. 또한 \texttt{bison}의 destructor 기능을 이용해 에러 상황에도 메모리를 적절히 해제해 메모리 누수를 방지했다. 그 결과 유지 보수가 용이하고 확장성 있는 코드를 작성할 수 있었다.
+
+또한 추가 기능으로서 \texttt{--latex} 을 프로그램 인자로 주면 \LaTeX 형식으로 트리를 만들 수 있다. 다음은 이 기능으로 그린 트리이다.
+\begin{lstlisting}[frame=single]
+$ ./20171634 --latex test1.c
+\end{lstlisting}
+
+\begin{landscape}
+\begin{forest}
+[{Program}
+  [{Var x : int[20]}]
+  [{Fun gcd : int}
+    [{Parameters}
+      [{u : int[]}]
+      [{v : int}]
+    ]
+    [{Compound Statement}
+      [{If}
+        [{==}
+          [{v}]
+          [{0}]
+        ]
+        [{Return}
+          [{u}]
+        ]
+      ]
+      [{If}
+        [{==}
+          [{v}]
+          [{1}]
+        ]
+        [{Return}
+          [{u}]
+        ]
+        [{Return}
+          [{Call gcd}
+            [{v}]
+            [{-}
+              [{u}]
+              [{*}
+                [{/}
+                  [{u}]
+                  [{v}]
+                ]
+                [{v}]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+  [{Fun main : void}
+    [{Parameters}
+      [{(Void)}]
+    ]
+    [{Compound Statement}
+      [{Var x : int}]
+      [{Var y : int}]
+      [{Assign}
+        [{Index x}
+          [{1}]
+        ]
+        [{2}]
+      ]
+      [{Assign}
+        [{x}]
+        [{Call input}
+        ]
+      ]
+      [{Assign}
+        [{y}]
+        [{Call input}
+        ]
+      ]
+      [{Call output}
+        [{Call gcd}
+          [{x}]
+          [{y}]
+        ]
+      ]
+    ]
+  ]
+]
+\end{forest}
+\end{landscape}
 
 \end{document}

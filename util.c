@@ -220,3 +220,158 @@ void printTree(Node node)
 {
     printSubTree(node, 0);
 }
+
+static void printSubTreeLatex(Node node, int level)
+{
+    if (node->kind == NodeExpr) {
+        switch (node->expr) {
+        case ExprConst:
+            iprintf(level, "[{%d}]\n", node->value.num);
+            break;
+
+        case ExprId:
+            iprintf(level, "[{%s}]\n", node->value.name);
+            break;
+
+        case ExprIndex:
+            iprintf(level, "[{Index %s}\n", node->value.name);
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case ExprCall:
+            iprintf(level, "[{Call %s}\n", node->value.name);
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case ExprArgs:
+            // this should not appear
+            break;
+
+        case ExprBinOp:
+            iprintf(level, "[{%s}\n", opToString(node->value.op));
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case ExprAssign:
+            iprintf(level, "[{Assign}\n");
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+        }
+    } else {
+        switch (node->stmt) {
+        case StmtReturn:
+            iprintf(level, "[{Return}\n");
+            printSubTreeLatex(node->children[0], level + 1);
+            iprintf(level, "]\n");
+            break;
+
+        case StmtWhile:
+            iprintf(level, "[{While}\n");
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case StmtIf:
+            iprintf(level, "[{If}\n");
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case StmtExprStmt:
+            printSubTreeLatex(node->children[0], level);
+            break;
+
+        case StmtStmtList:
+            // this should not appear
+            break;
+
+        case StmtCompoundStmt:
+            iprintf(level, "[{Compound Statement}\n");
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case StmtParamList:
+            iprintf(level, "[{Parameters}\n");
+            if (node->num_children == 0) {
+                iprintf(level + 1, "[{(Void)}]\n");
+            } else {
+                for (int i = 0; i < node->num_children; ++i) {
+                    printSubTreeLatex(node->children[i], level + 1);
+                }
+            }
+            iprintf(level, "]\n");
+            break;
+
+        case StmtParam:
+            if (node->value.param.is_array) {
+                iprintf(level, "[{%s : %s[]}]\n",
+                    node->value.param.name,
+                    typeToString(node->value.param.type));
+            } else {
+                iprintf(level, "[{%s : %s}]\n",
+                    node->value.param.name,
+                    typeToString(node->value.param.type));
+            }
+            break;
+
+        case StmtFunction:
+            iprintf(level, "[{Fun %s : %s}\n",
+                node->value.func.name,
+                typeToString(node->value.func.return_type));
+
+            // parameter
+            printSubTreeLatex(node->children[0], level + 1);
+
+            // body
+            printSubTreeLatex(node->children[1], level + 1);
+
+            iprintf(level, "]\n");
+            break;
+
+        case StmtVar:
+            if (node->value.var.is_array) {
+                iprintf(level, "[{Var %s : %s[%d]}]\n",
+                    node->value.var.name,
+                    typeToString(node->value.var.type),
+                    node->value.var.array_size);
+            } else {
+                iprintf(level, "[{Var %s : %s}]\n",
+                    node->value.var.name,
+                    typeToString(node->value.var.type));
+            }
+            break;
+
+        case StmtDeclList:
+            iprintf(level, "[{Program}\n");
+            for (int i = 0; i < node->num_children; ++i) {
+                printSubTreeLatex(node->children[i], level + 1);
+            }
+            iprintf(level, "]\n");
+            break;
+        }
+    }
+}
+
+void printTreeLatex(Node node)
+{
+    printSubTreeLatex(node, 0);
+}
