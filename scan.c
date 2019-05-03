@@ -89,13 +89,11 @@ Node makeIndexNode(int lineno, char* id, Node index)
     return node;
 }
 
-Node makeCallNode(int lineno, char* func, Node args)
+Node makeCallNode(int lineno, char* func)
 {
-    Node node = allocNode(lineno, NodeExpr, 1);
+    Node node = allocNode(lineno, NodeExpr, 0);
     node->expr = ExprCall;
     node->value.name = func;
-
-    node->children[0] = args;
 
     return node;
 }

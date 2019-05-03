@@ -90,11 +90,11 @@ compound_stmt       : LBRACE local_declarations statement_list RBRACE {
                     ;
 
 local_declarations  : local_declarations var_declaration { $$ = $1; addChildToNode($$, $2); }
-                    | { $$ = makeCompoundStatement(LN); }
+                    | %empty { $$ = makeCompoundStatement(LN); }
                     ;
 
 statement_list      : statement_list statement { $$ = $1; if ($2) { addChildToNode($$, $2); } }
-                    | { $$ = makeStmtListNode(LN); }
+                    | %empty { $$ = makeStmtListNode(LN); }
                     ;
 
 statement           : expression_stmt { $$ = $1; }
@@ -160,11 +160,17 @@ factor              : LPAREN expression RPAREN { $$ = $2; }
                     | NUM { $$ = makeConstNode(LN, $1); }
                     ;
 
-call                : ID LPAREN args RPAREN { $$ = makeCallNode(LN, $1, $3); }
+call                : ID LPAREN args RPAREN {
+                            $$ = makeCallNode(LN, $1);
+                            for (int i = 0; i < $3->num_children; ++i) {
+                                addChildToNode($$, $3->children[i]);
+                            }
+                            freeNode($3);
+                        }
                     ;
 
 args                : arg_list { $$ = $1; }
-                    | { $$ = makeArgsNode(LN); }
+                    | %empty { $$ = makeArgsNode(LN); }
                     ;
 
 arg_list            : arg_list COMMA expression { $$ = $1; addChildToNode($$, $3); }

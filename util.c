@@ -105,10 +105,7 @@ static void printSubTree(Node node, int level)
             break;
 
         case ExprArgs:
-            iprintf(level, "Arguments\n");
-            for (int i = 0; i < node->num_children; ++i) {
-                printSubTree(node->children[i], level + 1);
-            }
+            // this should not appear
             break;
 
         case ExprBinOp:

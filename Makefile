@@ -1,6 +1,6 @@
 all:
 	flex lex.l
-	bison parser.y
+	bison -Wall -rall parser.y
 	gcc -Wall -Wextra -std=c99 -o 20171634 main.c scan.c util.c lex.yy.c parser.tab.c
 
 test: all
@@ -12,3 +12,5 @@ clean:
 	rm ./lex.yy.h
 	rm ./parser.tab.c
 	rm ./parser.tab.h
+	rm ./parser.output
+

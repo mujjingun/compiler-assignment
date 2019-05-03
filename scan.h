@@ -104,7 +104,7 @@ void addChildToNode(Node node, Node newchild);
 Node makeConstNode(int lineno, int num);
 Node makeVarNode(int lineno, char* name);
 Node makeIndexNode(int lineno, char* id, Node index);
-Node makeCallNode(int lineno, char* func, Node args);
+Node makeCallNode(int lineno, char* func);
 Node makeArgsNode(int lineno);
 Node makeBinOpNode(int lineno, enum OpKind op, Node lhs, Node rhs);
 Node makeAssignNode(int lineno, Node lhs, Node rhs);
