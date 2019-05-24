@@ -324,6 +324,10 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             }
             break;
         case StmtReturn:
+            if (t->attr.kind != SymVariable) {
+                typeError(t, "Return value must be int");
+            }
+
             if (state->currReturnType == TypeVoid) {
                 typeError(t, "Return statement not allowed in a void function");
             }
