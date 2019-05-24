@@ -33,7 +33,9 @@ static Entry makeEntry(Node node, int loc)
         && (node->stmt == StmtVar || node->stmt == StmtFunction || node->stmt == StmtParam));
 
     if (node->stmt == StmtVar) {
-        if (node->value.var.is_array) {
+        if (node->value.var.kind == TypeVoid) {
+            entry->kind = SymUnknown;
+        } else if (node->value.var.is_array) {
             entry->kind = SymArray;
         } else {
             entry->kind = SymVariable;
@@ -55,7 +57,9 @@ static Entry makeEntry(Node node, int loc)
             }
         }
     } else if (node->stmt == StmtParam) {
-        if (node->value.param.is_array) {
+        if (node->value.param.kind == TypeVoid) {
+            entry->kind = SymUnknown;
+        } else if (node->value.param.is_array) {
             entry->kind = SymArray;
         } else {
             entry->kind = SymVariable;
@@ -245,6 +249,9 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             }
             break;
         case ExprIndex:
+            if (t->children[0]->attr.kind != SymVariable) {
+                typeError(t, "Array subscript is not int");
+            }
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymArray) {
                     typeError(t, "%s is not an array", t->value.name);
@@ -281,6 +288,9 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                     t->attr.kind = SymVariable;
                 }
             }
+            else {
+                t->attr.kind = SymUnknown;
+            }
             break;
         default:
             break;
@@ -288,6 +298,12 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         break;
     case NodeStmt:
         switch (t->stmt) {
+        case StmtIf:
+        case StmtWhile:
+            if (t->children[0]->attr.kind != SymVariable) {
+                typeError(t, "Condition must be int");
+            }
+            break;
         case StmtParam:
             if (t->value.param.kind == TypeVoid) {
                 idError(t, "Parameter cannot be void");
