@@ -72,6 +72,19 @@ typedef struct SymTableStateRec
 
 SymbolTableState state;
 
+/* 
+ * initialize symbol table
+ */
+void st_init()
+{
+    LocalSymbolTable table       = malloc(sizeof(struct LocalSymbolTableRec));
+    table->parent                = NULL;
+    table->next                  = NULL;
+    state.currentScope           = table;
+    state.lastConstructed->next  = table;
+    state.lastConstructed        = table;
+}
+
 static BucketList accessHashTable(int key, BucketList table[], char* name)
 {
     BucketList l = table[key];
@@ -84,6 +97,7 @@ void st_enter_scope()
 {
     LocalSymbolTable table       = malloc(sizeof(struct LocalSymbolTableRec));
     table->parent                = state.currentScope;
+    table->next                  = NULL;
     state.currentScope           = table;
     state.lastConstructed->next  = table;
     state.lastConstructed        = table;
