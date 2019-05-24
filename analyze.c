@@ -287,8 +287,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 } else {
                     t->attr.kind = SymVariable;
                 }
-            }
-            else {
+            } else {
                 t->attr.kind = SymUnknown;
             }
             break;
@@ -329,6 +328,16 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 typeError(t, "Return statement not allowed in a void function");
             }
             break;
+        case StmtDeclList:
+            if (t->num_children == 0) {
+                typeError(t, "Program is empty");
+            } else {
+                Node last = t->children[t->num_children - 1];
+                if (last->kind != NodeStmt || last->stmt != StmtFunction
+                    || strcmp(last->value.func.name, "main") != 0) {
+                    typeError(t, "Program must end with main()");
+                }
+            }
         default:
             break;
         }
