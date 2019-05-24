@@ -149,18 +149,16 @@ static void printHashTable(BucketList table[], FILE* listing)
     for (int i = 0; i < SIZE; ++i) {
         if (table[i] != NULL) {
             BucketList l = table[i];
-            while (l != NULL) {
-                fprintf(listing, "%-14s ", l->name);
-                /* LineList t = l->lines; */
-                /* fprintf(listing, "%-14s ", l->name); */
-                /* fprintf(listing, "%-8d  ", l->memloc); */
-                /* while (t != NULL) { */
-                /*     fprintf(listing, "%4d ", t->lineno); */
-                /*     t = t->next; */
-                /* } */
-                /* fprintf(listing, "\n"); */
-                /* l = l->next; */
-            }
+            fprintf(listing, "%-14s ", l->name);
+            /* LineList t = l->lines; */
+            /* fprintf(listing, "%-14s ", l->name); */
+            /* fprintf(listing, "%-8d  ", l->memloc); */
+            /* while (t != NULL) { */
+            /*     fprintf(listing, "%4d ", t->lineno); */
+            /*     t = t->next; */
+            /* } */
+            /* fprintf(listing, "\n"); */
+            /* l = l->next; */
         }
     }
 }
