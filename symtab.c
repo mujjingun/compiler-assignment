@@ -81,7 +81,6 @@ void st_init()
     table->parent                = NULL;
     table->next                  = NULL;
     state.currentScope           = table;
-    state.lastConstructed->next  = table;
     state.lastConstructed        = table;
 }
 
