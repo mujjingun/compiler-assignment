@@ -11,10 +11,10 @@ function main()
     filenames = map(x->joinpath("test_files", x), filenames)
     
     for name in filenames
+        println("-- compiling: ", name)
         output = read(`./project3_16 $name`, String)
         parsed = parse_output(output)
 
-        println("-- compiling: ", name)
         for i in parsed
             println(parsed)
         end

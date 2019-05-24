@@ -12,31 +12,31 @@ void gcd(void)
 
 void main( void )
 {
-    int local1 = 1;
+    int localone;
 
     /* duplicated declaration of local variable */
-    int local1 = 1;
+    int localone;
 
-    if(local1 == local1)
+    if(localone == localone)
     {
         /* duplicated declaration of local variable across scopes */
-        int local1;
+        int localone;
 
-        int local2 = 0;
+        int localtwo;
         /* duplicated declaration of local variable level 2 */
-        int local2 = 0;
+        int localtwo;
 
-        while(local1)
+        while(localone)
         {
             /* duplicated declaration of local variable across two scopes */
-            int local1 = 0;
+            int localone;
 
             /* duplicated declaration of local variable across three scopes */
-            int local2 = 0;
+            int localtwo;
 
-            int local3 = 0;
+            int localthree;
             /* duplicated declaration of local variable level 2 */
-            int local3 = 0;
+            int localthree;
         }
     }
 }
