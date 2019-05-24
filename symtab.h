@@ -22,12 +22,12 @@ typedef struct ActivationRecord* Record;
 void st_insert(char* name, Record record);
 
 /*
- * Enter 
+ * Create a new child scope
  */ 
 void st_enter_scope();
 
 /*
- * Stack a new symbol table scope
+ * Go back to the previous scope
  */ 
 void st_exit_scope();
 
