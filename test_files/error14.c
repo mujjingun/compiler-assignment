@@ -1,12 +1,12 @@
 
 int arr[100];
 
-void function1()
+void function1(void)
 {
     
 }
 
-int function2()
+int function2(void)
 {
     
 }

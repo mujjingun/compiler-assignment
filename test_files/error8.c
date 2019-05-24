@@ -1,9 +1,9 @@
 
-void gcd()
+void gcd(void)
 {
 }
 
-void main()
+void main(void)
 {
     int arr[100];
     int a;

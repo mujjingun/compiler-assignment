@@ -8,7 +8,7 @@ void main(void)
 int arr[100];
 
 /* illegal declaration */
-void function()
+void function(void)
 {
     
 }

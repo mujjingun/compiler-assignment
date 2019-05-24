@@ -1,7 +1,7 @@
 
 int a[100];
 
-void gcd()
+void gcd(void)
 {}
 
 void function(int arr[])

@@ -1,13 +1,13 @@
 
 int global;
-void gcd()
+void gcd(void)
 {}
 
 /* duplicated declaration of global variable */
 int global;
 
 /* duplicated declaration of function */
-void gcd()
+void gcd(void)
 {}
 
 void main( void )

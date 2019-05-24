@@ -1,6 +1,5 @@
 
-
-int function()
+int function(void)
 {
     /* variable undeclared */
     a = a + 1;
