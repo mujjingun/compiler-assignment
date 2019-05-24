@@ -3,6 +3,8 @@
 
 int x[20];
 
+void a;
+
 int gcd(int u[], int v)
 {
     if (v == 0){
