@@ -80,11 +80,12 @@ Node makeVarNode(int lineno, char* name)
 
 Node makeIndexNode(int lineno, char* id, Node index)
 {
-    Node node = allocNode(lineno, NodeExpr, 1);
+    Node node = allocNode(lineno, NodeExpr, 2);
     node->expr = ExprIndex;
     node->value.name = id;
 
-    node->children[0] = index;
+    node->children[0] = makeVarNode(lineno, id);
+    node->children[1] = index;
 
     return node;
 }
@@ -246,7 +247,6 @@ void freeNode(Node node)
 {
     if (node->kind == NodeExpr) {
         if (node->expr == ExprId
-            || node->expr == ExprIndex
             || node->expr == ExprCall) {
             free(node->value.name);
         }

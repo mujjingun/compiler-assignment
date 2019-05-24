@@ -95,10 +95,8 @@ static void printSubTree(Node node, int level)
             break;
 
         case ExprIndex:
-            iprintf(level, "Index id: %s\n", node->value.name);
-            for (int i = 0; i < node->num_children; ++i) {
-                printSubTree(node->children[i], level + 1);
-            }
+            iprintf(level, "Index id: %s\n", node->children[0]->value.name);
+            printSubTree(node->children[1], level + 1);
             break;
 
         case ExprCall:
@@ -238,10 +236,8 @@ static void printSubTreeLatex(Node node, int level)
             break;
 
         case ExprIndex:
-            iprintf(level, "[{Index %s}\n", node->value.name);
-            for (int i = 0; i < node->num_children; ++i) {
-                printSubTreeLatex(node->children[i], level + 1);
-            }
+            iprintf(level, "[{Index %s}\n", node->children[0]->value.name);
+            printSubTreeLatex(node->children[1], level + 1);
             iprintf(level, "]\n");
             break;
 
