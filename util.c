@@ -128,7 +128,9 @@ static void printSubTree(Node node, int level)
         switch (node->stmt) {
         case StmtReturn:
             iprintf(level, "Return\n");
-            printSubTree(node->children[0], level + 1);
+            if (node->num_children == 1) {
+                printSubTree(node->children[0], level + 1);
+            }
             break;
 
         case StmtWhile:
@@ -273,7 +275,9 @@ static void printSubTreeLatex(Node node, int level)
         switch (node->stmt) {
         case StmtReturn:
             iprintf(level, "[{Return}\n");
-            printSubTreeLatex(node->children[0], level + 1);
+            if (node->num_children == 1) {
+                printSubTreeLatex(node->children[0], level + 1);
+            }
             iprintf(level, "]\n");
             break;
 
