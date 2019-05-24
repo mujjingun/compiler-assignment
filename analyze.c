@@ -7,16 +7,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum SymbolType {
-    SymVariable,
-    SymArray,
-    SymFunction,
-};
-
 typedef struct ActivationRecord {
     int loc;
     enum SymbolType kind;
     enum TypeKind type;
+
+    union {
+        struct {
+            int num_params;
+            enum SymbolType* param_types;
+        } func;
+    };
 
     // list of referenced line numbers
     int num_linenos;
@@ -37,17 +38,29 @@ static Entry makeEntry(Node node, int loc)
         } else {
             entry->kind = SymVariable;
         }
-        entry->type = node->value.var.type;
+        entry->type = node->value.var.kind;
     } else if (node->stmt == StmtFunction) {
         entry->kind = SymFunction;
         entry->type = node->value.func.return_type;
+
+        Node params = node->children[0];
+        entry->func.num_params = params->num_children;
+        entry->func.param_types = malloc(sizeof(enum SymbolType) * entry->func.num_params);
+        for (int i = 0; i < entry->func.num_params; ++i) {
+            Node param = params->children[i];
+            if (param->value.param.is_array) {
+                entry->func.param_types[i] = SymArray;
+            } else {
+                entry->func.param_types[i] = SymVariable;
+            }
+        }
     } else if (node->stmt == StmtParam) {
         if (node->value.param.is_array) {
             entry->kind = SymArray;
         } else {
             entry->kind = SymVariable;
         }
-        entry->type = node->value.param.type;
+        entry->type = node->value.param.kind;
     }
 
     entry->num_linenos = 1;
@@ -207,40 +220,91 @@ typeError(Node t, const char* fmt, ...)
     return result;
 }
 
+typedef struct TypeCheckStateRec {
+    int functionLocCounter;
+    enum TypeKind currReturnType;
+} * TypeCheckState;
+
 /* Procedure checkNode performs
  * type checking at a single tree node
  */
-static void checkNode(Node t)
+static void checkNode(Node t, TypeCheckState state)
 {
-    // post-order traversal
-    for (int i = 0; i < t->num_children; i++) {
-        checkNode(t->children[i]);
+    Entry result;
+
+    switch (t->kind) {
+    case NodeStmt:
+        switch (t->stmt) {
+        case StmtFunction:
+            if ((result = st_lookup(t->value.func.name))) {
+                state->currReturnType = result->type;
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+    case NodeExpr:
+        break;
     }
 
-    Entry result;
+    // post-order traversal
+    for (int i = 0; i < t->num_children; i++) {
+        checkNode(t->children[i], state);
+    }
 
     switch (t->kind) {
     case NodeExpr:
         switch (t->expr) {
         case ExprBinOp:
-            if ((t->children[0]->attr.type != TypeInt) || (t->children[1]->attr.type != TypeInt)) {
-                typeError(t, "Op applied to non-integer");
-            }
-            t->attr.type = TypeInt;
+            t->attr.kind = SymVariable;
             break;
         case ExprConst:
+            t->attr.kind = SymVariable;
+            break;
         case ExprId:
-            t->attr.type = TypeInt;
+            if ((result = st_lookup(t->value.name))) {
+                t->attr.kind = result->kind;
+            } else {
+                t->attr.kind = SymUnknown;
+            }
             break;
         case ExprIndex:
-            t->attr.type = TypeInt;
+            if ((result = st_lookup(t->value.name))) {
+                if (result->kind != SymArray) {
+                    typeError(t, "%s is not an array", t->value.name);
+                }
+            }
+            t->attr.kind = SymVariable;
             break;
         case ExprCall:
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymFunction) {
                     typeError(t, "%s is not a function", t->value.name);
+                } else {
+                    int min_count = t->num_children;
+                    if (min_count > result->func.num_params) {
+                        min_count = result->func.num_params;
+                    }
+
+                    for (int i = 0; i < min_count; ++i) {
+                        enum SymbolType param_type = result->func.param_types[i];
+                        enum SymbolType arg_type = t->children[i]->attr.kind;
+                        if (param_type != arg_type) {
+                            typeError(t, "Type of parameter %d does not match type of argument", i);
+                        }
+                    }
+
+                    if (t->num_children != result->func.num_params) {
+                        typeError(t, "%d arguments passed to function %s with %d parameters",
+                            t->num_children, t->value.name, result->func.num_params);
+                    }
                 }
-                t->attr.type = result->type;
+                if (result->type == TypeVoid) {
+                    t->attr.kind = SymUnknown;
+                } else {
+                    t->attr.kind = SymVariable;
+                }
             }
             break;
         default:
@@ -250,7 +314,7 @@ static void checkNode(Node t)
     case NodeStmt:
         switch (t->stmt) {
         case StmtParam:
-            if (t->value.param.type == TypeVoid) {
+            if (t->value.param.kind == TypeVoid) {
                 idError(t, "Parameter cannot be void");
             }
             break;
@@ -265,8 +329,13 @@ static void checkNode(Node t)
             }
             break;
         case StmtVar:
-            if (t->value.var.type == TypeVoid) {
+            if (t->value.var.kind == TypeVoid) {
                 typeError(t, "Variable cannot be declared with type void");
+            }
+            break;
+        case StmtReturn:
+            if (state->currReturnType == TypeVoid) {
+                typeError(t, "Return statement not allowed in a void function");
             }
             break;
         default:
@@ -283,5 +352,16 @@ static void checkNode(Node t)
  */
 void typeCheck(Node syntaxTree)
 {
-    checkNode(syntaxTree);
+    struct TypeCheckStateRec state;
+
+    checkNode(syntaxTree, &state);
+
+    if (syntaxTree->num_children <= 0) {
+        typeError(syntaxTree, "Program is empty");
+    } else {
+        Node last = syntaxTree->children[syntaxTree->num_children - 1];
+        if (last->kind != NodeStmt || last->stmt != StmtFunction || strcmp(last->value.func.name, "main") != 0) {
+            typeError(last, "Program does not end with main()");
+        }
+    }
 }

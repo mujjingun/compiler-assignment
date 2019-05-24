@@ -80,12 +80,11 @@ Node makeVarNode(int lineno, char* name)
 
 Node makeIndexNode(int lineno, char* id, Node index)
 {
-    Node node = allocNode(lineno, NodeExpr, 2);
+    Node node = allocNode(lineno, NodeExpr, 1);
     node->expr = ExprIndex;
     node->value.name = id;
 
-    node->children[0] = makeVarNode(lineno, id);
-    node->children[1] = index;
+    node->children[0] = index;
 
     return node;
 }
@@ -193,7 +192,7 @@ Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id)
     Node node = allocNode(lineno, NodeStmt, 0);
     node->stmt = StmtParam;
     node->value.param.name = id;
-    node->value.param.type = type;
+    node->value.param.kind = type;
     node->value.param.is_array = is_array;
 
     return node;
@@ -216,7 +215,7 @@ Node makeVarDeclNode(int lineno, enum TypeKind type, char* id)
 {
     Node node = allocNode(lineno, NodeStmt, 0);
     node->stmt = StmtVar;
-    node->value.var.type = type;
+    node->value.var.kind = type;
     node->value.var.is_array = false;
     node->value.var.name = id;
 
@@ -227,7 +226,7 @@ Node makeArrayDeclNode(int lineno, enum TypeKind type, int num, char* id)
 {
     Node node = allocNode(lineno, NodeStmt, 0);
     node->stmt = StmtVar;
-    node->value.var.type = type;
+    node->value.var.kind = type;
     node->value.var.is_array = true;
     node->value.var.array_size = num;
     node->value.var.name = id;

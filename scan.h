@@ -63,6 +63,13 @@ enum TypeKind {
 
 const char* typeToString(enum TypeKind t);
 
+enum SymbolType {
+    SymUnknown,
+    SymVariable,
+    SymArray,
+    SymFunction,
+};
+
 struct NodeRec {
 
     union {
@@ -77,7 +84,7 @@ struct NodeRec {
         enum OpKind op;
         struct {
             char* name;
-            enum TypeKind type;
+            enum TypeKind kind;
             bool is_array;
         } param;
         struct {
@@ -85,7 +92,7 @@ struct NodeRec {
             char* name;
         } func;
         struct {
-            enum TypeKind type;
+            enum TypeKind kind;
             char* name;
             bool is_array;
             int array_size;
@@ -93,7 +100,9 @@ struct NodeRec {
     } value;
 
     union {
-        enum TypeKind type;
+        struct {
+            enum SymbolType kind;
+        };
     } attr;
 
     int lineno;
