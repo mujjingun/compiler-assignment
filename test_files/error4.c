@@ -1,21 +1,21 @@
 
-void function1(int arr[])
+void functionone(int arr[])
 {
     arr[1];
 }
 
-void function2(int arr)
+void functiontwo(int arr)
 {
 }
 
 void main( void )
 {
-    int arr1;
-    int arr2[10];
+    int arrone;
+    int arrtwo[10];
 
     /* argument type mismatch. Expected array */
-    function1(arr1);
+    functionone(arrone);
 
     /* argument type mismatch. Expected scalar */
-    function2(arr2);
+    functiontwo(arrtwo);
 }

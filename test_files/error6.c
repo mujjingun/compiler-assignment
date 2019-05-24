@@ -3,7 +3,7 @@ int arr;
 
 void main(void)
 {
-    int a = 1;
+    int a;
 
     /* array subscript illegal for scalar type */
     a[1];

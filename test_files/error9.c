@@ -1,53 +1,53 @@
 
-int f1(void)
+int fone(void)
 {
     int a;
     return a; 
 }
 
-int f2(void)
+int ftwo(void)
 {
     int a;
     return f1(a); 
 }
 
-int f3(void)
+int fthree(void)
 {
     int a;
     /* return type mismatch */
     return f2; 
 }
 
-int f3(int a[])
+int ffour(int a[])
 {
     /* return type mismatch */
     return a; 
 }
 
-int f4(void)
+int ffive(void)
 {
     int arr[];
     /* return type mismatch */
     return arr; 
 }
 
-void f5(void)
+void fsix(void)
 {
 }
 
-int f6(void)
+int fseven(void)
 {
     /* return type mismatch */
     return f6();
 }
 
-void f5(void)
+void feight(void)
 {
     /* illegal return statement */
     return ;
 }
 
-void f5(void)
+void fnine(void)
 {
     int a;
     /* illegal return of non-void element */

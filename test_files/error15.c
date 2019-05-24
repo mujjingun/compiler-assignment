@@ -1,14 +1,14 @@
 
 void main(void)
 {
-    int a = 1;
-    int b = 1;
-    int c = 1;
+    int a;
+    int b;
+    int c;
 
     a = b + c;
     if(a)
     {
-        int d = 1;
+        int d;
         a = d + c; 
         d = a + c; 
     }

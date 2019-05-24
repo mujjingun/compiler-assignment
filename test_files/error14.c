@@ -1,29 +1,28 @@
 
 int arr[100];
 
-void function1(void)
+void functionone(void)
 {
     
 }
 
-int function2(void)
+int functiontwo(void)
 {
     
 }
 
 void main(void)
 {
-    int a = 1; 
-    int b = 10; 
+    int a; 
+    int b; 
     int c; 
-
 
     c = a + b; 
 
-    c = function2() + b; 
+    c = functiontwo() + b; 
 
     /* type mismatch */
-    c = function1() + b; 
+    c = functionone() + b; 
 
     c = arr[a] + b; 
 
@@ -33,10 +32,10 @@ void main(void)
 
     c = a - b; 
 
-    c = function2() - b; 
+    c = functiontwo() - b; 
 
     /* type mismatch */
-    c = function1() - b; 
+    c = functionone() - b; 
 
     c = arr[a] - b; 
 
@@ -45,10 +44,10 @@ void main(void)
 
     c = a / b; 
 
-    c = function2() / b; 
+    c = functiontwo() / b; 
 
     /* type mismatch */
-    c = function1() / b; 
+    c = functionone() / b; 
 
     c = arr[a] / b; 
 
@@ -60,10 +59,10 @@ void main(void)
 
     c = a * b; 
 
-    c = function2() * b; 
+    c = functiontwo() * b; 
 
     /* type mismatch */
-    c = function1() * b; 
+    c = functionone() * b; 
 
     c = arr[a] * b; 
 
@@ -73,10 +72,10 @@ void main(void)
 
     c = a == b; 
 
-    c = function2() == b; 
+    c = functiontwo() == b; 
 
     /* type mismatch */
-    c = function1() == b; 
+    c = functionone() == b; 
 
     c = arr[a] == b; 
 
@@ -85,10 +84,10 @@ void main(void)
 
     c = a != b; 
 
-    c = function2() != b; 
+    c = functiontwo() != b; 
 
     /* type mismatch */
-    c = function1() != b; 
+    c = functionone() != b; 
 
     c = arr[a] != b; 
 
@@ -97,10 +96,10 @@ void main(void)
 
     c = a > b; 
 
-    c = function2() > b; 
+    c = functiontwo() > b; 
 
     /* type mismatch */
-    c = function1() > b; 
+    c = functionone() > b; 
 
     c = arr[a] > b; 
 
@@ -109,10 +108,10 @@ void main(void)
 
     c = a >= b; 
 
-    c = function2() >= b; 
+    c = functiontwo() >= b; 
 
     /* type mismatch */
-    c = function1() >= b; 
+    c = functionone() >= b; 
 
     c = arr[a] >= b; 
 
@@ -121,10 +120,10 @@ void main(void)
 
     c = a < b; 
 
-    c = function2() < b; 
+    c = functiontwo() < b; 
 
     /* type mismatch */
-    c = function1() < b; 
+    c = functionone() < b; 
 
     c = arr[a] < b; 
 
@@ -133,10 +132,10 @@ void main(void)
 
     c = a <= b; 
 
-    c = function2() <= b; 
+    c = functiontwo() <= b; 
 
     /* type mismatch */
-    c = function1() <= b; 
+    c = functionone() <= b; 
 
     c = arr[a] <= b; 
 
