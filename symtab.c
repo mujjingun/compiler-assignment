@@ -77,12 +77,12 @@ SymbolTableState state;
  */
 void st_init()
 {
-    LocalSymbolTable table       = malloc(sizeof(struct LocalSymbolTableRec));
-    table->parent                = NULL;
-    table->next                  = NULL;
-    state.currentScope           = table;
-    state.lastConstructed->next  = table;
-    state.lastConstructed        = table;
+    LocalSymbolTable table = malloc(sizeof(struct LocalSymbolTableRec));
+    table->parent          = NULL;
+    table->next            = NULL;
+    state.currentScope     = table;
+    state.lastConstructed  = table;
+    state.root             = table;
 }
 
 static BucketList accessHashTable(int key, BucketList table[], char* name)
