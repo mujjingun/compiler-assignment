@@ -97,8 +97,29 @@ idError(Node t, const char* fmt, ...)
     return result;
 }
 
+// Report type error
+#ifdef __GNUC__
+__attribute__((__format__(__printf__, 2, 3)))
+#endif
+static int
+typeError(Node t, const char* fmt, ...)
+{
+    fprintf(stderr, "Type error at line %d: ", t->lineno);
+    va_list args;
+    va_start(args, fmt);
+    int result = vfprintf(stderr, fmt, args);
+    va_end(args);
+
+    fprintf(stderr, "\n");
+
+    //Error = TRUE;
+
+    return result;
+}
+
 typedef struct SemanticCheckStateRec {
     int functionLocCounter;
+    enum TypeKind currReturnType;
 } * SemanticCheckState;
 
 static void buildSymtabImpl(Node t, SemanticCheckState state)
@@ -130,6 +151,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 Entry rec = makeEntry(t, state->functionLocCounter++);
                 st_insert(t->value.func.name, rec);
             }
+
             // enter scope
             st_enter_scope();
             break;
@@ -167,6 +189,22 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         break;
     }
 
+    switch (t->kind) {
+    case NodeStmt:
+        switch (t->stmt) {
+        case StmtFunction:
+            if ((result = st_lookup(t->value.func.name))) {
+                state->currReturnType = result->type;
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+    case NodeExpr:
+        break;
+    }
+
     // recursive traversal
     for (int i = 0; i < t->num_children; i++) {
         buildSymtabImpl(t->children[i], state);
@@ -185,78 +223,15 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
     case NodeExpr:
         break;
     }
-}
-
-/* Function buildSymtab constructs the symbol
- * table by preorder traversal of the syntax tree
- */
-void buildSymtab(Node t)
-{
-    st_init();
-
-    struct SemanticCheckStateRec state;
-    state.functionLocCounter = 0;
-
-    buildSymtabImpl(t, &state);
-}
-
-// Report type error
-#ifdef __GNUC__
-__attribute__((__format__(__printf__, 2, 3)))
-#endif
-static int
-typeError(Node t, const char* fmt, ...)
-{
-    fprintf(stderr, "Type error at line %d: ", t->lineno);
-    va_list args;
-    va_start(args, fmt);
-    int result = vfprintf(stderr, fmt, args);
-    va_end(args);
-
-    fprintf(stderr, "\n");
-
-    //Error = TRUE;
-
-    return result;
-}
-
-typedef struct TypeCheckStateRec {
-    int functionLocCounter;
-    enum TypeKind currReturnType;
-} * TypeCheckState;
-
-/* Procedure checkNode performs
- * type checking at a single tree node
- */
-static void checkNode(Node t, TypeCheckState state)
-{
-    Entry result;
-
-    switch (t->kind) {
-    case NodeStmt:
-        switch (t->stmt) {
-        case StmtFunction:
-            if ((result = st_lookup(t->value.func.name))) {
-                state->currReturnType = result->type;
-            }
-            break;
-        default:
-            break;
-        }
-        break;
-    case NodeExpr:
-        break;
-    }
-
-    // post-order traversal
-    for (int i = 0; i < t->num_children; i++) {
-        checkNode(t->children[i], state);
-    }
 
     switch (t->kind) {
     case NodeExpr:
         switch (t->expr) {
         case ExprBinOp:
+        case ExprAssign:
+            if (t->children[0]->attr.kind != SymVariable || t->children[1]->attr.kind != SymVariable) {
+                typeError(t, "Operands are not int");
+            }
             t->attr.kind = SymVariable;
             break;
         case ExprConst:
@@ -347,21 +322,15 @@ static void checkNode(Node t, TypeCheckState state)
     }
 }
 
-/* Procedure typeCheck performs type checking 
- * by a postorder syntax tree traversal
+/* Function buildSymtab constructs the symbol
+ * table by preorder traversal of the syntax tree
  */
-void typeCheck(Node syntaxTree)
+void semanticAnalysis(Node t)
 {
-    struct TypeCheckStateRec state;
+    st_init();
 
-    checkNode(syntaxTree, &state);
+    struct SemanticCheckStateRec state;
+    state.functionLocCounter = 0;
 
-    if (syntaxTree->num_children <= 0) {
-        typeError(syntaxTree, "Program is empty");
-    } else {
-        Node last = syntaxTree->children[syntaxTree->num_children - 1];
-        if (last->kind != NodeStmt || last->stmt != StmtFunction || strcmp(last->value.func.name, "main") != 0) {
-            typeError(last, "Program does not end with main()");
-        }
-    }
+    buildSymtabImpl(t, &state);
 }

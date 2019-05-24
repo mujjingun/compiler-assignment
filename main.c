@@ -55,8 +55,7 @@ int main(int argc, char* argv[])
             }
 
             // Semantic analysis
-            buildSymtab(scanner.tree);
-            typeCheck(scanner.tree);
+            semanticAnalysis(scanner.tree);
 
             // TODO: Code generation
 
