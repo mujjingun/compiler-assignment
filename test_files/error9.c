@@ -7,15 +7,14 @@ int fone(void)
 
 int ftwo(void)
 {
-    int a;
-    return f1(a); 
+    return fone(); 
 }
 
 int fthree(void)
 {
     int a;
     /* return type mismatch */
-    return f2; 
+    return ftwo; 
 }
 
 int ffour(int a[])
@@ -26,7 +25,7 @@ int ffour(int a[])
 
 int ffive(void)
 {
-    int arr[];
+    int arr[10];
     /* return type mismatch */
     return arr; 
 }
@@ -38,7 +37,7 @@ void fsix(void)
 int fseven(void)
 {
     /* return type mismatch */
-    return f6();
+    return fsix();
 }
 
 void feight(void)
