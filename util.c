@@ -66,7 +66,11 @@ const char* tokenToString(TokenType t)
     return "Unknown";
 }
 
-__attribute__((__format__(__printf__, 2, 3))) static int iprintf(int level, const char* fmt, ...)
+#ifdef __GNUC__
+__attribute__((__format__(__printf__, 2, 3)))
+#endif
+static int
+iprintf(int level, const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);

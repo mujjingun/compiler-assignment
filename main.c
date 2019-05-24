@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "analyze.h"
 #include "globals.h"
 #include "lex.yy.h"
 #include "scan.h"
@@ -52,6 +53,13 @@ int main(int argc, char* argv[])
             } else {
                 printTree(scanner.tree);
             }
+
+            // Semantic analysis
+            buildSymtab(scanner.tree);
+            typeCheck(scanner.tree);
+
+            // TODO: Code generation
+
             freeNodeCascade(scanner.tree);
         }
 

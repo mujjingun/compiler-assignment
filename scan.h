@@ -92,6 +92,10 @@ struct NodeRec {
         } var;
     } value;
 
+    union {
+        enum TypeKind type;
+    } attr;
+
     int lineno;
 
     int num_children;
