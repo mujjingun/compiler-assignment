@@ -78,6 +78,9 @@ SymbolTableState state;
 void st_init()
 {
     LocalSymbolTable table = malloc(sizeof(struct LocalSymbolTableRec));
+    for (int i = 0; i < SIZE; ++i) {
+        table->hashTable[i] = NULL;
+    }
     table->parent          = NULL;
     table->next            = NULL;
     state.currentScope     = table;
@@ -96,6 +99,9 @@ static BucketList accessHashTable(int key, BucketList table[], char* name)
 void st_enter_scope()
 {
     LocalSymbolTable table       = malloc(sizeof(struct LocalSymbolTableRec));
+    for (int i = 0; i < SIZE; ++i) {
+        table->hashTable[i] = NULL;
+    }
     table->parent                = state.currentScope;
     table->next                  = NULL;
     state.currentScope           = table;
