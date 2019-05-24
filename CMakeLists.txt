@@ -32,6 +32,8 @@ add_executable(${PROJECT_NAME}
     "main.c"
     "scan.c"
     "util.c"
+    "symtab.c"
+    "analyze.c"
     ${LEX_SOURCE}
     ${BISON_SOURCE}
 )

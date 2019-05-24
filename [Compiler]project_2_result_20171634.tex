@@ -304,7 +304,7 @@ $ ./20171634 errorfree.c
 \subsection{자체 평가}
 \texttt{bison}과 \texttt{flex}의 Reentrant mode를 사용하여 구조적으로 프로그램을 작성했고, 여러 파일을 한꺼번에 입력할 수 있다는 점에서 다른 사람과 구별된다고 생각한다. 또한 \texttt{bison}의 destructor 기능을 이용해 에러 상황에도 메모리를 적절히 해제해 메모리 누수를 방지했다. 그 결과 유지 보수가 용이하고 확장성 있는 코드를 작성할 수 있었다.
 
-또한 추가 기능으로서 \texttt{--latex} 을 프로그램 인자로 주면 \LaTeX 형식으로 트리를 만들 수 있다. 다음은 이 기능으로 그린 트리이다.
+또한 추가 기능으로서 \texttt{--latex} 을 프로그램 인자로 주면 \LaTeX 형식으로 트리를 만들 수 있다. 다음은 이 기능으로 생성한 AST이다.
 \begin{lstlisting}[frame=single]
 $ ./20171634 --latex test1.c
 \end{lstlisting}
