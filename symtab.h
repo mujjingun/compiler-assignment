@@ -12,13 +12,14 @@
 #include <stdio.h>
 
 struct ActivationRecord;
+typedef struct ActivationRecord* Record;
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char* name, struct ActivationRecord* record);
+void st_insert(char* name, Record record);
 
 /*
  * Enter 
@@ -33,7 +34,7 @@ void st_exit_scope();
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-int st_lookup(char* name);
+Record st_lookup(char* name);
 
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 
