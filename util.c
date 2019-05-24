@@ -95,8 +95,8 @@ static void printSubTree(Node node, int level)
             break;
 
         case ExprIndex:
-            iprintf(level, "Index id: %s\n", node->children[0]->value.name);
-            printSubTree(node->children[1], level + 1);
+            iprintf(level, "Index id: %s\n", node->value.name);
+            printSubTree(node->children[0], level + 1);
             break;
 
         case ExprCall:
@@ -175,11 +175,11 @@ static void printSubTree(Node node, int level)
             if (node->value.param.is_array) {
                 iprintf(level, "Parameter id : %s\tType : %s[]\n",
                     node->value.param.name,
-                    typeToString(node->value.param.type));
+                    typeToString(node->value.param.kind));
             } else {
                 iprintf(level, "Parameter id : %s\tType : %s\n",
                     node->value.param.name,
-                    typeToString(node->value.param.type));
+                    typeToString(node->value.param.kind));
             }
             break;
 
@@ -199,12 +199,12 @@ static void printSubTree(Node node, int level)
             if (node->value.var.is_array) {
                 iprintf(level, "Variable id : %s\tType : %s[%d]\n",
                     node->value.var.name,
-                    typeToString(node->value.var.type),
+                    typeToString(node->value.var.kind),
                     node->value.var.array_size);
             } else {
                 iprintf(level, "Variable id : %s\tType : %s\n",
                     node->value.var.name,
-                    typeToString(node->value.var.type));
+                    typeToString(node->value.var.kind));
             }
             break;
 
@@ -236,8 +236,8 @@ static void printSubTreeLatex(Node node, int level)
             break;
 
         case ExprIndex:
-            iprintf(level, "[{Index %s}\n", node->children[0]->value.name);
-            printSubTreeLatex(node->children[1], level + 1);
+            iprintf(level, "[{Index %s}\n", node->value.name);
+            printSubTreeLatex(node->children[0], level + 1);
             iprintf(level, "]\n");
             break;
 
@@ -325,11 +325,11 @@ static void printSubTreeLatex(Node node, int level)
             if (node->value.param.is_array) {
                 iprintf(level, "[{%s : %s[]}]\n",
                     node->value.param.name,
-                    typeToString(node->value.param.type));
+                    typeToString(node->value.param.kind));
             } else {
                 iprintf(level, "[{%s : %s}]\n",
                     node->value.param.name,
-                    typeToString(node->value.param.type));
+                    typeToString(node->value.param.kind));
             }
             break;
 
@@ -351,12 +351,12 @@ static void printSubTreeLatex(Node node, int level)
             if (node->value.var.is_array) {
                 iprintf(level, "[{Var %s : %s[%d]}]\n",
                     node->value.var.name,
-                    typeToString(node->value.var.type),
+                    typeToString(node->value.var.kind),
                     node->value.var.array_size);
             } else {
                 iprintf(level, "[{Var %s : %s}]\n",
                     node->value.var.name,
-                    typeToString(node->value.var.type));
+                    typeToString(node->value.var.kind));
             }
             break;
 
