@@ -249,6 +249,7 @@ void freeNode(Node node)
 {
     if (node->kind == NodeExpr) {
         if (node->expr == ExprId
+            || node->expr == ExprIndex
             || node->expr == ExprCall) {
             free(node->value.name);
         }
@@ -268,10 +269,10 @@ void freeNode(Node node)
     free(node);
 }
 
-void freeNodeCascade(Node node)
+void freeTree(Node node)
 {
     for (int i = 0; i < node->num_children; ++i) {
-        freeNodeCascade(node->children[i]);
+        freeTree(node->children[i]);
     }
 
     freeNode(node);

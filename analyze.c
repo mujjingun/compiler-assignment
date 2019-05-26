@@ -95,10 +95,6 @@ idError(Node t, const char* fmt, ...)
 
     fprintf(stderr, "\n");
 
-    //printSymTab(stderr);
-
-    //Error = TRUE;
-
     return result;
 }
 
@@ -117,8 +113,6 @@ typeError(Node t, const char* fmt, ...)
 
     fprintf(stderr, "\n");
 
-    //Error = TRUE;
-
     return result;
 }
 
@@ -129,6 +123,7 @@ typedef struct SemanticCheckStateRec {
     int globalLocCounter;
     int scopeLevel;
     enum TypeKind currReturnType;
+    SymTable sym;
 } * SemanticCheckState;
 
 static bool buildSymtabImpl(Node t, SemanticCheckState state)
@@ -141,7 +136,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     case NodeStmt:
         switch (t->stmt) {
         case StmtVar:
-            if ((result = st_lookup(t->value.var.name)) && result->scope == state->scopeLevel) {
+            if ((result = st_lookup(state->sym, t->value.var.name)) && result->scope == state->scopeLevel) {
                 // aready in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.var.name, result->linenos[0]);
@@ -160,11 +155,11 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                     loc = (state->localLocCounter -= size);
                 }
                 Record rec = makeRecord(t, loc, state->scopeLevel);
-                st_insert(t->value.var.name, rec);
+                st_insert(state->sym, t->value.var.name, rec);
             }
             break;
         case StmtFunction:
-            if ((result = st_lookup(t->value.func.name))) {
+            if ((result = st_lookup(state->sym, t->value.func.name))) {
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.func.name, result->linenos[0]);
@@ -172,13 +167,13 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             } else {
                 // not yet in table
                 Record rec = makeRecord(t, state->functionLocCounter, state->scopeLevel);
-                st_insert(t->value.func.name, rec);
+                st_insert(state->sym, t->value.func.name, rec);
 
                 state->functionLocCounter++;
             }
 
             // enter scope
-            st_enter_scope();
+            st_enter_scope(state->sym);
             state->scopeLevel++;
 
             // initialize loc counters
@@ -186,7 +181,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             state->paramLocCounter = t->children[0]->num_children * 4;
             break;
         case StmtParam:
-            if ((result = st_lookup(t->value.param.name))) {
+            if ((result = st_lookup(state->sym, t->value.param.name))) {
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.param.name, result->linenos[0]);
@@ -194,7 +189,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             } else {
                 // loc is set in reverse
                 Record rec = makeRecord(t, state->paramLocCounter, state->scopeLevel);
-                st_insert(t->value.param.name, rec);
+                st_insert(state->sym, t->value.param.name, rec);
 
                 state->paramLocCounter -= 4;
             }
@@ -202,7 +197,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
         case StmtCompoundStmt:
             // enter scope
             if (!t->value.is_function_body) {
-                st_enter_scope();
+                st_enter_scope(state->sym);
                 state->scopeLevel++;
             }
             break;
@@ -214,7 +209,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
         switch (t->expr) {
         case ExprId:
         case ExprCall:
-            if ((result = st_lookup(t->value.name))) {
+            if ((result = st_lookup(state->sym, t->value.name))) {
                 // already in table, so ignore location,
                 // add line number of use only
                 RecordAddLineno(result, t->lineno);
@@ -234,7 +229,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     case NodeStmt:
         switch (t->stmt) {
         case StmtFunction:
-            if ((result = st_lookup(t->value.func.name))) {
+            if ((result = st_lookup(state->sym, t->value.func.name))) {
                 state->currReturnType = result->type;
             }
             break;
@@ -255,13 +250,13 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     case NodeStmt:
         switch (t->stmt) {
         case StmtFunction:
-            st_exit_scope();
+            st_exit_scope(state->sym);
             state->scopeLevel--;
             break;
         case StmtCompoundStmt:
             // exit scope
             if (!t->value.is_function_body) {
-                st_exit_scope();
+                st_exit_scope(state->sym);
                 state->scopeLevel--;
             }
             break;
@@ -288,7 +283,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             t->attr.kind = SymVariable;
             break;
         case ExprId:
-            if ((result = st_lookup(t->value.name))) {
+            if ((result = st_lookup(state->sym, t->value.name))) {
                 t->attr.kind = result->kind;
             } else {
                 t->attr.kind = SymUnknown;
@@ -299,7 +294,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                 typeError(t, "Array subscript is not int");
                 error = true;
             }
-            if ((result = st_lookup(t->value.name))) {
+            if ((result = st_lookup(state->sym, t->value.name))) {
                 if (result->kind != SymArray) {
                     typeError(t, "'%s' is not an array", t->value.name);
                     error = true;
@@ -308,7 +303,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             t->attr.kind = SymVariable;
             break;
         case ExprCall:
-            if ((result = st_lookup(t->value.name))) {
+            if ((result = st_lookup(state->sym, t->value.name))) {
                 if (result->kind != SymFunction) {
                     typeError(t, "'%s' is not a function", t->value.name);
                     error = true;
@@ -426,16 +421,17 @@ static void freeRecord(Record rec)
 /* Function buildSymtab constructs the symbol
  * table by preorder traversal of the syntax tree
  */
-bool semanticAnalysis(Node t)
+SymTable semanticAnalysis(Node t, bool* error)
 {
-    st_init(freeRecord);
-
     struct SemanticCheckStateRec state;
     state.functionLocCounter = 0;
     state.globalLocCounter = 0;
     state.scopeLevel = 0;
+    state.sym = st_init(freeRecord);
 
-    return buildSymtabImpl(t, &state);
+    *error = buildSymtabImpl(t, &state);
+
+    return state.sym;
 }
 
 static void printActivationRecord(const char* name, Record rec)
@@ -443,9 +439,9 @@ static void printActivationRecord(const char* name, Record rec)
     printf("%s\t%d\t%d\n", name, rec->loc, rec->scope);
 }
 
-void printFormattedSymtab()
+void printFormattedSymtab(SymTable tab)
 {
     puts("Name\tLoc\tScope");
     puts("-------------------------");
-    printSymTab(printActivationRecord);
+    printSymTab(tab, printActivationRecord);
 }

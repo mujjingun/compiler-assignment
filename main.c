@@ -69,18 +69,19 @@ int main(int argc, char* argv[])
             }
 
             // Semantic analysis
-            bool error = semanticAnalysis(scanner.tree);
+            bool error;
+            SymTable symtab = semanticAnalysis(scanner.tree, &error);
 
             // Print symbol table
             if (!error && printSymtab) {
-                printFormattedSymtab();
+                printFormattedSymtab(symtab);
             }
 
-            st_free();
+            st_free(symtab);
 
             // TODO: Code generation
 
-            freeNodeCascade(scanner.tree);
+            freeTree(scanner.tree);
         }
 
         yylex_destroy(scanner.flex);

@@ -53,57 +53,61 @@ typedef struct LocalSymbolTableRec {
 } * LocalSymbolTable;
 
 
-typedef struct SymTableStateRec
+struct SymTableStateRec
 {
     LocalSymbolTable root;            // global root of symbol table
     LocalSymbolTable lastConstructed; // local symbol table previously constructed
     LocalSymbolTable currentScope;    // current local scope symbol table
     void (*freeRecord)(Record);       // destructor for the record
 
-} SymbolTableState;
-
-static SymbolTableState state;
+};
 
 /* 
  * initialize symbol table
  */
-void st_init(void (*freeRecord)(Record))
+SymTable st_init(void (*freeRecord)(Record))
 {
+    SymTable state = malloc(sizeof(struct SymTableStateRec));
+
     LocalSymbolTable table = malloc(sizeof(struct LocalSymbolTableRec));
     for (int i = 0; i < SIZE; ++i) {
         table->hashTable[i] = NULL;
     }
     table->parent          = NULL;
     table->next            = NULL;
-    state.currentScope     = table;
-    state.lastConstructed  = table;
-    state.root             = table;
-    state.freeRecord       = freeRecord;
+    state->currentScope     = table;
+    state->lastConstructed  = table;
+    state->root             = table;
+    state->freeRecord       = freeRecord;
+
+    return state;
 }
 
-static void freeHashTable(BucketList table[])
+static void freeHashTable(SymTable state, BucketList table[])
 {
     for (int i = 0; i < SIZE; ++i) {
         BucketList p = table[i];
         while (p != NULL) {
             BucketList t = p->next;
-            state.freeRecord(p->record);
+            state->freeRecord(p->record);
             free(p);
             p = t;
         }
     }
 }
 
-void st_free()
+void st_free(SymTable state)
 {
-    LocalSymbolTable localTable = state.root;
+    LocalSymbolTable localTable = state->root;
     while(localTable)
     {
         LocalSymbolTable t = localTable->next;
-        freeHashTable(localTable->hashTable);
+        freeHashTable(state, localTable->hashTable);
         free(localTable);
         localTable = t;
     }
+
+    free(state);
 }
 
 static BucketList accessHashTable(int key, BucketList table[], const char* name)
@@ -114,22 +118,22 @@ static BucketList accessHashTable(int key, BucketList table[], const char* name)
     return l;
 }
 
-void st_enter_scope()
+void st_enter_scope(SymTable state)
 {
     LocalSymbolTable table       = malloc(sizeof(struct LocalSymbolTableRec));
     for (int i = 0; i < SIZE; ++i) {
         table->hashTable[i] = NULL;
     }
-    table->parent                = state.currentScope;
+    table->parent                = state->currentScope;
     table->next                  = NULL;
-    state.currentScope           = table;
-    state.lastConstructed->next  = table;
-    state.lastConstructed        = table;
+    state->currentScope           = table;
+    state->lastConstructed->next  = table;
+    state->lastConstructed        = table;
 }
 
-void st_exit_scope()
+void st_exit_scope(SymTable state)
 {
-    state.currentScope = state.currentScope->parent;
+    state->currentScope = state->currentScope->parent;
 }
 
 /* Procedure st_insert inserts line numbers and
@@ -137,24 +141,23 @@ void st_exit_scope()
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char* name, Record record)
+void st_insert(SymTable state, char* name, Record record)
 {
     int key                   = hash(name);
-    LocalSymbolTable symTable = state.currentScope;
-    BucketList bucket;
-    bucket                    = malloc(sizeof(struct BucketListRec));
+    LocalSymbolTable symTable = state->currentScope;
+    BucketList bucket         = malloc(sizeof(struct BucketListRec));
     bucket->name              = name;
-    bucket->next              = NULL;
     bucket->record            = record;
+    bucket->next              = symTable->hashTable[key];
     symTable->hashTable[key]  = bucket;
 } /* st_insert */
 
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-Record st_lookup(char* name)
+Record st_lookup(SymTable state, char* name)
 {
-    LocalSymbolTable table = state.currentScope;
+    LocalSymbolTable table = state->currentScope;
     int key                = hash(name);
     BucketList bucket      = NULL;
     while(table && !bucket)
@@ -183,9 +186,9 @@ static void printHashTable(BucketList table[], void (*print)(const char*, Record
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(void (*print)(const char*, Record))
+void printSymTab(SymTable state, void (*print)(const char*, Record))
 {
-    LocalSymbolTable localTable = state.root;
+    LocalSymbolTable localTable = state->root;
     while(localTable)
     {
         printHashTable(localTable->hashTable, print);

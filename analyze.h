@@ -2,13 +2,14 @@
 #define ANALYZE_H
 
 #include "scan.h"
+#include "symtab.h"
 #include <stdbool.h>
 
 /* Function buildSymtab constructs the symbol 
  * table by preorder traversal of the syntax tree
  */
-bool semanticAnalysis(Node tree);
+SymTable semanticAnalysis(Node tree, bool* error);
 
-void printFormattedSymtab();
+void printFormattedSymtab(SymTable tab);
 
 #endif

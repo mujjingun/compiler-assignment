@@ -11,45 +11,45 @@
 
 #include <stdio.h>
 
-struct ActivationRecord;
 typedef struct ActivationRecord* Record;
+typedef struct SymTableStateRec* SymTable;
 
 /* 
  * initialize symbol table
  */
-void st_init(void (*freeRecord)(Record));
+SymTable st_init(void (*freeRecord)(Record));
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(char* name, Record record);
+void st_insert(SymTable state, char* name, Record record);
 
 /*
  * Create a new child scope
  */ 
-void st_enter_scope();
+void st_enter_scope(SymTable state);
 
 /*
  * Go back to the previous scope
  */ 
-void st_exit_scope();
+void st_exit_scope(SymTable state);
 
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-Record st_lookup(char* name);
+Record st_lookup(SymTable state, char* name);
 
 /*
  * destroy symbol table
  */
-void st_free();
+void st_free(SymTable state);
 
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(void (*print)(const char*, Record));
+void printSymTab(SymTable state, void (*print)(const char*, Record));
 
 #endif
