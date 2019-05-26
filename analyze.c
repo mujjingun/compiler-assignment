@@ -7,16 +7,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+enum VPFType {
+    VPFVariable,
+    VPFParam,
+    VPFFunction,
+};
+
 struct ActivationRecord {
     int loc, scope;
     enum SymbolType kind;
     enum TypeKind type;
+    enum VPFType vpf;
 
     union {
         struct {
             int num_params;
             enum SymbolType* param_types;
         } func;
+        int arr_size;
     };
 
     // list of referenced line numbers
@@ -34,15 +42,18 @@ static Record makeRecord(Node node, int loc, int scope)
         && (node->stmt == StmtVar || node->stmt == StmtFunction || node->stmt == StmtParam));
 
     if (node->stmt == StmtVar) {
+        rec->vpf = VPFVariable;
         if (node->value.var.kind == TypeVoid) {
             rec->kind = SymUnknown;
         } else if (node->value.var.is_array) {
             rec->kind = SymArray;
+            rec->arr_size = node->value.var.array_size;
         } else {
             rec->kind = SymVariable;
         }
         rec->type = node->value.var.kind;
     } else if (node->stmt == StmtFunction) {
+        rec->vpf = VPFFunction;
         rec->kind = SymFunction;
         rec->type = node->value.func.return_type;
 
@@ -58,6 +69,7 @@ static Record makeRecord(Node node, int loc, int scope)
             }
         }
     } else if (node->stmt == StmtParam) {
+        rec->vpf = VPFParam;
         if (node->value.param.kind == TypeVoid) {
             rec->kind = SymUnknown;
         } else if (node->value.param.is_array) {
@@ -438,7 +450,38 @@ SymTable semanticAnalysis(Node t, bool* error)
 
 static void printActivationRecord(const char* name, Record rec)
 {
-    printf("%s\t%d\t%d\t", name, rec->loc, rec->scope);
+    printf("%s\t%d\t%d\t", name, rec->scope, rec->loc);
+
+    switch (rec->vpf) {
+    case VPFVariable:
+        printf("Var\t");
+        break;
+    case VPFParam:
+        printf("Param\t");
+        break;
+    case VPFFunction:
+        printf("Func\t");
+        break;
+    }
+
+    if (rec->kind == SymArray) {
+        printf("Yes\t");
+    } else {
+        printf("No\t");
+    }
+
+    if (rec->vpf == VPFVariable && rec->kind == SymArray) {
+        printf("%d\t", rec->arr_size);
+    } else {
+        printf("-\t");
+    }
+
+    if (rec->kind == SymArray) {
+        printf("array\t");
+    } else {
+        printf("%s\t", typeToString(rec->type));
+    }
+
     for (int i = 0; i < rec->num_linenos; ++i) {
         if (i > 0) {
             printf(", ");
@@ -450,7 +493,7 @@ static void printActivationRecord(const char* name, Record rec)
 
 void printFormattedSymtab(SymTable tab)
 {
-    puts("Name\tLoc\tScope\tLine numbers");
-    puts("------------------------------");
+    puts("Name\tScope\tLoc\tV/P/F\tArray?\tArrSize\tType\tLine numbers");
+    puts("--------------------------------------------------------------------");
     printSymTab(tab, printActivationRecord);
 }
