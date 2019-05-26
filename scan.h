@@ -97,6 +97,7 @@ struct NodeRec {
             bool is_array;
             int array_size;
         } var;
+        bool is_function_body;
     } value;
 
     union {

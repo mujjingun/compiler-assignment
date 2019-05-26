@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct ActivationRecord {
-    int loc;
+struct ActivationRecord {
+    int loc, scope;
     enum SymbolType kind;
     enum TypeKind type;
 
@@ -22,62 +22,63 @@ typedef struct ActivationRecord {
     // list of referenced line numbers
     int num_linenos;
     int* linenos;
-} * Entry;
+};
 
-static Entry makeEntry(Node node, int loc)
+static Record makeRecord(Node node, int loc, int scope)
 {
-    Entry entry = malloc(sizeof(struct ActivationRecord));
-    entry->loc = loc;
+    Record rec = malloc(sizeof(struct ActivationRecord));
+    rec->loc = loc;
+    rec->scope = scope;
 
     assert(node->kind == NodeStmt
         && (node->stmt == StmtVar || node->stmt == StmtFunction || node->stmt == StmtParam));
 
     if (node->stmt == StmtVar) {
         if (node->value.var.kind == TypeVoid) {
-            entry->kind = SymUnknown;
+            rec->kind = SymUnknown;
         } else if (node->value.var.is_array) {
-            entry->kind = SymArray;
+            rec->kind = SymArray;
         } else {
-            entry->kind = SymVariable;
+            rec->kind = SymVariable;
         }
-        entry->type = node->value.var.kind;
+        rec->type = node->value.var.kind;
     } else if (node->stmt == StmtFunction) {
-        entry->kind = SymFunction;
-        entry->type = node->value.func.return_type;
+        rec->kind = SymFunction;
+        rec->type = node->value.func.return_type;
 
         Node params = node->children[0];
-        entry->func.num_params = params->num_children;
-        entry->func.param_types = malloc(sizeof(enum SymbolType) * entry->func.num_params);
-        for (int i = 0; i < entry->func.num_params; ++i) {
+        rec->func.num_params = params->num_children;
+        rec->func.param_types = malloc(sizeof(enum SymbolType) * rec->func.num_params);
+        for (int i = 0; i < rec->func.num_params; ++i) {
             Node param = params->children[i];
             if (param->value.param.is_array) {
-                entry->func.param_types[i] = SymArray;
+                rec->func.param_types[i] = SymArray;
             } else {
-                entry->func.param_types[i] = SymVariable;
+                rec->func.param_types[i] = SymVariable;
             }
         }
     } else if (node->stmt == StmtParam) {
         if (node->value.param.kind == TypeVoid) {
-            entry->kind = SymUnknown;
+            rec->kind = SymUnknown;
         } else if (node->value.param.is_array) {
-            entry->kind = SymArray;
+            rec->kind = SymArray;
         } else {
-            entry->kind = SymVariable;
+            rec->kind = SymVariable;
         }
-        entry->type = node->value.param.kind;
+        rec->type = node->value.param.kind;
     }
 
-    entry->num_linenos = 1;
-    entry->linenos = malloc(sizeof(int) * 1);
-    entry->linenos[0] = node->lineno;
-    return entry;
+    rec->num_linenos = 1;
+    rec->linenos = malloc(sizeof(int) * 1);
+    rec->linenos[0] = node->lineno;
+    return rec;
 }
 
-static void entryAddLineno(Entry entry, int lineno)
+static void RecordAddLineno(Record Record, int lineno)
 {
-    entry->num_linenos++;
-    entry->linenos = realloc(entry->linenos, sizeof(int) * entry->num_linenos);
-    entry->linenos[entry->num_linenos - 1] = lineno;
+    Record->num_linenos++;
+    Record->linenos = realloc(Record->linenos, sizeof(int) * Record->num_linenos);
+    Record->linenos[Record->num_linenos - 1] = lineno;
 }
 
 #ifdef __GNUC__
@@ -123,25 +124,39 @@ typeError(Node t, const char* fmt, ...)
 
 typedef struct SemanticCheckStateRec {
     int functionLocCounter;
+    int paramLocCounter;
+    int localLocCounter;
+    int globalLocCounter;
+    int scopeLevel;
     enum TypeKind currReturnType;
 } * SemanticCheckState;
 
 static void buildSymtabImpl(Node t, SemanticCheckState state)
 {
-    Entry result;
+    Record result;
 
     switch (t->kind) {
     case NodeStmt:
         switch (t->stmt) {
         case StmtVar:
-            if ((result = st_lookup(t->value.var.name))) {
+            if ((result = st_lookup(t->value.var.name)) && result->scope == state->scopeLevel) {
                 // aready in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.var.name, result->linenos[0]);
             } else {
                 // not yet in table
-                // TODO: set loc to appropriate value
-                Entry rec = makeEntry(t, 0);
+                int loc, size;
+                if (t->value.var.is_array) {
+                    size = t->value.var.array_size * 4;
+                } else {
+                    size = 4;
+                }
+                if (state->scopeLevel == 0) {
+                    loc = (state->globalLocCounter += size);
+                } else {
+                    loc = (state->localLocCounter -= size);
+                }
+                Record rec = makeRecord(t, loc, state->scopeLevel);
                 st_insert(t->value.var.name, rec);
             }
             break;
@@ -152,12 +167,19 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                     t->value.func.name, result->linenos[0]);
             } else {
                 // not yet in table
-                Entry rec = makeEntry(t, state->functionLocCounter++);
+                Record rec = makeRecord(t, state->functionLocCounter, state->scopeLevel);
                 st_insert(t->value.func.name, rec);
+
+                state->functionLocCounter++;
             }
 
             // enter scope
             st_enter_scope();
+            state->scopeLevel++;
+
+            // initialize loc counters
+            state->localLocCounter = -4;
+            state->paramLocCounter = t->children[0]->num_children * 4;
             break;
         case StmtParam:
             if ((result = st_lookup(t->value.param.name))) {
@@ -165,9 +187,18 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.param.name, result->linenos[0]);
             } else {
-                // TODO: set loc to appropriate value
-                Entry rec = makeEntry(t, 0);
+                // loc is set in reverse
+                Record rec = makeRecord(t, state->paramLocCounter, state->scopeLevel);
                 st_insert(t->value.param.name, rec);
+
+                state->paramLocCounter -= 4;
+            }
+            break;
+        case StmtCompoundStmt:
+            // enter scope
+            if (!t->value.is_function_body) {
+                st_enter_scope();
+                state->scopeLevel++;
             }
             break;
         default:
@@ -181,7 +212,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             if ((result = st_lookup(t->value.name))) {
                 // already in table, so ignore location,
                 // add line number of use only
-                entryAddLineno(result, t->lineno);
+                RecordAddLineno(result, t->lineno);
             } else {
                 // Usage of an undeclared identifier
                 idError(t, "Unknown identifier '%s'", t->value.name);
@@ -219,6 +250,14 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         switch (t->stmt) {
         case StmtFunction:
             st_exit_scope();
+            state->scopeLevel--;
+            break;
+        case StmtCompoundStmt:
+            // exit scope
+            if (!t->value.is_function_body) {
+                st_exit_scope();
+                state->scopeLevel--;
+            }
             break;
         default:
             break;
@@ -324,7 +363,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             }
             break;
         case StmtReturn:
-            if (t->attr.kind != SymVariable) {
+            if (t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Return value must be int");
             }
 
@@ -351,6 +390,11 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
     }
 }
 
+static void printActivationRecord(const char* name, Record rec)
+{
+    printf("%s\t%d\t%d\n", name, rec->loc, rec->scope);
+}
+
 /* Function buildSymtab constructs the symbol
  * table by preorder traversal of the syntax tree
  */
@@ -360,6 +404,12 @@ void semanticAnalysis(Node t)
 
     struct SemanticCheckStateRec state;
     state.functionLocCounter = 0;
+    state.globalLocCounter = 0;
+    state.scopeLevel = 0;
 
     buildSymtabImpl(t, &state);
+
+    puts("Name\tLoc\tScope");
+    puts("-------------------------");
+    printSymTab(printActivationRecord);
 }

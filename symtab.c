@@ -150,21 +150,12 @@ Record st_lookup(char* name)
         return bucket->record;
 }
 
-static void printHashTable(BucketList table[], FILE* listing)
+static void printHashTable(BucketList table[], void (*print)(const char*, Record))
 {
     for (int i = 0; i < SIZE; ++i) {
         if (table[i] != NULL) {
             BucketList l = table[i];
-            fprintf(listing, "%-14s ", l->name);
-            /* LineList t = l->lines; */
-            /* fprintf(listing, "%-14s ", l->name); */
-            /* fprintf(listing, "%-8d  ", l->memloc); */
-            /* while (t != NULL) { */
-            /*     fprintf(listing, "%4d ", t->lineno); */
-            /*     t = t->next; */
-            /* } */
-            /* fprintf(listing, "\n"); */
-            /* l = l->next; */
+            print(l->name, l->record);
         }
     }
 }
@@ -173,15 +164,12 @@ static void printHashTable(BucketList table[], FILE* listing)
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(FILE* listing)
+void printSymTab(void (*print)(const char*, Record))
 {
-    fprintf(listing, "Variable Name  Location   Line Numbers\n");
-    fprintf(listing, "-------------  --------   ------------\n");
-    
     LocalSymbolTable localTable = state.root;
     while(localTable)
     {
-        printHashTable(localTable->hashTable, listing);
+        printHashTable(localTable->hashTable, print);
         localTable = localTable->next;
     }
 } /* printSymTab */

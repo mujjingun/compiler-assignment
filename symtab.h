@@ -45,6 +45,6 @@ Record st_lookup(char* name);
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(FILE* listing);
+void printSymTab(void (*print)(const char*, Record));
 
 #endif

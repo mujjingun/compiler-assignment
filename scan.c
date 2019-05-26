@@ -175,6 +175,7 @@ Node makeCompoundStatement(int lineno)
 {
     Node node = allocNode(lineno, NodeStmt, 0);
     node->stmt = StmtCompoundStmt;
+    node->value.is_function_body = false;
 
     return node;
 }
@@ -206,6 +207,8 @@ Node makeFunctionNode(int lineno, enum TypeKind return_type, char* id, Node para
     node->value.func.name = id;
 
     node->children[0] = params;
+
+    body->value.is_function_body = true;
     node->children[1] = body;
 
     return node;
