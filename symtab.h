@@ -24,7 +24,7 @@ SymTable st_init(void (*freeRecord)(Record));
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(SymTable state, char* name, Record record);
+void st_insert(SymTable state, const char* name, Record record);
 
 /*
  * Create a new child scope

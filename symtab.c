@@ -22,7 +22,7 @@
 #define SHIFT 4
 
 /* the hash function */
-static int hash(char* key)
+static int hash(const char* key)
 {
     int temp = 0;
     int i = 0;
@@ -40,7 +40,7 @@ static int hash(char* key)
  * it appears in the source code
  */
 typedef struct BucketListRec {
-    char* name;
+    const char* name;
     Record record;
     struct BucketListRec* next;
 } * BucketList;
@@ -141,7 +141,7 @@ void st_exit_scope(SymTable state)
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert(SymTable state, char* name, Record record)
+void st_insert(SymTable state, const char* name, Record record)
 {
     int key                   = hash(name);
     LocalSymbolTable symTable = state->currentScope;
