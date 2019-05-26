@@ -58,15 +58,16 @@ typedef struct SymTableStateRec
     LocalSymbolTable root;            // global root of symbol table
     LocalSymbolTable lastConstructed; // local symbol table previously constructed
     LocalSymbolTable currentScope;    // current local scope symbol table
+    void (*freeRecord)(Record);       // destructor for the record
 
 } SymbolTableState;
 
-SymbolTableState state;
+static SymbolTableState state;
 
 /* 
  * initialize symbol table
  */
-void st_init()
+void st_init(void (*freeRecord)(Record))
 {
     LocalSymbolTable table = malloc(sizeof(struct LocalSymbolTableRec));
     for (int i = 0; i < SIZE; ++i) {
@@ -77,6 +78,7 @@ void st_init()
     state.currentScope     = table;
     state.lastConstructed  = table;
     state.root             = table;
+    state.freeRecord       = freeRecord;
 }
 
 static void freeHashTable(BucketList table[])
@@ -85,7 +87,8 @@ static void freeHashTable(BucketList table[])
         BucketList p = table[i];
         while (p != NULL) {
             BucketList t = p->next;
-            free(t);
+            state.freeRecord(p->record);
+            free(p);
             p = t;
         }
     }
@@ -96,14 +99,14 @@ void st_free()
     LocalSymbolTable localTable = state.root;
     while(localTable)
     {
-        freeHashTable(localTable->hashTable);
         LocalSymbolTable t = localTable->next;
+        freeHashTable(localTable->hashTable);
         free(localTable);
         localTable = t;
     }
 }
 
-static BucketList accessHashTable(int key, BucketList table[], char* name)
+static BucketList accessHashTable(int key, BucketList table[], const char* name)
 {
     BucketList l = table[key];
     while ((l != NULL) && (strcmp(name, l->name) != 0))
@@ -138,8 +141,8 @@ void st_insert(char* name, Record record)
 {
     int key                   = hash(name);
     LocalSymbolTable symTable = state.currentScope;
-    BucketList bucket         = accessHashTable(key, symTable->hashTable, name);
-    bucket                    =  malloc(sizeof(struct BucketListRec));
+    BucketList bucket;
+    bucket                    = malloc(sizeof(struct BucketListRec));
     bucket->name              = name;
     bucket->next              = NULL;
     bucket->record            = record;

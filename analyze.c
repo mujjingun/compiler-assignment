@@ -413,12 +413,22 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     return error;
 }
 
+static void freeRecord(Record rec)
+{
+    if (rec->kind == SymFunction) {
+        free(rec->func.param_types);
+    }
+
+    free(rec->linenos);
+    free(rec);
+}
+
 /* Function buildSymtab constructs the symbol
  * table by preorder traversal of the syntax tree
  */
 bool semanticAnalysis(Node t)
 {
-    st_init();
+    st_init(freeRecord);
 
     struct SemanticCheckStateRec state;
     state.functionLocCounter = 0;

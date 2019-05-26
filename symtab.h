@@ -17,7 +17,7 @@ typedef struct ActivationRecord* Record;
 /* 
  * initialize symbol table
  */
-void st_init();
+void st_init(void (*freeRecord)(Record));
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
