@@ -9,7 +9,6 @@ int func(int parA[], int parB) {
     int a[10];
     int i;
     i = 0;
-
     while (parB == 0) {
         int wvar;
         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
@@ -32,7 +31,6 @@ void main(void) {
     while (tmp = 1) {
         int one;
         one = arr[1];
-
         if (one == brr[2])
             tmp = one == brr[3];
         else {

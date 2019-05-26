@@ -74,11 +74,13 @@ static Record makeRecord(Node node, int loc, int scope)
     return rec;
 }
 
-static void RecordAddLineno(Record Record, int lineno)
+static void RecordAddLineno(Record rec, int lineno)
 {
-    Record->num_linenos++;
-    Record->linenos = realloc(Record->linenos, sizeof(int) * Record->num_linenos);
-    Record->linenos[Record->num_linenos - 1] = lineno;
+    if (rec->linenos[rec->num_linenos - 1] != lineno) {
+        rec->num_linenos++;
+        rec->linenos = realloc(rec->linenos, sizeof(int) * rec->num_linenos);
+        rec->linenos[rec->num_linenos - 1] = lineno;
+    }
 }
 
 #ifdef __GNUC__
@@ -418,7 +420,7 @@ static void freeRecord(Record rec)
     free(rec);
 }
 
-/* Function buildSymtab constructs the symbol
+/* Function semanticAnalysis constructs the symbol
  * table by preorder traversal of the syntax tree
  */
 SymTable semanticAnalysis(Node t, bool* error)
@@ -436,12 +438,19 @@ SymTable semanticAnalysis(Node t, bool* error)
 
 static void printActivationRecord(const char* name, Record rec)
 {
-    printf("%s\t%d\t%d\n", name, rec->loc, rec->scope);
+    printf("%s\t%d\t%d\t", name, rec->loc, rec->scope);
+    for (int i = 0; i < rec->num_linenos; ++i) {
+        if (i > 0) {
+            printf(", ");
+        }
+        printf("%d", rec->linenos[i]);
+    }
+    puts("");
 }
 
 void printFormattedSymtab(SymTable tab)
 {
-    puts("Name\tLoc\tScope");
-    puts("-------------------------");
+    puts("Name\tLoc\tScope\tLine numbers");
+    puts("------------------------------");
     printSymTab(tab, printActivationRecord);
 }
