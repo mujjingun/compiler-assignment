@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "analyze.h"
 #include "globals.h"
@@ -14,15 +15,27 @@ void yyerror(yyscan_t scanner, char const* s)
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        printf("Usage: %s [--latex] <source> [<source2> ...]\n", argv[0]);
+        printf("Usage: %s [--ast] [--latex] <source> [<source2> ...]\n", argv[0]);
         return 0;
     }
 
-    int printLatex = 0;
+    bool printLatex = false;
+    bool printAst = false;
+    bool printSymtab = true;
+
     int i = 1;
-    if (strcmp(argv[1], "--latex") == 0) {
-        printLatex = 1;
-        i = 2;
+    for (; i < argc; ++i) {
+        if (strlen(argv[i]) > 2 && strncmp(argv[i], "--", 2) == 0) {
+            if (strcmp(argv[i], "--latex") == 0) {
+                printLatex = true;
+            }
+            else if (strcmp(argv[i], "--ast") == 0) {
+                printAst = true;
+            }
+        }
+        else {
+            break;
+        }
     }
 
     for (; i < argc; ++i) {
@@ -48,14 +61,21 @@ int main(int argc, char* argv[])
         if (parse_result != 0) {
             fprintf(stderr, "Error: Parse failed\n");
         } else {
+
+            // Print AST
             if (printLatex) {
                 printTreeLatex(scanner.tree);
-            } else {
+            } else if (printAst) {
                 printTree(scanner.tree);
             }
 
             // Semantic analysis
-            semanticAnalysis(scanner.tree);
+            bool error = semanticAnalysis(scanner.tree);
+
+            // Print symbol table
+            if (!error && printSymtab) {
+                printFormattedSymtab();
+            }
 
             // TODO: Code generation
 
@@ -65,6 +85,9 @@ int main(int argc, char* argv[])
         yylex_destroy(scanner.flex);
 
         fclose(fp);
+
+        // print newline
+        puts("");
     }
 
     return 0;

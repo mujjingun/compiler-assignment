@@ -131,9 +131,11 @@ typedef struct SemanticCheckStateRec {
     enum TypeKind currReturnType;
 } * SemanticCheckState;
 
-static void buildSymtabImpl(Node t, SemanticCheckState state)
+static bool buildSymtabImpl(Node t, SemanticCheckState state)
 {
     Record result;
+
+    bool error = false;
 
     switch (t->kind) {
     case NodeStmt:
@@ -143,6 +145,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 // aready in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.var.name, result->linenos[0]);
+                error = true;
             } else {
                 // not yet in table
                 int loc, size;
@@ -165,6 +168,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.func.name, result->linenos[0]);
+                error = true;
             } else {
                 // not yet in table
                 Record rec = makeRecord(t, state->functionLocCounter, state->scopeLevel);
@@ -186,6 +190,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.param.name, result->linenos[0]);
+                error = true;
             } else {
                 // loc is set in reverse
                 Record rec = makeRecord(t, state->paramLocCounter, state->scopeLevel);
@@ -216,6 +221,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             } else {
                 // Usage of an undeclared identifier
                 idError(t, "Unknown identifier '%s'", t->value.name);
+                error = true;
             }
             break;
         default:
@@ -242,7 +248,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
 
     // recursive traversal
     for (int i = 0; i < t->num_children; i++) {
-        buildSymtabImpl(t->children[i], state);
+        error = buildSymtabImpl(t->children[i], state) || error;
     }
 
     switch (t->kind) {
@@ -274,6 +280,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         case ExprAssign:
             if (t->children[0]->attr.kind != SymVariable || t->children[1]->attr.kind != SymVariable) {
                 typeError(t, "Operands are not int");
+                error = true;
             }
             t->attr.kind = SymVariable;
             break;
@@ -290,10 +297,12 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         case ExprIndex:
             if (t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Array subscript is not int");
+                error = true;
             }
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymArray) {
                     typeError(t, "%s is not an array", t->value.name);
+                    error = true;
                 }
             }
             t->attr.kind = SymVariable;
@@ -302,6 +311,7 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymFunction) {
                     typeError(t, "%s is not a function", t->value.name);
+                    error = true;
                 } else {
                     int min_count = t->num_children;
                     if (min_count > result->func.num_params) {
@@ -312,13 +322,15 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
                         enum SymbolType param_type = result->func.param_types[i];
                         enum SymbolType arg_type = t->children[i]->attr.kind;
                         if (param_type != arg_type) {
-                            typeError(t, "Type of parameter %d does not match type of argument", i);
+                            typeError(t, "Type of parameter #%d does not match type of argument", i);
+                            error = true;
                         }
                     }
 
                     if (t->num_children != result->func.num_params) {
                         typeError(t, "%d arguments passed to function %s with %d parameters",
                             t->num_children, t->value.name, result->func.num_params);
+                        error = true;
                     }
                 }
                 if (result->type == TypeVoid) {
@@ -340,45 +352,54 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
         case StmtWhile:
             if (t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Condition must be int");
+                error = true;
             }
             break;
         case StmtParam:
             if (t->value.param.kind == TypeVoid) {
                 idError(t, "Parameter cannot be void");
+                error = true;
             }
             break;
         case StmtFunction:
             if (strcmp(t->value.func.name, "main") == 0) {
                 if (t->value.func.return_type != TypeVoid) {
                     typeError(t, "Return type of main should always be void");
+                    error = true;
                 }
                 if (t->children[0]->num_children != 0) {
                     typeError(t, "main() should have exactly 0 parameters");
+                    error = true;
                 }
             }
             break;
         case StmtVar:
             if (t->value.var.kind == TypeVoid) {
                 typeError(t, "Variable cannot be declared with type void");
+                error = true;
             }
             break;
         case StmtReturn:
-            if (t->children[0]->attr.kind != SymVariable) {
+            if (t->num_children > 0 && t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Return value must be int");
+                error = true;
             }
 
             if (state->currReturnType == TypeVoid) {
                 typeError(t, "Return statement not allowed in a void function");
+                error = true;
             }
             break;
         case StmtDeclList:
             if (t->num_children == 0) {
                 typeError(t, "Program is empty");
+                error = true;
             } else {
                 Node last = t->children[t->num_children - 1];
                 if (last->kind != NodeStmt || last->stmt != StmtFunction
                     || strcmp(last->value.func.name, "main") != 0) {
                     typeError(t, "Program must end with main()");
+                    error = true;
                 }
             }
         default:
@@ -388,17 +409,14 @@ static void buildSymtabImpl(Node t, SemanticCheckState state)
     default:
         break;
     }
-}
 
-static void printActivationRecord(const char* name, Record rec)
-{
-    printf("%s\t%d\t%d\n", name, rec->loc, rec->scope);
+    return error;
 }
 
 /* Function buildSymtab constructs the symbol
  * table by preorder traversal of the syntax tree
  */
-void semanticAnalysis(Node t)
+bool semanticAnalysis(Node t)
 {
     st_init();
 
@@ -407,8 +425,16 @@ void semanticAnalysis(Node t)
     state.globalLocCounter = 0;
     state.scopeLevel = 0;
 
-    buildSymtabImpl(t, &state);
+    return buildSymtabImpl(t, &state);
+}
 
+static void printActivationRecord(const char* name, Record rec)
+{
+    printf("%s\t%d\t%d\n", name, rec->loc, rec->scope);
+}
+
+void printFormattedSymtab()
+{
     puts("Name\tLoc\tScope");
     puts("-------------------------");
     printSymTab(printActivationRecord);
