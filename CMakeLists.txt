@@ -38,5 +38,9 @@ add_executable(${PROJECT_NAME}
     ${BISON_SOURCE}
 )
 
+set_target_properties(compiler1 PROPERTIES
+    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} --coverage"
+    LINK_FLAGS "--coverage")
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 add_dependencies(${PROJECT_NAME} lex bison)

@@ -75,12 +75,11 @@ int main(int argc, char* argv[])
             // Print symbol table
             if (!error && printSymtab) {
                 printFormattedSymtab(symtab);
+
+                // TODO: Code generation
             }
 
             st_free(symtab);
-
-            // TODO: Code generation
-
             freeTree(scanner.tree);
         }
 

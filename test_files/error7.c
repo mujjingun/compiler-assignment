@@ -1,6 +1,16 @@
 
 int glob;
 
+/* argument name clash */
+void foo(int a, int a) {
+
+}
+
+/* void parameter */
+void bar(int a, void b) {
+
+}
+
 void function(int a, int b, int c)
 {
     int d[100];

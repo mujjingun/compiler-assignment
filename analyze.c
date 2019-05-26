@@ -400,10 +400,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             }
             break;
         case StmtDeclList:
-            if (t->num_children == 0) {
-                typeError(t, "Program is empty");
-                error = true;
-            } else {
+            if (t->num_children > 0) {
                 Node last = t->children[t->num_children - 1];
                 if (last->kind != NodeStmt || last->stmt != StmtFunction
                     || strcmp(last->value.func.name, "main") != 0) {
