@@ -1,10 +1,11 @@
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "analyze.h"
 #include "globals.h"
 #include "lex.yy.h"
 #include "scan.h"
+#include "symtab.h"
 #include "util.h"
 
 void yyerror(yyscan_t scanner, char const* s)
@@ -28,12 +29,10 @@ int main(int argc, char* argv[])
         if (strlen(argv[i]) > 2 && strncmp(argv[i], "--", 2) == 0) {
             if (strcmp(argv[i], "--latex") == 0) {
                 printLatex = true;
-            }
-            else if (strcmp(argv[i], "--ast") == 0) {
+            } else if (strcmp(argv[i], "--ast") == 0) {
                 printAst = true;
             }
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -76,6 +75,8 @@ int main(int argc, char* argv[])
             if (!error && printSymtab) {
                 printFormattedSymtab();
             }
+
+            st_free();
 
             // TODO: Code generation
 

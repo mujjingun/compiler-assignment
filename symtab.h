@@ -41,6 +41,11 @@ void st_exit_scope();
  */
 Record st_lookup(char* name);
 
+/*
+ * destroy symbol table
+ */
+void st_free();
+
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 
  * to the listing file

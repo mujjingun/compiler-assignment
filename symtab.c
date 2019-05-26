@@ -33,14 +33,6 @@ static int hash(char* key)
     return temp;
 }
 
-/* the list of line numbers of the source 
- * code in which a variable is referenced
- */
-typedef struct LineListRec {
-    int lineno;
-    struct LineListRec* next;
-} * LineList;
-
 /* The record in the bucket lists for
  * each variable, including name, 
  * assigned memory location, and
@@ -49,7 +41,6 @@ typedef struct LineListRec {
  */
 typedef struct BucketListRec {
     char* name;
-    LineList lines;
     Record record;
     struct BucketListRec* next;
 } * BucketList;
@@ -86,6 +77,30 @@ void st_init()
     state.currentScope     = table;
     state.lastConstructed  = table;
     state.root             = table;
+}
+
+static void freeHashTable(BucketList table[])
+{
+    for (int i = 0; i < SIZE; ++i) {
+        BucketList p = table[i];
+        while (p != NULL) {
+            BucketList t = p->next;
+            free(t);
+            p = t;
+        }
+    }
+}
+
+void st_free()
+{
+    LocalSymbolTable localTable = state.root;
+    while(localTable)
+    {
+        freeHashTable(localTable->hashTable);
+        LocalSymbolTable t = localTable->next;
+        free(localTable);
+        localTable = t;
+    }
 }
 
 static BucketList accessHashTable(int key, BucketList table[], char* name)
@@ -153,9 +168,10 @@ Record st_lookup(char* name)
 static void printHashTable(BucketList table[], void (*print)(const char*, Record))
 {
     for (int i = 0; i < SIZE; ++i) {
-        if (table[i] != NULL) {
-            BucketList l = table[i];
-            print(l->name, l->record);
+        BucketList p = table[i];
+        while (p != NULL) {
+            print(p->name, p->record);
+            p = p->next;
         }
     }
 }

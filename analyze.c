@@ -301,7 +301,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
             }
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymArray) {
-                    typeError(t, "%s is not an array", t->value.name);
+                    typeError(t, "'%s' is not an array", t->value.name);
                     error = true;
                 }
             }
@@ -310,7 +310,7 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
         case ExprCall:
             if ((result = st_lookup(t->value.name))) {
                 if (result->kind != SymFunction) {
-                    typeError(t, "%s is not a function", t->value.name);
+                    typeError(t, "'%s' is not a function", t->value.name);
                     error = true;
                 } else {
                     int min_count = t->num_children;
@@ -322,13 +322,13 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                         enum SymbolType param_type = result->func.param_types[i];
                         enum SymbolType arg_type = t->children[i]->attr.kind;
                         if (param_type != arg_type) {
-                            typeError(t, "Type of parameter #%d does not match type of argument", i);
+                            typeError(t, "Type of parameter #%d does not match type of argument", i + 1);
                             error = true;
                         }
                     }
 
                     if (t->num_children != result->func.num_params) {
-                        typeError(t, "%d arguments passed to function %s with %d parameters",
+                        typeError(t, "%d arguments passed to function '%s' with %d parameters",
                             t->num_children, t->value.name, result->func.num_params);
                         error = true;
                     }

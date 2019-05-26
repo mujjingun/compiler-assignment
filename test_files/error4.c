@@ -18,4 +18,10 @@ void main( void )
 
     /* argument type mismatch. Expected scalar */
     functiontwo(arrtwo);
+
+    /* argument count mismatch */
+    functionone(arrtwo, arrtwo);
+
+    /* argument count mismatch + type mismatch */
+    functionone(arrone, arrtwo);
 }
