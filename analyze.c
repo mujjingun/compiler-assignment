@@ -490,7 +490,7 @@ static void printActivationRecord(const char* name, Record rec)
 
 void printFormattedSymtab(SymTable tab)
 {
-    puts("Name\tScope\tLoc\tV/P/F\tArray?\tArrSize\tType\tLine numbers");
-    puts("--------------------------------------------------------------------");
-    printSymTab(tab, printActivationRecord);
+    const char* heading = "Name\tScope\tLoc\tV/P/F\tArray?\tArrSize\tType\tLine numbers\n"
+                          "--------------------------------------------------------------------";
+    printSymTab(tab, heading, printActivationRecord);
 }

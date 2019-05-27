@@ -50,6 +50,6 @@ void st_free(SymTable state);
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(SymTable state, void (*print)(const char*, Record));
+void printSymTab(SymTable state, const char* heading, void (*print)(const char*, Record));
 
 #endif
