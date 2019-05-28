@@ -39,7 +39,7 @@
 %type<op> mulop addop relop
 %type<type> type_specifier
 
-%destructor { freeNodeCascade($$); } <node>
+%destructor { freeTree($$); } <node>
 %destructor { free($$); } <name>
 
 %%
