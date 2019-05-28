@@ -133,6 +133,7 @@ typeError(Node t, const char* fmt, ...)
 typedef struct SemanticCheckStateRec {
     int functionLocCounter;
     int paramLocCounter;
+    int lastLocalLoc;
     int localLocCounter;
     int globalLocCounter;
     int scopeLevel;
@@ -242,6 +243,9 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     switch (t->kind) {
     case NodeStmt:
         switch (t->stmt) {
+        case StmtCompoundStmt:
+            state->lastLocalLoc = state->localLocCounter;
+            break;
         case StmtFunction:
             if ((result = st_lookup(state->sym, t->value.func.name))) {
                 state->currReturnType = result->type;
@@ -408,6 +412,9 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                     error = true;
                 }
             }
+        case StmtCompoundStmt:
+            state->localLocCounter = state->lastLocalLoc;
+            break;
         default:
             break;
         }
