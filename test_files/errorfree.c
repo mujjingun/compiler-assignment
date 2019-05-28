@@ -5,5 +5,5 @@
  }
  void main(void) {
      a = func() + 1;
-     print(a);
+     a;
  }
