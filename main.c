@@ -73,9 +73,11 @@ int main(int argc, char* argv[])
             SymTable symtab = semanticAnalysis(scanner.tree, &error);
 
             // Print symbol table
-            if (!error && printSymtab) {
+            if (printSymtab) {
                 printFormattedSymtab(symtab);
+            }
 
+            if (!error) {
                 // TODO: Code generation
             }
 
