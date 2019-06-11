@@ -80,6 +80,10 @@ static Record makeRecord(Node node, int loc, int scope)
         rec->type = node->value.param.kind;
     }
 
+    // set attributes
+    node->attr.kind = rec->kind;
+    node->attr.type = rec->type;
+
     rec->num_linenos = 1;
     rec->linenos = malloc(sizeof(int) * 1);
     rec->linenos[0] = node->lineno;
@@ -130,7 +134,7 @@ typeError(Node t, const char* fmt, ...)
     return result;
 }
 
-typedef struct SemanticCheckStateRec {
+typedef struct BuildSymtabStateRec {
     int functionLocCounter;
     int paramLocCounter;
     int lastLocalLoc;
@@ -139,9 +143,9 @@ typedef struct SemanticCheckStateRec {
     int scopeLevel;
     enum TypeKind currReturnType;
     SymTable sym;
-} * SemanticCheckState;
+} * BuildSymtabState;
 
-static bool buildSymtabImpl(Node t, SemanticCheckState state)
+static bool buildSymtabImpl(Node t, BuildSymtabState state)
 {
     Record result;
 
@@ -215,6 +219,8 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                 st_enter_scope(state->sym);
                 state->scopeLevel++;
             }
+
+            state->lastLocalLoc = state->localLocCounter;
             break;
         default:
             break;
@@ -223,39 +229,41 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
     case NodeExpr:
         switch (t->expr) {
         case ExprId:
-        case ExprCall:
+        case ExprIndex:
             if ((result = st_lookup(state->sym, t->value.name))) {
                 // already in table, so ignore location,
                 // add line number of use only
                 RecordAddLineno(result, t->lineno);
+
+                // set attributes
+                t->attr.kind = result->kind;
+                t->attr.type = result->type;
             } else {
                 // Usage of an undeclared identifier
                 idError(t, "Unknown identifier '%s'", t->value.name);
                 error = true;
             }
             break;
-        default:
-            break;
-        }
-        break;
-    }
+        case ExprCall:
+            if ((result = st_lookup(state->sym, t->value.name))) {
+                // already in table, so ignore location,
+                // add line number of use only
+                RecordAddLineno(result, t->lineno);
 
-    switch (t->kind) {
-    case NodeStmt:
-        switch (t->stmt) {
-        case StmtCompoundStmt:
-            state->lastLocalLoc = state->localLocCounter;
-            break;
-        case StmtFunction:
-            if ((result = st_lookup(state->sym, t->value.func.name))) {
-                state->currReturnType = result->type;
+                // set attributes
+                t->attr.kind = result->kind;
+                t->attr.type = result->type;
+                t->attr.func.num_params = result->func.num_params;
+                t->attr.func.param_types = result->func.param_types;
+            } else {
+                // Usage of an undeclared identifier
+                idError(t, "Unknown function identifier '%s'", t->value.name);
+                error = true;
             }
             break;
         default:
             break;
         }
-        break;
-    case NodeExpr:
         break;
     }
 
@@ -277,6 +285,8 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                 st_exit_scope(state->sym);
                 state->scopeLevel--;
             }
+
+            state->localLocCounter = state->lastLocalLoc;
             break;
         default:
             break;
@@ -284,6 +294,36 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
         break;
     case NodeExpr:
         break;
+    }
+
+    return error;
+}
+
+typedef struct TypeCheckStateRec {
+    enum TypeKind currReturnType;
+} * TypeCheckState;
+
+static bool typeCheckImpl(Node t, TypeCheckState state)
+{
+    bool error = false;
+
+    switch (t->kind) {
+    case NodeStmt:
+        switch (t->stmt) {
+        case StmtFunction:
+            state->currReturnType = t->attr.type;
+            break;
+        default:
+            break;
+        }
+        break;
+    case NodeExpr:
+        break;
+    }
+
+    // recursive traversal
+    for (int i = 0; i < t->num_children; i++) {
+        error = typeCheckImpl(t->children[i], state) || error;
     }
 
     switch (t->kind) {
@@ -300,59 +340,46 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
         case ExprConst:
             t->attr.kind = SymVariable;
             break;
-        case ExprId:
-            if ((result = st_lookup(state->sym, t->value.name))) {
-                t->attr.kind = result->kind;
-            } else {
-                t->attr.kind = SymUnknown;
-            }
-            break;
         case ExprIndex:
             if (t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Array subscript is not int");
                 error = true;
             }
-            if ((result = st_lookup(state->sym, t->value.name))) {
-                if (result->kind != SymArray) {
-                    typeError(t, "'%s' is not an array", t->value.name);
-                    error = true;
-                }
+            if (t->attr.kind != SymArray) {
+                typeError(t, "'%s' is not an array", t->value.name);
+                error = true;
             }
             t->attr.kind = SymVariable;
             break;
         case ExprCall:
-            if ((result = st_lookup(state->sym, t->value.name))) {
-                if (result->kind != SymFunction) {
-                    typeError(t, "'%s' is not a function", t->value.name);
-                    error = true;
-                } else {
-                    int min_count = t->num_children;
-                    if (min_count > result->func.num_params) {
-                        min_count = result->func.num_params;
-                    }
+            if (t->attr.kind != SymFunction) {
+                typeError(t, "'%s' is not a function", t->value.name);
+                error = true;
+            } else {
+                int min_count = t->num_children;
+                if (min_count > t->attr.func.num_params) {
+                    min_count = t->attr.func.num_params;
+                }
 
-                    for (int i = 0; i < min_count; ++i) {
-                        enum SymbolType param_type = result->func.param_types[i];
-                        enum SymbolType arg_type = t->children[i]->attr.kind;
-                        if (param_type != arg_type) {
-                            typeError(t, "Type of parameter #%d does not match type of argument", i + 1);
-                            error = true;
-                        }
-                    }
-
-                    if (t->num_children != result->func.num_params) {
-                        typeError(t, "%d arguments passed to function '%s' with %d parameters",
-                            t->num_children, t->value.name, result->func.num_params);
+                for (int i = 0; i < min_count; ++i) {
+                    enum SymbolType param_type = t->attr.func.param_types[i];
+                    enum SymbolType arg_type = t->children[i]->attr.kind;
+                    if (param_type != arg_type) {
+                        typeError(t, "Type of parameter #%d does not match type of argument", i + 1);
                         error = true;
                     }
                 }
-                if (result->type == TypeVoid) {
-                    t->attr.kind = SymUnknown;
-                } else {
-                    t->attr.kind = SymVariable;
+
+                if (t->num_children != t->attr.func.num_params) {
+                    typeError(t, "%d arguments passed to function '%s' with %d parameters",
+                        t->num_children, t->value.name, t->attr.func.num_params);
+                    error = true;
                 }
-            } else {
+            }
+            if (t->attr.type == TypeVoid) {
                 t->attr.kind = SymUnknown;
+            } else {
+                t->attr.kind = SymVariable;
             }
             break;
         default:
@@ -412,9 +439,6 @@ static bool buildSymtabImpl(Node t, SemanticCheckState state)
                     error = true;
                 }
             }
-        case StmtCompoundStmt:
-            state->localLocCounter = state->lastLocalLoc;
-            break;
         default:
             break;
         }
@@ -441,13 +465,16 @@ static void freeRecord(Record rec)
  */
 SymTable semanticAnalysis(Node t, bool* error)
 {
-    struct SemanticCheckStateRec state;
+    struct BuildSymtabStateRec state;
     state.functionLocCounter = 0;
     state.globalLocCounter = 0;
     state.scopeLevel = 0;
     state.sym = st_init(freeRecord);
 
     *error = buildSymtabImpl(t, &state);
+
+    struct TypeCheckStateRec typeCheckState;
+    typeCheckImpl(t, &typeCheckState);
 
     return state.sym;
 }

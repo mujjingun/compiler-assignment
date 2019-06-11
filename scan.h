@@ -100,10 +100,14 @@ struct NodeRec {
         bool is_function_body;
     } value;
 
-    union {
+    struct {
+        enum SymbolType kind;
+        enum TypeKind type;
+
         struct {
-            enum SymbolType kind;
-        };
+            int num_params;
+            enum SymbolType* param_types;
+        } func;
     } attr;
 
     int lineno;

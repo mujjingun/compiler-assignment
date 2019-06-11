@@ -50,6 +50,12 @@ static Node allocNode(int lineno, enum NodeKind kind, int num_children)
     } else {
         node->children = NULL;
     }
+
+    node->attr.kind = SymUnknown;
+    node->attr.type = TypeVoid;
+    node->attr.func.num_params = 0;
+    node->attr.func.param_types = NULL;
+
     return node;
 }
 

@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
 )
 
 set_target_properties(compiler1 PROPERTIES
-    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} --coverage"
+    COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra --coverage"
     LINK_FLAGS "--coverage")
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
