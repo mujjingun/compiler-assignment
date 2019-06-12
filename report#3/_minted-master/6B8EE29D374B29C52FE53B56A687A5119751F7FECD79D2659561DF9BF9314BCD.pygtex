@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYGZdl{} make
+\PYGZdl{} ./project3\PYGZus{}16 \PYGZlt{}file\PYGZgt{}
+\PYGZdl{} ./project3\PYGZus{}16
+Usage: ./project3\PYGZus{}16 \PYG{o}{[}\PYGZhy{}\PYGZhy{}ast\PYG{o}{]} \PYG{o}{[}\PYGZhy{}\PYGZhy{}latex\PYG{o}{]} \PYGZlt{}source\PYGZgt{} \PYG{o}{[}\PYGZlt{}source2\PYGZgt{} ...\PYG{o}{]}
+\end{Verbatim}

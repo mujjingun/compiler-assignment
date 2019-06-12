@@ -1,0 +1,24 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cm}{/* 심볼 테이블 초기화 */}
+\PYG{n}{SymTable} \PYG{n+nf}{st\PYGZus{}init}\PYG{p}{(}\PYG{k+kt}{void} \PYG{p}{(}\PYG{o}{*}\PYG{n}{freeRecord}\PYG{p}{)(}\PYG{n}{Record}\PYG{p}{));}
+
+\PYG{c+cm}{/* 심볼 테이블에 심볼과 심볼에 대한 정보를 추가 */}
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}insert}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{,}
+              \PYG{k}{const} \PYG{k+kt}{char}\PYG{o}{*} \PYG{n}{name}\PYG{p}{,}
+              \PYG{n}{Record} \PYG{n}{record}\PYG{p}{);}
+
+\PYG{c+cm}{/* 새로운 스코프에 들어갈 경우 Scope tree 에 노드를 추가 */}
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}enter\PYGZus{}scope}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{);}
+
+\PYG{c+cm}{/* 기존 스코프를 벗어날 경우 parent scope node 로 이동 */}
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}exit\PYGZus{}scope}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{);}
+
+\PYG{c+cm}{/* 심볼 테이블에서 심볼 정보를 검색 (없을 경우 NULL 반환) */}
+\PYG{n}{Record} \PYG{n+nf}{st\PYGZus{}lookup}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{,} \PYG{k+kt}{char}\PYG{o}{*} \PYG{n}{name}\PYG{p}{);}
+
+\PYG{c+cm}{/* 심볼 테이블의 메모리를 해제 */}
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}free}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{);}
+
+\PYG{c+cm}{/* 심볼 테이블 출력 */}
+\PYG{k+kt}{void} \PYG{n}{printSymTab}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{,} \PYG{k}{const} \PYG{k+kt}{char}\PYG{o}{*} \PYG{n}{heading}\PYG{p}{,} \PYG{k+kt}{void} \PYG{p}{(}\PYG{o}{*}\PYG{n}{print}\PYG{p}{)(}\PYG{k}{const} \PYG{k+kt}{char}\PYG{o}{*}\PYG{p}{,} \PYG{n}{Record}\PYG{p}{))}
+\end{Verbatim}
