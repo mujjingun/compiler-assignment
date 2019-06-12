@@ -1,4 +1,21 @@
-\frametitle{Section}
-\begin{center}
-    감사합니다
-  \end{center}
+\frametitle{Location Counter 구현방법}
+\begin{minted}
+	[frame=lines,
+	framesep=2mm,
+	baselinestretch=0.7]{c}
+void main(void) {
+    int a;
+    {
+        int b;
+    }
+    {
+        int c;
+    }
+}
+	\end{minted}
+	\begin{itemize}
+		\item 위와 같은 코드가 있을 때, \code{b}와 \code{c}는 같은 위치에 할당되어야 함.
+		\item 이를 처리하기 위해 \code{lastLocalLoc} 변수를 만듦.
+		\item Scope에 들어갈 때 \code{lastLocalLoc} 변수에 현재 \code{localLocCounter} 값을 대입
+		\item Scope에서 나올 때 \code{localLocCounter} 값을 \code{lastLocalLoc} 으로 복귀시킴.
+	\end{itemize}

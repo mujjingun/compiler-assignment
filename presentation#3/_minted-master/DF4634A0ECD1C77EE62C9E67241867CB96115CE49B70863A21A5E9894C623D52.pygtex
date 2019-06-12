@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{static} \PYG{k+kt}{bool} \PYG{n+nf}{buildSymtabImpl}\PYG{p}{(}\PYG{n}{Node} \PYG{n}{t}\PYG{p}{,} \PYG{n}{BuildSymtabState} \PYG{n}{state}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+    \PYG{c+c1}{// ...}
+    \PYG{k}{case} \PYG{n+nl}{StmtCompoundStmt}\PYG{p}{:}
+        \PYG{c+c1}{// enter scope}
+        \PYG{k}{if} \PYG{p}{(}\PYG{o}{!}\PYG{n}{t}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{value}\PYG{p}{.}\PYG{n}{is\PYGZus{}function\PYGZus{}body}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+            \PYG{n}{st\PYGZus{}enter\PYGZus{}scope}\PYG{p}{(}\PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{sym}\PYG{p}{);}
+            \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{scopeLevel}\PYG{o}{++}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{}}
+        \PYG{k}{break}\PYG{p}{;}
+    \PYG{c+c1}{// ...}
+    \PYG{c+c1}{// recursive traversal}
+    \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{t}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{num\PYGZus{}children}\PYG{p}{;} \PYG{n}{i}\PYG{o}{++}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n}{error} \PYG{o}{=} \PYG{n}{buildSymtabImpl}\PYG{p}{(}\PYG{n}{t}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{children}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],} \PYG{n}{state}\PYG{p}{)} \PYG{o}{||} \PYG{n}{error}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+    \PYG{c+c1}{// ...}
+    \PYG{k}{case} \PYG{n+nl}{StmtCompoundStmt}\PYG{p}{:}
+        \PYG{c+c1}{// exit scope}
+        \PYG{k}{if} \PYG{p}{(}\PYG{o}{!}\PYG{n}{t}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{value}\PYG{p}{.}\PYG{n}{is\PYGZus{}function\PYGZus{}body}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+            \PYG{n}{st\PYGZus{}exit\PYGZus{}scope}\PYG{p}{(}\PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{sym}\PYG{p}{);}
+            \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{scopeLevel}\PYG{o}{\PYGZhy{}\PYGZhy{}}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{}}
+        \PYG{k}{break}\PYG{p}{;}
+    \PYG{c+c1}{// ...}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

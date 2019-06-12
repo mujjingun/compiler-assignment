@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kt}{void} \PYG{n+nf}{function}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{a}\PYG{p}{,} \PYG{k+kt}{int} \PYG{n}{b}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{k+kt}{int} \PYG{n}{a}\PYG{p}{;} \PYG{c+c1}{// Argument shadowing!}
+    \PYG{n}{a} \PYG{o}{=} \PYG{l+m+mi}{3}\PYG{p}{;}
+    \PYG{n}{b} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}
