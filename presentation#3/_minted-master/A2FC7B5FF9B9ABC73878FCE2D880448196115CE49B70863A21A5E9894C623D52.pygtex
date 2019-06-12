@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cm}{/* The record in the bucket lists for}
+\PYG{c+cm}{* each variable, including name,}
+\PYG{c+cm}{* assigned memory location, and}
+\PYG{c+cm}{* the list of line numbers in which}
+\PYG{c+cm}{* it appears in the source code}
+\PYG{c+cm}{*/}
+\PYG{k}{typedef} \PYG{k}{struct} \PYG{n}{BucketListRec} \PYG{p}{\PYGZob{}}
+	\PYG{k}{const} \PYG{k+kt}{char}\PYG{o}{*} \PYG{n}{name}\PYG{p}{;}
+	\PYG{n}{Record} \PYG{n}{record}\PYG{p}{;}
+	\PYG{k}{struct} \PYG{n}{BucketListRec}\PYG{o}{*} \PYG{n}{next}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}} \PYG{o}{*} \PYG{n}{BucketList}\PYG{p}{;}
+
+\PYG{c+cm}{/* The local scope symbol table  */}
+\PYG{k}{typedef} \PYG{k}{struct} \PYG{n}{LocalSymbolTableRec} \PYG{p}{\PYGZob{}}
+	\PYG{n}{BucketList} \PYG{n}{hashTable}\PYG{p}{[}\PYG{n}{SIZE}\PYG{p}{];}
+	\PYG{k}{struct} \PYG{n}{LocalSymbolTableRec}\PYG{o}{*} \PYG{n}{parent}\PYG{p}{;}
+	\PYG{k}{struct} \PYG{n}{LocalSymbolTableRec}\PYG{o}{*} \PYG{n}{next}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}} \PYG{o}{*} \PYG{n}{LocalSymbolTable}\PYG{p}{;}
+\end{Verbatim}

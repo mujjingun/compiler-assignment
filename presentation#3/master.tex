@@ -11,29 +11,22 @@
 \setminted{fontsize=\footnotesize,baselinestretch=1}
 \usemintedstyle{murphy}
 
-\title[Task Parallel Computing in C++]{C++ 태스크 기반 병렬 프로그래밍}
+\def\code#1{\texttt{#1}}
+
+\title[Compiler Project Presentation]{컴파일러 프로젝트 발표}
 
 \subtitle{}
-% Sous-titre optionnel
 
-
-\author{김규래}
-% La commande \inst{...} Permet d'afficher l' affiliation de l'intervenant.
-% Si il y a plusieurs intervenants: Marcel Dupont\inst{1}, Roger Durand\inst{2}
-% Il suffit alors d'ajouter un autre institut sur le modèle ci-dessous.
+\author{김규래, 박건}
 
 \institute[Sogang University]
 {
-  서강대학교 전자공학과\\
+  서강대학교\\
 }
 
 
-\date{April 6 2019}
-\subject{Task Parallel Computing}
-
-\logo{
-  \includegraphics[scale=0.15]{images/cpp_logo.jpeg}
-}
+\date{June 13 2019}
+\subject{Design and Development of Compiler for C- Language}
 
 \fontsize{11pt}{7.2}
 
@@ -49,26 +42,113 @@
   % You might wish to add the option [pausesections]
 \end{frame}
 
-\section{성능 최적화의 기본 원칙들}
-\begin{frame}{무조건 측정, 또 측정한다!}
-  \begin{figure}
-    \includegraphics[scale=0.26]{images/chandler.png}
-  \end{figure}
-  \begin{center}
-    \textit{``성능을 실제로 벤치마킹 해보기 전까지는 절대 성능을 논하지 말아야 한다.''} \\
-    Chandler Carruth, CppCon 2015
-  \end{center}
+\section{프로젝트 3 결과}
+\subsection{Symbol Table 구현방법}
+\begin{frame}{Symbol Table 구현방법}
+	\begin{figure}
+		\includegraphics[scale=0.3]{images/symtab.png}
+	\end{figure}
 \end{frame}
 
-\begin{frame}{알고리즘적인 최적화가 최우선}
-  \begin{figure}
-    \includegraphics[scale=0.35]{images/complexity.jpg}
-  \end{figure}
-  복잡도의 벽은 많은 경우 넘어서기가 힘듭니다.
-  \footnote{Devopedia. 2018. "Algorithmic complexity." Version 6, December 7. Accessed 2019-03-23. https://devopedia.org/algorithmic-complexity}
+\begin{frame}{Symbol Table 구현방법}
+	\begin{block}{Linked List of Hash Tables}
+		\begin{itemize}
+			\item Linked List의 각 노드가 해당 Scope의 Hash Table
+			\item Scope에 들어갈 때 \code{st\_enter\_scope()} 함수로 Linked List에 노드 추가
+			\item Scope가 종료될 때 \code{st\_exit\_scope()} 함수로 Linked List에서 노드 제거
+			\item Semantic Analysis가 끝난 후 Symbol Table의 내용을 각 Scope별로 출력해야 하기 때문에 완전히 제거하지 않고, 따로 저장해 놓음. (\code{next} 필드)
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}{라이브러리, 프레임워크 교체를 먼저}
+\begin{frame}[fragile]{Symbol Table 주요 코드}
+	\begin{minted}
+	[frame=lines,
+	framesep=2mm,
+	baselinestretch=0.7]{c}
+/* The record in the bucket lists for
+* each variable, including name, 
+* assigned memory location, and
+* the list of line numbers in which
+* it appears in the source code
+*/
+typedef struct BucketListRec {
+	const char* name;
+	Record record;
+	struct BucketListRec* next;
+} * BucketList;
+
+/* The local scope symbol table  */
+typedef struct LocalSymbolTableRec {
+	BucketList hashTable[SIZE];
+	struct LocalSymbolTableRec* parent;
+	struct LocalSymbolTableRec* next;
+} * LocalSymbolTable;
+	\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Symbol Table 주요 코드}
+	\begin{minted}
+	[frame=lines,
+	framesep=2mm,
+	baselinestretch=0.7]{c}
+void st_enter_scope(SymTable state)
+{
+    LocalSymbolTable table 
+         = malloc(sizeof(struct LocalSymbolTableRec));
+    for (int i = 0; i < SIZE; ++i) {
+        table->hashTable[i] = NULL;
+    }
+    table->parent                 = state->currentScope;
+    table->next                   = NULL;
+    state->currentScope           = table;
+    state->lastConstructed->next  = table;
+    state->lastConstructed        = table;
+}
+
+void st_exit_scope(SymTable state)
+{
+    state->currentScope = state->currentScope->parent;
+}
+	\end{minted}
+\end{frame}
+
+\subsection{Semantic Analysis 구현방법}
+\begin{frame}{Semantic Analysis 구현방법}
+	\begin{itemize}
+		\item 처음에는 복잡성을 줄이기 위해 Single Pass로 구현
+		\item 그러나 나중에 수업시간에 배웠던 대로 Two Pass로 구현을 바꿈.
+		\item 바꾸었더니 실행시간이 줄어듦.
+	\end{itemize}
+	
+	\begin{figure}
+		\includegraphics[scale=0.25]{figure/performance.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Location Counter 구현방법}
+	\begin{minted}
+	[frame=lines,
+	framesep=2mm,
+	baselinestretch=0.7]{c}
+void main(void) {
+    int a;
+    {
+        int b;
+    }
+    {
+        int c;
+    }
+}
+	\end{minted}
+	\begin{itemize}
+		\item 위와 같은 코드가 있을 때, \code{b}와 \code{c}는 같은 위치에 할당되어야 함.
+		\item 
+	\end{itemize}
+\end{frame}
+
+\subsection{테스트 방법}
+\begin{frame}{테스트}
   \begin{tcolorbox}[tabvert,tabularx={X|Y}, boxrule=0.3pt]
     Version                      & Speedup \\\hline\hline
     Python                       & 1       \\
@@ -80,7 +160,8 @@
   프레임워크/시스템/언어에 따른 성능의 장벽은 생각보다 높습니다.\footnote{Leiserson et al., \textit{There's Plenty of Room at The Top}, Under Review}
 \end{frame}
 
-\begin{frame}{성능 최적화의 두가지 관점}
+\subsection{결과\textsl{}}
+\begin{frame}{}
   \begin{block}{Latency 최소화}
     \begin{itemize}
     \item 각 연산을 수행하는데 걸리는 시간을 최소화
@@ -97,7 +178,7 @@
   \end{exampleblock}
 \end{frame}
 
-\section{병렬 컴퓨팅 개요}
+\section{프로젝트 4 계획}
 \begin{frame}{병렬화를 통한 Throughput 최대화}
   \begin{align*}
     \text{Throughput} = \text{sockets} \times
@@ -114,683 +195,6 @@
     \item GPU, Xeon Phi 같은 병렬화에 특화된 하드웨어 사용
     \end{itemize}
   \end{block}
-\end{frame}
-
-\begin{frame}{병렬화를 통한 Throughput 최대화}
-  \begin{align*}
-    \text{Throughput} = \text{sockets} \times
-    \frac{\text{cores}}{\text{socket}} \times
-    \frac{\text{cycles}}{\text{second}} \times
-    \frac{\text{\textcolor{red}{operations}}}{\text{\textcolor{red}{cycle}}}
-  \end{align*}
-  \begin{block}{병렬화를 하는 다양한 수단들}
-    \begin{itemize}
-    \item \textcolor{red}{CPU 에서 제공하는 SIMD instruction 을 사용}
-    \item Multithreading (Shared-memory parallelism)
-    \item Distributed Computing (Distributed-memory parallelism)
-    \item GPU, Xeon Phi 같은 병렬화에 특화된 하드웨어 사용
-    \end{itemize}
-  \end{block}
-\end{frame}
-
-\begin{frame}{병렬화를 통한 Throughput 최대화}
-  \begin{align*}
-    \text{Throughput} = \text{sockets} \times
-    \frac{\text{\textcolor{red}{cores}}}{\text{\textcolor{red}{socket}}} \times
-    \frac{\text{cycles}}{\text{second}} \times
-    \frac{\text{operations}}{\text{cycle}}
-  \end{align*}
-  \begin{block}{병렬화를 하는 다양한 수단들}
-    \begin{itemize}
-    \item CPU 에서 제공하는 SIMD instruction 을 사용
-    \item \textcolor{red}{Multithreading (Shared-memory parallelism)}
-    \item Distributed Computing (Distributed-memory parallelism)
-    \item GPU, Xeon Phi 같은 병렬화에 특화된 하드웨어 사용
-    \end{itemize}
-  \end{block}
-\end{frame}
-
-\begin{frame}{병렬화를 통한 Throughput 최대화}
-  \begin{align*}
-    \text{Throughput} = \text{\textcolor{red}{sockets}} \times
-    \frac{\text{cores}}{\text{socket}} \times
-    \frac{\text{cycles}}{\text{second}} \times
-    \frac{\text{operations}}{\text{cycle}}
-  \end{align*}
-  \begin{block}{병렬화를 하는 다양한 수단들}
-    \begin{itemize}
-    \item CPU 에서 제공하는 SIMD instruction 을 사용
-    \item Multithreading (Shared-memory parallelism)
-    \item \textcolor{red}{Distributed Computing (Distributed-memory parallelism)}
-    \item GPU, Xeon Phi 같은 병렬화에 특화된 하드웨어 사용
-    \end{itemize}
-  \end{block}
-\end{frame}
-
-\begin{frame}{병렬의 근본적 한계}
-  \begin{itemize}
-    \item 병렬화를 통해서 얻어낼 수 있는 성능은 매우 제한적입니다.
-    \item \textbf{병렬화는 최후의 수단입니다.}
-  \end{itemize}
-  \begin{figure}
-    \includegraphics[scale=0.35]{images/amdahl.png}
-  \end{figure}
-\end{frame}
-
-\section{병렬 컴퓨팅 방법 비교}
-\begin{frame}{Loop Parallelism vs Task Parallelism}
-  \begin{figure}
-    \includegraphics[scale=0.35]{images/parallelism.png}
-  \end{figure}\footnote{사진출처: Peter Tröger, \textit{Parallel Programming Concepts: Programming Models}}
-\end{frame}
-
-\begin{frame}[fragile]{Loop Parallelism}
-  \begin{itemize}
-  \item 데이터에 일괄적으로 수행되는 연산들을 병렬로 실행
-  \item 기존 코드의 큰 수정 없이 쉽게 병렬화 적용 가능
-  \item Fork-join Parallelism, Data Parallelism
-  \end{itemize}
-  \begin{minted}
-    [frame=lines,
-     baselinestretch=1.2]{cpp}
-#pragma omp parallel for
-for(int i = 0; i < N; ++i)
-{
-  c[i] = a[i] + b[i];
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/conv_frame0.png}
-  \end{figure}\footnote{사진출처: https://github.com/vdumoulin/conv\_arithmetic}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/conv_frame1.png}
-  \end{figure}\footnote{사진출처: https://github.com/vdumoulin/conv\_arithmetic}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/conv_frame2.png}
-  \end{figure}\footnote{사진출처: https://github.com/vdumoulin/conv\_arithmetic}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/conv_frame3.png}
-  \end{figure}\footnote{사진출처: https://github.com/vdumoulin/conv\_arithmetic}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={17},
-      baselinestretch=0.7]{cpp}
-inline cv::Mat
-filter(cv::Mat const& src,
-       std::vector<float> const& kernel,
-       size_t m, size_t n)
-{
-    /* ... */
-    auto dst = cv::Mat(dst_m, dst_n, CV_32FC1);
-
-#pragma omp parallel for schedule(static) collapse(2) 
-    for(size_t i = 0; i < dst_m; ++i)
-    {
-        for(size_t j = 0; j < dst_n; ++j)
-        {
-            /*  load image patch */
-
-            float value = dot(buffer, kernel);
-            dst.at<float>(i, j) = value;
-        }
-    }
-    return dst;
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={9},
-      baselinestretch=0.7]{cpp}
-inline cv::Mat
-filter(cv::Mat const& src,
-       std::vector<float> const& kernel,
-       size_t m, size_t n)
-{
-    /* ... */
-    auto dst = cv::Mat(dst_m, dst_n, CV_32FC1);
-
-#pragma omp parallel for schedule(static) collapse(2) 
-    for(size_t i = 0; i < dst_m; ++i)
-    {
-        for(size_t j = 0; j < dst_n; ++j)
-        {
-            /* load image patch */
-
-            float value = dot(buffer, kernel);
-            dst.at<float>(i, j) = value;
-        }
-    }
-    return dst;
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Processing Pipeline}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=1.3]{cpp}
-    auto smooth   = filter(image, gaussian_kernel, 9, 9);
-    auto x_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto y_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto gradient = sobel_norm(x_edge, y_edge);
-    auto output   = thresholding(x_edge, 0.7, 0.12);
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Processing Pipeline}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={2-3},
-      baselinestretch=1.3]{cpp}
-    auto smooth   = filter(image, gaussian_kernel, 9, 9);
-    auto x_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto y_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto gradient = sobel_norm(x_edge, y_edge);
-    auto output   = thresholding(x_edge, 0.7, 0.12);
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Example Image}
-  \begin{figure}
-    \includegraphics[scale=0.25]{images/sushi.jpg}
-  \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{Example Output}
-  \begin{figure}
-    \includegraphics[scale=0.25]{images/processed.png}
-  \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{Loop Parallelism Example}
-  \begin{figure}
-    \includegraphics[scale=0.30]{images/occupancy_loop.png}
-  \end{figure}\footnote{사진출처: Abalenkovs, et al. Parallel Programming Models for Dense Linear Algebra on Heterogeneous Systems (2015).}
-\end{frame}
-
-\begin{frame}[fragile]{Loop Parallelism Example}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/occupancy_task.png}
-  \end{figure}\footnote{사진출처: Abalenkovs, et al. Parallel Programming Models for Dense Linear Algebra on Heterogeneous Systems (2015).}
-\end{frame}
-
-\section{Task Parallelism}
-\begin{frame}{Task Parallelism}
-  \begin{itemize}
-  \item 각 태스크의 종속관계를 파악하고 종속성이 없는 태스크들을 동적으로 병렬화
-  \item 특수한 언어, 프레임워크를 통해 데이터 종속관계를 모델링 해야 함
-  \item Directed Acyclic Graph (DAG) 또는 Computation Tree 를 통해 종속관계 표현
-  \item Cilk, HPX, TBB, cpp-taskflow
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{\textit{Directed Acyclic Graph} (DAG)}
-  \begin{itemize}
-    \item 사이클이 존재하지 않는 지향성 그래프.
-    \item '연산' 들은 대부분 DAG 로 표현할 수 있습니다.
-  \end{itemize}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/dag.png}
-  \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{2D Convolution}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/conv_frame0.png}
-  \end{figure}\footnote{사진출처: https://github.com/vdumoulin/conv\_arithmetic}
-\end{frame}
-
-\begin{frame}[fragile]{Processing Pipeline}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=1.3]{cpp}
-    auto smooth   = filter(image, gaussian_kernel, 9, 9);
-    auto x_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto y_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto gradient = sobel_norm(x_edge, y_edge);
-    auto output   = thresholding(x_edge, 0.7, 0.12);
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Pixelwise Computation DAG}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/diagram1.png}
-  \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{Pixelwise Computation DAG}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/diagram2.png}
-  \end{figure}
-  \begin{itemize}
-    \item Loop 병렬의 경우 픽셀간의 병렬 관계를 한 단계에서만 활용합니다.
-    \item 1단계에서 모든 픽셀들의 연산이 끝날 때까지 barrier 에서 blocking.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Pixelwise Computation DAG}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/diagram3.png}
-  \end{figure}
-  \begin{itemize}
-    \item 실제로는 병렬 관계가 깊게까지 이어집니다.
-    \item 이러한 병렬 가능한 구간을 자동으로 감지하기 위해서 DAG 형태로 연산을 표현.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Task Parallelism 기본 원리}
-  \begin{center}
-  프로그램 내에 존재하는 '깊은' 병렬화 가능 구간, 미세하게 병렬화가 가능한 task들을 종속관계 분석을 통해 병렬화하는 것이 \textit{Task parallelism}.
-  \end{center}
-
-  \begin{enumerate}
-    \item \textbf{DAG 생성}
-      \bigskip
-    \item \textbf{병렬화 가능한 task 들을 병렬로 실행}
-      \bigskip
-    \item \textbf{코어 간의 로드 임밸런스 해소}
-      \bigskip
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}[fragile]{Task Parallelism 기본 원리}
-  \begin{center}
-  프로그램 내에 존재하는 '깊은' 병렬화 가능 구간, 미세하게 병렬화가 가능한 task들을 종속관계 분석을 통해 병렬화하는 것이 \textit{Task parallelism}.
-  \end{center}
-
-  \begin{enumerate}
-    \item \textbf{DAG 생성} \\
-      \textit{API 또는 Domain Specific Language}
-    \item \textbf{병렬화 가능한 task 들을 병렬로 실행} \\
-      \textit{DAG 를 순회하면서 task 들을 consume} 
-    \item \textbf{코어 간의 로드 임밸런스 해소} \\
-      \textit{Task Scheduling}
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}[fragile]{Task Parallelism 기본 원리}
-  \begin{center}
-  프로그램 내에 존재하는 '깊은' 병렬화 가능 구간, 미세하게 병렬화가 가능한 task들을 종속관계 분석을 통해 병렬화하는 것이 \textit{Task parallelism}.
-  \end{center}
-
-  \begin{enumerate}
-    \item \textcolor{red}{\textbf{DAG 생성}} \\
-      \textit{API 또는 Domain Specific Language}
-    \item \textbf{병렬화 가능한 task 들을 병렬로 실행} \\
-      \textit{DAG 를 순회하면서 task 들을 consume} 
-    \item \textbf{코어 간의 로드 임밸런스 해소} \\
-      \textit{Task Scheduling}
-  \end{enumerate}
-\end{frame}
-
-\section{Task Parallelism 프레임워크}
-\begin{frame}[fragile]{OpenMP 4.0}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.7]{cpp}
-int fib(int n)
-{
-    int i, j;
-    if (n<2)
-    {
-        return n;
-    }
-    else
-    {
-#pragma omp task shared(i)
-        i = fib(n - 1);
-#pragma omp task shared(j)
-        j = fib(n - 2);
-#pragma omp taskwait
-        return i+j;
-     }
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{OpenMP 4.0}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.8]{cpp}
-for(int i=0; i<num_blocks; i++) {
-#pragma omp task depend( inout: block_list[i][i] )
-    diag_func( block_list[i][i] );
-    for(int j=i+1; j<numBlocks; j++) {
-#pragma omp task depend( in: block_list[i][i]) \
-                 depend(inout: block_list[i][j])
-        row_func(block_list[i][j], block_list[i][i] );
-    }
-    for(int j=i+1; j<num_blocks; j++) {
-#pragma omp task depend( in: block_list[i][i]) \
-                 depend(inout: block_list[j][i])
-        col_func( block_list[j][i], block_list[i][i] );
-        /* ... */
-    }
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{OpenMP Task System}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={2,5,6,10,11},
-      baselinestretch=0.8]{cpp}
-for(int i=0; i<num_blocks; i++) {
-#pragma omp task depend( inout: block_list[i][i] )
-    diag_func( block_list[i][i] );
-    for(int j=i+1; j<numBlocks; j++) {
-#pragma omp task depend( in: block_list[i][i]) \
-                 depend(inout: block_list[i][j])
-        row_func(block_list[i][j], block_list[i][i] );
-    }
-    for(int j=i+1; j<num_blocks; j++) {
-#pragma omp task depend( in: block_list[i][i]) \
-                 depend(inout: block_list[j][i])
-        col_func( block_list[j][i], block_list[i][i] );
-        /* ... */
-    }
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{OpenMP Task System}
-  \begin{itemize}
-    \item OpenMP 4.0 이상을 지원하는 모든 컴파일러에서 사용 가능. (\textit{GCC})
-    \item 기존 코드의 큰 변경 없이 사용 가능.
-    \item Shared-memory 만 지원.
-    \item 생성할 수 있는 DAG 의 형태가 제한적.
-    \item 데이터 기반으로 하고 싶을 경우 모든 것을 C스타일 배열만 사용 가능.
-    \item GCC 의 경우 아직 Work-stealing 스케줄링이 구현돼 있지 않음.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{CppTaskflow}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={15-18},
-      baselinestretch=0.5]{cpp}
-// create three regular tasks
-tf::Task A = tf.emplace([](){}).name("A");
-tf::Task C = tf.emplace([](){}).name("C");
-tf::Task D = tf.emplace([](){}).name("D");
-
-// create a subflow graph (dynamic tasking)
-tf::Task B = tf.emplace([] (tf::SubflowBuilder& subflow) {
-  tf::Task B1 = subflow.emplace([](){}).name("B1");
-  tf::Task B2 = subflow.emplace([](){}).name("B2");
-  tf::Task B3 = subflow.emplace([](){}).name("B3");
-  B1.precede(B3);
-  B2.precede(B3);
-}).name("B");
-            
-A.precede(B);  // B runs after A 
-A.precede(C);  // C runs after A 
-B.precede(D);  // D runs after B 
-C.precede(D);  // D runs after C 
-
-tf.wait_for_all();
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{CppTaskflow}
-  \begin{figure}
-    \includegraphics[scale=0.25]{images/cpptaskflow.png}
-  \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{CppTaskflow}
-  \begin{itemize}
-    \item Illinois 대학에서 오픈소스로 개발\footnote{Huang et al., “Cpp-Taskflow: Fast Task-based Parallel
-Programming using Modern C++” in IPDPS, 2007,}.
-    \item Shared-memory 만 지원.
-    \item 그래프 라이브러리들과 유사한 형태의 모던 C++ API.
-    \item Work-stealing 알고리즘 탑재.
-    \item map, filter, reduce 등의 알고리즘들 제공.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.8]{cpp}
-template <typename Type>
-inline hpx::future<int>
-traverse(node& t)
-{
-    if(!t.has_children())
-        return t.compute_result();
-    auto results = std::vector<hpx::future<Type>>(factor);
-
-    for(size_t i = 0; i < factor; ++i)
-        results[i] = hpx::async(traverse, t.children[i]);
-
-    return hpx::when_all(results, t.compute_results()).then(
-        [](auto f, auto r){
-            return combine_results(f, r);
-        }
-    );
-    return t.compute_result();
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={7, 10},
-      baselinestretch=0.8]{cpp}
-template <typename Type>
-inline hpx::future<int>
-traverse(node& t)
-{
-    if(!t.has_children())
-        return t.compute_result();
-    auto results = std::vector<hpx::future<Type>>(factor);
-
-    for(size_t i = 0; i < factor; ++i)
-        results[i] = hpx::async(traverse, t.children[i]);
-
-    return hpx::when_all(results, t.compute_results()).then(
-        [](auto f, auto r){
-            return combine_results(f, r);
-        }
-    );
-    return t.compute_result();
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{HPX}
-    \begin{figure}
-      \includegraphics[scale=0.30]{images/HPX.png}
-    \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{HPX}
-  \begin{itemize}
-  \item Lousiana 주립대학에서 오픈소스로 개발\footnote{Kaiser, Hartmut, et al. "Hpx: A task based programming model in a global address space." Proceedings of the 8th International Conference on Partitioned Global Address Space Programming Models. ACM, 2014.}.
-  \item Shared-memory 와 AGAS 형태의 분산 메모리 프로그래밍 지원.
-  \item 표준 C++ 기반의 Task Parallelism 과 Loop Parallelism 프로그래밍 지원.
-  \item C++ STL 알고리즘들의 병렬 버전 지원.
-  \item 다양한 Work-stealing 스케줄링 제공.
-  \item 빌드 시스템을 HPX 에 맞춰야된다는 것이 단점.
-  \end{itemize}
-\end{frame}
-
-\section{Example}
-\begin{frame}[fragile]{Example with HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=1.3]{cpp}
-    auto smooth   = filter(image, gaussian_kernel, 9, 9);
-    auto x_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto y_edge   = filter(smooth, sobel_x_kernel, 3, 3);
-    auto gradient = sobel_norm(x_edge, y_edge);
-    auto output   = thresholding(x_edge, 0.7, 0.12);
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Example with HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.7]{cpp}
-inline cv::Mat
-filter(cv::Mat const& src,
-       std::vector<float> const& kernel,
-       size_t m, size_t n)
-{
-    /* ... */
-    auto dst = cv::Mat(dst_m, dst_n, CV_32FC1);
-
-#pragma omp parallel for schedule(static) collapse(2) 
-    for(size_t i = 0; i < dst_m; ++i)
-    {
-        for(size_t j = 0; j < dst_n; ++j)
-        {
-            /*  load image patch */
-
-            float value = dot(buffer, kernel);
-            dst.at<float>(i, j) = value;
-        }
-    }
-    return dst;
-}
-  \end{minted}
-\end{frame}
-
-
-\begin{frame}[fragile]{Example with HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.5]{cpp}
-template<template<typename> class Future, size_t Block>
-class future_image_block
-{
-private:
-    size_t _image_m;
-    size_t _image_n;
-    size_t _block_m;
-    size_t _block_n;
-    std::vector<Future<std::vector<float>>> _futures;
-
-public:
-    inline future_image_block()
-        : _futures(), _image_m(0), _image_n(0)
-    {}
-
-    inline future_image_block(size_t m, size_t n)
-        : _image_m(m),
-          _image_n(n),
-          _block_m(ceil(m / static_cast<float>(Block))),
-          _block_n(ceil(n / static_cast<float>(Block))),
-          _futures(_block_m * _block_n)
-    {}
-
-    /* ... */
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Example with HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      baselinestretch=0.5]{cpp}
-template<template<typename> class Future, size_t Block>
-inline decltype(auto)
-filter(future_image_block<Future, Block>& src,
-       std::vector<float> const& kernel,
-       size_t m, size_t n)
-{
-    /* ... */
-
-    auto dst = future_image_block<Future, Block>(dst_m, dst_n);
-
-    for(size_t block_i = 0; block_i < dst.block_rows(); ++block_i)
-    {
-        for(size_t block_j = 0; block_j < dst.block_cols(); ++block_j)
-        {
-            dst.block(block_i, block_j) = hpx::async(
-                [&src, &kernel, block_i, block_j, ker_m, ker_n, dst_m, dst_n]{
-                    return block_filter(block_i, block_j,
-                                        ker_m, ker_n,
-                                        dst_m, dst_n,
-                                        src, kernel);
-                });
-        }
-    }
-    return dst;
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Example with HPX}
-  \begin{minted}
-    [frame=lines,
-      framesep=2mm,
-      highlightlines={15-19},
-      baselinestretch=0.4]{cpp}
-template<template<typename> class Future, size_t Block>
-inline decltype(auto)
-filter(future_image_block<Future, Block>& src,
-       std::vector<float> const& kernel,
-       size_t m, size_t n)
-{
-    /* ... */
-
-    auto dst = future_image_block<Future, Block>(dst_m, dst_n);
-
-    for(size_t block_i = 0; block_i < dst.block_rows(); ++block_i)
-    {
-        for(size_t block_j = 0; block_j < dst.block_cols(); ++block_j)
-        {
-            dst.block(block_i, block_j) = hpx::async(
-                [&src, &kernel, block_i, block_j, ker_m, ker_n, dst_m, dst_n]{
-                    return block_filter(block_i, block_j, ker_m, ker_n,
-                                        dst_m, dst_n, src, kernel);
-                });
-        }
-    }
-    return dst;
-}
-  \end{minted}
-\end{frame}
-
-\begin{frame}[fragile]{Example with HPX}
-  \begin{figure}
-    \includegraphics[scale=0.40]{images/speedup.png}
-  \end{figure}\footnote{Khatami, Zahra, Hartmut Kaiser, and J. Ramanujam. "Redesigning op2 compiler to use hpx runtime asynchronous techniques." 2017 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW). IEEE, 2017.}
 \end{frame}
 
 \begin{frame}[fragile]{Results}

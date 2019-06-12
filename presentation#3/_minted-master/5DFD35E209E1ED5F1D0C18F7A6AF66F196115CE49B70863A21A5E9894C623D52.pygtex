@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}enter\PYGZus{}scope}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+    \PYG{n}{LocalSymbolTable} \PYG{n}{table}
+         \PYG{o}{=} \PYG{n}{malloc}\PYG{p}{(}\PYG{k}{sizeof}\PYG{p}{(}\PYG{k}{struct} \PYG{n}{LocalSymbolTableRec}\PYG{p}{));}
+    \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{SIZE}\PYG{p}{;} \PYG{o}{++}\PYG{n}{i}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n}{table}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{hashTable}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{NULL}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+    \PYG{n}{table}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{parent}                 \PYG{o}{=} \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{currentScope}\PYG{p}{;}
+    \PYG{n}{table}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{next}                   \PYG{o}{=} \PYG{n+nb}{NULL}\PYG{p}{;}
+    \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{currentScope}           \PYG{o}{=} \PYG{n}{table}\PYG{p}{;}
+    \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{lastConstructed}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{next}  \PYG{o}{=} \PYG{n}{table}\PYG{p}{;}
+    \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{lastConstructed}        \PYG{o}{=} \PYG{n}{table}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kt}{void} \PYG{n+nf}{st\PYGZus{}exit\PYGZus{}scope}\PYG{p}{(}\PYG{n}{SymTable} \PYG{n}{state}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+    \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{currentScope} \PYG{o}{=} \PYG{n}{state}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{currentScope}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{parent}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}
