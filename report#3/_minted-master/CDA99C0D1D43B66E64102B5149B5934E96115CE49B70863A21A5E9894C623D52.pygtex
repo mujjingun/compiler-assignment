@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{enum} \PYG{n}{SymbolType} \PYG{p}{\PYGZob{}}
+    \PYG{n}{SymUnknown}\PYG{p}{,}
+    \PYG{n}{SymVariable}\PYG{p}{,}
+    \PYG{n}{SymArray}\PYG{p}{,}
+    \PYG{n}{SymFunction}\PYG{p}{,}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{k}{struct} \PYG{n}{NodeRec} \PYG{p}{\PYGZob{}}
+    \PYG{c+c1}{// Omitted}
+    \PYG{k}{union} \PYG{p}{\PYGZob{}}
+        \PYG{k}{struct} \PYG{p}{\PYGZob{}}
+            \PYG{n}{eion} \PYG{p}{\PYGZob{}}
+        \PYG{k}{struct} \PYG{p}{\PYGZob{}}
+            \PYG{k}{enum} \PYG{n}{SymbolType} \PYG{n}{kind}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{};}
+    \PYG{p}{\PYGZcb{}} \PYG{n}{attr}\PYG{p}{;}
+    \PYG{c+c1}{// Omitted}
+\PYG{p}{\PYGZcb{};}
+\end{Verbatim}

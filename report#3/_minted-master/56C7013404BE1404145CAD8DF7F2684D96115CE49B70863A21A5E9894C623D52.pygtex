@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{struct} \PYG{n}{ActivationRecord} \PYG{p}{\PYGZob{}}
+    \PYG{k+kt}{int} \PYG{n}{loc}\PYG{p}{,} \PYG{n}{scope}\PYG{p}{;}
+    \PYG{k}{enum} \PYG{n}{SymbolType} \PYG{n}{kind}\PYG{p}{;}
+    \PYG{k}{enum} \PYG{n}{TypeKind} \PYG{n}{type}\PYG{p}{;}
+    \PYG{k}{enum} \PYG{n}{VPFType} \PYG{n}{vpf}\PYG{p}{;}
+
+    \PYG{k}{union} \PYG{p}{\PYGZob{}}
+        \PYG{k}{struct} \PYG{p}{\PYGZob{}}
+            \PYG{k+kt}{int} \PYG{n}{num\PYGZus{}params}\PYG{p}{;}
+            \PYG{k}{enum} \PYG{n}{SymbolType}\PYG{o}{*} \PYG{n}{param\PYGZus{}types}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{}} \PYG{n}{func}\PYG{p}{;}
+        \PYG{k+kt}{int} \PYG{n}{arr\PYGZus{}size}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{};}
+
+    \PYG{c+c1}{// list of referenced line numbers}
+    \PYG{k+kt}{int} \PYG{n}{num\PYGZus{}linenos}\PYG{p}{;}
+    \PYG{k+kt}{int}\PYG{o}{*} \PYG{n}{linenos}\PYG{p}{;}
+\PYG{p}{\PYGZcb{};}
+\end{Verbatim}
