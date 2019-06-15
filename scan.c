@@ -271,6 +271,10 @@ void freeNode(Node node)
         }
     }
 
+    if (node->attr.func.num_params > 0) {
+        free(node->attr.func.param_types);
+    }
+
     free(node->children);
     free(node);
 }

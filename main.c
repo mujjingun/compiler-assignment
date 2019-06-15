@@ -22,7 +22,6 @@ int main(int argc, char* argv[])
 
     bool printLatex = false;
     bool printAst = false;
-    bool printSymtab = true;
 
     int i = 1;
     for (; i < argc; ++i) {
@@ -69,19 +68,12 @@ int main(int argc, char* argv[])
             }
 
             // Semantic analysis
-            bool error;
-            SymTable symtab = semanticAnalysis(scanner.tree, &error);
-
-            // Print symbol table
-            if (printSymtab) {
-                printFormattedSymtab(symtab);
-            }
+            bool error = semanticAnalysis(scanner.tree);
 
             if (!error) {
                 // TODO: Code generation
             }
 
-            st_free(symtab);
             freeTree(scanner.tree);
         }
 

@@ -59,13 +59,16 @@ static Record makeRecord(Node node, int loc, int scope)
 
         Node params = node->children[0];
         rec->func.num_params = params->num_children;
-        rec->func.param_types = malloc(sizeof(enum SymbolType) * rec->func.num_params);
-        for (int i = 0; i < rec->func.num_params; ++i) {
-            Node param = params->children[i];
-            if (param->value.param.is_array) {
-                rec->func.param_types[i] = SymArray;
-            } else {
-                rec->func.param_types[i] = SymVariable;
+        rec->func.param_types = NULL;
+        if (rec->func.num_params > 0) {
+            rec->func.param_types = malloc(sizeof(enum SymbolType) * rec->func.num_params);
+            for (int i = 0; i < rec->func.num_params; ++i) {
+                Node param = params->children[i];
+                if (param->value.param.is_array) {
+                    rec->func.param_types[i] = SymArray;
+                } else {
+                    rec->func.param_types[i] = SymVariable;
+                }
             }
         }
     } else if (node->stmt == StmtParam) {
@@ -246,6 +249,12 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
             break;
         case ExprCall:
             if ((result = st_lookup(state->sym, t->value.name))) {
+                if (result->kind != SymFunction) {
+                    idError(t, "'%s' is not a function", t->value.name);
+                    error = true;
+                    break;
+                }
+
                 // already in table, so ignore location,
                 // add line number of use only
                 RecordAddLineno(result, t->lineno);
@@ -254,7 +263,12 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
                 t->attr.kind = result->kind;
                 t->attr.type = result->type;
                 t->attr.func.num_params = result->func.num_params;
-                t->attr.func.param_types = result->func.param_types;
+                if (t->attr.func.num_params > 0) {
+                    t->attr.func.param_types = malloc(sizeof(enum SymbolType) * t->attr.func.num_params);
+                    for (int i = 0; i < t->attr.func.num_params; ++i) {
+                        t->attr.func.param_types[i] = result->func.param_types[i];
+                    }
+                }
             } else {
                 // Usage of an undeclared identifier
                 idError(t, "Unknown function identifier '%s'", t->value.name);
@@ -340,7 +354,7 @@ static bool typeCheckImpl(Node t, TypeCheckState state)
         case ExprConst:
             t->attr.kind = SymVariable;
             break;
-        case ExprIndex:
+        case ExprIndex: {
             if (t->children[0]->attr.kind != SymVariable) {
                 typeError(t, "Array subscript is not int");
                 error = true;
@@ -350,38 +364,33 @@ static bool typeCheckImpl(Node t, TypeCheckState state)
                 error = true;
             }
             t->attr.kind = SymVariable;
-            break;
-        case ExprCall:
-            if (t->attr.kind != SymFunction) {
-                typeError(t, "'%s' is not a function", t->value.name);
-                error = true;
-            } else {
-                int min_count = t->num_children;
-                if (min_count > t->attr.func.num_params) {
-                    min_count = t->attr.func.num_params;
-                }
+        } break;
+        case ExprCall: {
+            int min_count = t->num_children;
+            if (min_count > t->attr.func.num_params) {
+                min_count = t->attr.func.num_params;
+            }
 
-                for (int i = 0; i < min_count; ++i) {
-                    enum SymbolType param_type = t->attr.func.param_types[i];
-                    enum SymbolType arg_type = t->children[i]->attr.kind;
-                    if (param_type != arg_type) {
-                        typeError(t, "Type of parameter #%d does not match type of argument", i + 1);
-                        error = true;
-                    }
-                }
-
-                if (t->num_children != t->attr.func.num_params) {
-                    typeError(t, "%d arguments passed to function '%s' with %d parameters",
-                        t->num_children, t->value.name, t->attr.func.num_params);
+            for (int i = 0; i < min_count; ++i) {
+                enum SymbolType param_type = t->attr.func.param_types[i];
+                enum SymbolType arg_type = t->children[i]->attr.kind;
+                if (param_type != arg_type) {
+                    typeError(t, "Type of parameter #%d does not match type of argument", i + 1);
                     error = true;
                 }
+            }
+
+            if (t->num_children != t->attr.func.num_params) {
+                typeError(t, "%d arguments passed to function '%s' with %d parameters",
+                    t->num_children, t->value.name, t->attr.func.num_params);
+                error = true;
             }
             if (t->attr.type == TypeVoid) {
                 t->attr.kind = SymUnknown;
             } else {
                 t->attr.kind = SymVariable;
             }
-            break;
+        } break;
         default:
             break;
         }
@@ -455,7 +464,6 @@ static void freeRecord(Record rec)
     if (rec->kind == SymFunction) {
         free(rec->func.param_types);
     }
-
     free(rec->linenos);
     free(rec);
 }
@@ -463,20 +471,23 @@ static void freeRecord(Record rec)
 /* Function semanticAnalysis constructs the symbol
  * table by preorder traversal of the syntax tree
  */
-SymTable semanticAnalysis(Node t, bool* error)
+bool semanticAnalysis(Node t)
 {
     struct BuildSymtabStateRec state;
     state.functionLocCounter = 0;
     state.globalLocCounter = 0;
     state.scopeLevel = 0;
+
+    // build the symbol table
     state.sym = st_init(freeRecord);
+    bool error = buildSymtabImpl(t, &state);
+    st_free(state.sym);
 
-    *error = buildSymtabImpl(t, &state);
-
+    // type checking
     struct TypeCheckStateRec typeCheckState;
-    typeCheckImpl(t, &typeCheckState);
+    error = typeCheckImpl(t, &typeCheckState) || error;
 
-    return state.sym;
+    return error;
 }
 
 static void printActivationRecord(const char* name, Record rec)

@@ -8,7 +8,7 @@
 /* Function buildSymtab constructs the symbol 
  * table by preorder traversal of the syntax tree
  */
-SymTable semanticAnalysis(Node tree, bool* error);
+bool semanticAnalysis(Node tree);
 
 void printFormattedSymtab(SymTable tab);
 
