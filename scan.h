@@ -2,6 +2,7 @@
 #define SCAN_H
 
 #include <stdbool.h>
+#include "gen.h"
 
 typedef struct NodeRec* Node;
 
@@ -71,12 +72,12 @@ enum SymbolType {
 };
 
 struct NodeRec {
-
     union {
         enum ExprKind expr;
         enum StmtKind stmt;
     };
     enum NodeKind kind;
+    enum Storage storage;
 
     union {
         int num;
