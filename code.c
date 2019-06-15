@@ -41,15 +41,19 @@ void register_name(enum Storage reg, int reg_num, char* reg_name)
     sprintf(reg_name, "%c%d", reg_prefix, reg_num);
 }
 
-void load_local(Node t, enum Storage reg, int reg_num)
+void load_id(Node t, enum Storage reg, int reg_num)
 {
-    char reg_name[2];
+    char reg_name[3];
     register_name(reg, reg_num, reg_name);
 
     if(t->record->scope == GLOBAL_SCOPE)
     {
         /* incomplete */
         fprintf(stdout, "la $%s, %s", "", "");
+    }
+    else if(t->expr == ExprConst)
+    {
+        fprintf(stdout, "li $%s, %d\n", reg_name, t->value.num);
     }
     else
     {
@@ -63,6 +67,13 @@ void load_local(Node t, enum Storage reg, int reg_num)
             break;
         }
     }
+}
+
+void store_id(int loc, enum Storage reg, int reg_num)
+{
+    char reg_name[3];
+    register_name(reg, reg_num, reg_name);
+    fprintf(stdout, "lw $%s, %d($fp)\n", reg_name, loc);
 }
 
 void exec_binop(Node t,
@@ -86,3 +97,4 @@ void exec_binop(Node t,
         break;
     }
 }
+
