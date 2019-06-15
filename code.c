@@ -46,14 +46,14 @@ void load_id(Node t, enum Storage reg, int reg_num)
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
 
-    if(t->record->scope == GLOBAL_SCOPE)
+    if(t->expr == ExprConst)
+    {
+        fprintf(stdout, "li $%s, %d\n", reg_name, t->value.num);
+    }
+    else if(t->record->scope == GLOBAL_SCOPE)
     {
         /* incomplete */
         fprintf(stdout, "la $%s, %s", "", "");
-    }
-    else if(t->expr == ExprConst)
-    {
-        fprintf(stdout, "li $%s, %d\n", reg_name, t->value.num);
     }
     else
     {

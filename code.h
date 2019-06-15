@@ -21,6 +21,8 @@ void exec_binop(Node t,
                 enum Storage opa_reg, int opa_reg_num,
                 enum Storage opb_reg, int opb_reg_num);
 
+void load_id(Node t, enum Storage reg, int reg_num);
+
 void store_id(int loc, enum Storage reg, int reg_num);
 
 #endif
