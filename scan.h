@@ -2,9 +2,17 @@
 #define SCAN_H
 
 #include <stdbool.h>
-#include "gen.h"
+#include "symtab.h"
 
 typedef struct NodeRec* Node;
+
+enum Storage {
+    SavedTemp,
+    Temp,
+    Return,
+    Argument,
+    Memory
+};
 
 // scanner
 struct Scanner {
@@ -78,6 +86,7 @@ struct NodeRec {
     };
     enum NodeKind kind;
     enum Storage storage;
+    Record record;
 
     union {
         int num;

@@ -89,7 +89,7 @@ static void freeHashTable(SymTable state, BucketList table[])
         BucketList p = table[i];
         while (p != NULL) {
             BucketList t = p->next;
-            state->freeRecord(p->record);
+            //state->freeRecord(p->record);
             free(p);
             p = t;
         }
