@@ -9,9 +9,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num)
 {
     switch (t->expr) {
     case ExprConst:
-        break;
-
     case ExprId:
+        load_id(t, reg, reg_num);
         break;
 
     case ExprIndex:
@@ -27,27 +26,35 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num)
         break;
 
     case ExprBinOp:
-        //printSubTree(node->children[i], level + 1);
-        if (t->children[0]->storage != Temp) {
-            expr_cgen(out, t->children[0], Temp, reg_num);
-        }
-
-        if (t->children[1]->storage != Temp) {
-            expr_cgen(out, t->children[0], Temp, reg_num + 1);
-        }
+        expr_cgen(out, t->children[0], Temp, reg_num);
+        expr_cgen(out, t->children[1], Temp, reg_num + 1);
         exec_binop(t, Temp, reg, Temp, reg, Temp, reg + 1);
         t->storage = Temp;
         break;
 
     case ExprAssign:
+    {
+        int stackloc = t->children[0]->record->loc;
+        expr_cgen(out, t->children[1], Temp, reg_num + 1);
+        store_id(stackloc, reg, reg_num + 1);
         break;
+    }
     }
 }
 
-static void cGen(FILE* out, FILE* data, Node t)
+typedef struct codegenStateRec {
+    FILE* out;
+    FILE* data;
+    int label_ctr;
+} * codegenState;
+
+static void cGen(Node t, codegenState state)
 {
+    FILE* out = state->out;
+    FILE* data = state->data;
+
     switch (t->kind) {
-    case NodeStmt:
+    case NodeStmt: {
         switch (t->stmt) {
         case StmtVar: {
             if (t->record->scope == 0) {
@@ -59,26 +66,61 @@ static void cGen(FILE* out, FILE* data, Node t)
             break;
         }
 
-        case StmtIf:
-            break;
+        case StmtIf: {
+            int else_label = state->label_ctr++;
+            int end_label = state->label_ctr++;
 
-        case StmtParam:
-            break;
+            emitComment(out, "evaluate the condition to temp register 0");
+            expr_cgen(out, t->children[0], Temp, 0);
 
-        case StmtWhile:
+            emitComment(out, "branch to else if the condition is false");
+            fprintf(out, "beq $t0,$0,$_L%d\n\n", else_label);
+
+            emitComment(out, "if block");
+            cGen(t->children[1], state);
+
+            emitComment(out, "jump to end");
+            fprintf(out, "j $_L%d\n\n", end_label);
+
+            emitComment(out, "else");
+            fprintf(out, "$_L%d:\n", else_label);
+
+            if (t->num_children == 3) {
+                cGen(t->children[2], state);
+            }
+
+            emitComment(out, "end of if statement");
+            fprintf(out, "$_L%d:\n\n", end_label);
+
             break;
+        }
+
+        case StmtWhile: {
+            int loop_label = state->label_ctr++;
+            int exit_label = state->label_ctr++;
+
+            emitComment(out, "loop");
+            fprintf(out, "$_L%d:\n", loop_label);
+
+            emitComment(out, "evaluate the loop condition");
+
+            break;
+        }
 
         case StmtReturn:
             break;
 
         case StmtDeclList: {
             for (int i = 0; i < t->num_children; i++) {
-                cGen(out, data, t->children[i]);
+                cGen(t->children[i], state);
             }
             break;
         }
 
         case StmtExprStmt:
+            for (int i = 0; i < t->num_children; i++) {
+                cGen(t->children[i], state);
+            }
             break;
 
         case StmtFunction: {
@@ -93,7 +135,7 @@ static void cGen(FILE* out, FILE* data, Node t)
 
             Node body = t->children[1];
             for (int i = 0; i < body->num_children; i++) {
-                cGen(out, data, body->children[i]);
+                cGen(body->children[i], state);
             }
 
             fprintf(out, "\n");
@@ -113,22 +155,24 @@ static void cGen(FILE* out, FILE* data, Node t)
 
         case StmtStmtList: {
             for (int i = 0; i < t->num_children; i++) {
-                cGen(out, data, t->children[i]);
+                cGen(t->children[i], state);
             }
             break;
         }
-
-        case StmtParamList:
-            break;
 
         case StmtCompoundStmt: {
             for (int i = 0; i < t->num_children; i++) {
-                cGen(out, data, t->children[i]);
+                cGen(t->children[i], state);
             }
             break;
         }
+
+        default:
+            break;
         }
         break;
+    }
+
     case NodeExpr: {
         expr_cgen(out, t, Temp, 0);
         break;
@@ -155,7 +199,11 @@ void codeGen(Node syntaxTree, const char* filename)
     fputs(".align 2\n", out);
     fputs(".globl main\n\n", out);
 
-    cGen(out, data, syntaxTree);
+    struct codegenStateRec rec;
+    rec.out = out;
+    rec.data = data;
+    rec.label_ctr = 0;
+    cGen(syntaxTree, &rec);
 
     emitComment(out, "End of code.");
 

@@ -18,7 +18,7 @@ addiu $sp,$sp,-4
 
 
 # restore return address
-lw $ra,4($fp)
+lw $ra,-4($fp)
 # copy the fp to the sp
 move $sp,$fp
 # load the control link into the fp
