@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "analyze.h"
+#include "cgen.h"
 #include "globals.h"
 #include "lex.yy.h"
 #include "scan.h"
@@ -48,6 +49,13 @@ int main(int argc, char* argv[])
             printf("%s:\n", argv[i]);
         }
 
+        char asm_filename[256];
+        int j = 0;
+        for (; j < 252 && argv[i] && argv[i][j] != '.'; ++j) {
+            asm_filename[j] = argv[i][j];
+        }
+        strcpy(asm_filename + j, ".asm");
+
         struct Scanner scanner;
 
         // set input stream
@@ -71,7 +79,7 @@ int main(int argc, char* argv[])
             bool error = semanticAnalysis(scanner.tree);
 
             if (!error) {
-                // TODO: Code generation
+                codeGen(scanner.tree, asm_filename);
             }
 
             freeTree(scanner.tree);
