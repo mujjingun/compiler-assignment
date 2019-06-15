@@ -216,6 +216,7 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
                 RecordAddLineno(result, t->lineno);
 
                 // set attributes
+                t->record = result;
                 t->attr.kind = result->kind;
                 t->attr.type = result->type;
             } else {
