@@ -1,3 +1,4 @@
+
 #include "analyze.h"
 #include "globals.h"
 #include "symtab.h"
@@ -6,31 +7,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-enum VPFType {
-    VPFVariable,
-    VPFParam,
-    VPFFunction,
-};
-
-struct ActivationRecord {
-    int loc, scope;
-    enum SymbolType kind;
-    enum TypeKind type;
-    enum VPFType vpf;
-
-    union {
-        struct {
-            int num_params;
-            enum SymbolType* param_types;
-        } func;
-        int arr_size;
-    };
-
-    // list of referenced line numbers
-    int num_linenos;
-    int* linenos;
-};
 
 static Record makeRecord(Node node, int loc, int scope)
 {
@@ -177,6 +153,7 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
                     loc = (state->localLocCounter -= size);
                 }
                 Record rec = makeRecord(t, loc, state->scopeLevel);
+                t->record = rec;
                 st_insert(state->sym, t->value.var.name, rec);
             }
             break;
