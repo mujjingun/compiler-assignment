@@ -7,7 +7,8 @@ enum Storage {
     SavedTemp,
     Temp,
     Return,
-    Argument
+    Argument,
+    Memory
 };
 
 void codeGen(Node syntaxTree, const char* filename);
