@@ -103,6 +103,17 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "$_L%d:\n", loop_label);
 
             emitComment(out, "evaluate the loop condition");
+            expr_cgen(out, t->children[0], Temp, 0);
+
+            emitComment(out, "exit if the condition is false");
+            fprintf(out, "beq $t0,$0,$_L%d\n\n", exit_label);
+
+            emitComment(out, "loop body");
+            cGen(t->children[1], state);
+
+            fprintf(out, "j $_L%d\n", loop_label);
+
+            fprintf(out, "$_L%d\n", exit_label);
 
             break;
         }
