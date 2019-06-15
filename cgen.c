@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-static void expr_cgen(Node t, enum Storage reg, int reg_num)
+static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num)
 {
     switch (t->expr) {
     case ExprConst:
@@ -19,7 +19,7 @@ static void expr_cgen(Node t, enum Storage reg, int reg_num)
 
     case ExprCall:
         //printSubTree(node->children[i], level + 1);
-        fprintf(stdout, "");
+        fprintf(out, "");
         break;
 
     case ExprArgs:
@@ -28,14 +28,12 @@ static void expr_cgen(Node t, enum Storage reg, int reg_num)
 
     case ExprBinOp:
         //printSubTree(node->children[i], level + 1);
-        if(t->children[0]->storage != Temp)
-        {
-            expr_cgen(t->children[0], Temp, reg_num); 
+        if (t->children[0]->storage != Temp) {
+            expr_cgen(out, t->children[0], Temp, reg_num);
         }
 
-        if(t->children[1]->storage != Temp)
-        {
-            expr_cgen(t->children[0], Temp, reg_num + 1); 
+        if (t->children[1]->storage != Temp) {
+            expr_cgen(out, t->children[0], Temp, reg_num + 1);
         }
         exec_binop(t, Temp, reg, Temp, reg, Temp, reg + 1);
         t->storage = Temp;
@@ -100,7 +98,7 @@ static void cGen(FILE* out, FILE* data, Node t)
 
             fprintf(out, "\n");
             emitComment(out, "restore return address");
-            fprintf(out, "lw $ra,4($fp)\n");
+            fprintf(out, "lw $ra,-4($fp)\n");
 
             emitComment(out, "copy the fp to the sp");
             fprintf(out, "move $sp,$fp\n");
@@ -131,8 +129,10 @@ static void cGen(FILE* out, FILE* data, Node t)
         }
         }
         break;
-    case NodeExpr:
-        expr_cgen(t, Temp, 0);
+    case NodeExpr: {
+        expr_cgen(out, t, Temp, 0);
+        break;
+    }
     }
 }
 
