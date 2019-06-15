@@ -5,6 +5,47 @@
 
 #include <stdio.h>
 
+static void expr_cgen(Node t, enum Storage reg, int reg_num)
+{
+    switch (t->expr) {
+    case ExprConst:
+        break;
+
+    case ExprId:
+        break;
+
+    case ExprIndex:
+        break;
+
+    case ExprCall:
+        //printSubTree(node->children[i], level + 1);
+        fprintf(stdout, "");
+        break;
+
+    case ExprArgs:
+        // this should not appear
+        break;
+
+    case ExprBinOp:
+        //printSubTree(node->children[i], level + 1);
+        if(t->children[0]->storage != Temp)
+        {
+            expr_cgen(t->children[0], Temp, reg_num); 
+        }
+
+        if(t->children[1]->storage != Temp)
+        {
+            expr_cgen(t->children[0], Temp, reg_num + 1); 
+        }
+        exec_binop(t, Temp, reg, Temp, reg, Temp, reg + 1);
+        t->storage = Temp;
+        break;
+
+    case ExprAssign:
+        break;
+    }
+}
+
 static void cGen(FILE* out, FILE* data, Node t)
 {
     switch (t->kind) {
@@ -91,23 +132,7 @@ static void cGen(FILE* out, FILE* data, Node t)
         }
         break;
     case NodeExpr:
-        switch (t->expr) {
-        case ExprId:
-            break;
-        case ExprCall:
-            break;
-        case ExprBinOp:
-            break;
-        case ExprConst:
-            break;
-        case ExprIndex:
-            break;
-        case ExprAssign:
-            break;
-        case ExprArgs:
-            break;
-        }
-        break;
+        expr_cgen(t, Temp, 0);
     }
 }
 
