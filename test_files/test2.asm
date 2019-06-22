@@ -23,6 +23,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 slt $t0, $t0, $t1
@@ -34,6 +35,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 slt $t0, $t0, $t1
@@ -45,6 +47,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 slt $t0, $t1, $t0
@@ -57,6 +60,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 slt $t0, $t1, $t0
@@ -69,6 +73,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 slt $t0, $t1, $t0
@@ -81,6 +86,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 slt $t0, $t1, $t0
@@ -92,6 +98,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 slt $t0, $t1, $t0
@@ -103,6 +110,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 slt $t0, $t1, $t0
@@ -114,6 +122,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 slt $t0, $t0, $t1
@@ -126,6 +135,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 slt $t0, $t0, $t1
@@ -138,6 +148,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 slt $t0, $t0, $t1
@@ -150,6 +161,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 xor $t0, $t0, $t1
@@ -162,6 +174,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 xor $t0, $t0, $t1
@@ -174,6 +187,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 xor $t0, $t0, $t1
@@ -186,6 +200,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 xor $t0, $t0, $t1
@@ -198,6 +213,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 xor $t0, $t0, $t1
@@ -210,6 +226,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 xor $t0, $t0, $t1
@@ -222,6 +239,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 addu $t0, $t0, $t1
@@ -232,6 +250,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 addu $t0, $t0, $t1
@@ -242,6 +261,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 addu $t0, $t0, $t1
@@ -252,6 +272,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 subu $t0, $t0, $t1
@@ -262,6 +283,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 subu $t0, $t0, $t1
@@ -272,6 +294,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 subu $t0, $t0, $t1
@@ -282,6 +305,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 mult $t0, $t1
@@ -293,6 +317,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 mult $t0, $t1
@@ -304,6 +329,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 mult $t0, $t1
@@ -315,6 +341,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 2
 div $0,$t0,$t1
@@ -327,6 +354,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 1
 div $0,$t0,$t1
@@ -339,6 +367,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 li $t0, 1
 li $t1, 0
 div $0,$t0,$t1
@@ -351,6 +380,7 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+move $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 
@@ -367,8 +397,11 @@ output:
 li $v0,1
 lw $a0,4($sp)
 syscall
+li $v0,4
+la $a0,_Newline
+syscall
 j $ra
 
 .data
-glo: .word 1
+_Newline: .asciiz "\n"
 # End of code.
