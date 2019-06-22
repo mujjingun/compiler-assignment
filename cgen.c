@@ -341,6 +341,11 @@ void codeGen(Node syntaxTree, const char* filename)
           "syscall\n"
           "j $ra\n\n",
         out);
+    fputs("input:\n"
+          "li $v0,5\n"
+          "syscall\n"
+          "j $ra\n\n",
+        out);
 
     // write data
     fputs(".data\n"

@@ -402,6 +402,11 @@ la $a0,_Newline
 syscall
 j $ra
 
+input:
+li $v0,5
+syscall
+j $ra
+
 .data
 _Newline: .asciiz "\n"
 # End of code.

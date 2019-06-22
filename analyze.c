@@ -479,6 +479,23 @@ bool semanticAnalysis(Node t)
         rec->linenos[0] = -1;
         st_insert(state.sym, "output", rec);
     }
+    {
+        Record rec = malloc(sizeof(struct ActivationRecord));
+        rec->loc = -1;
+        rec->scope = 0;
+
+        rec->vpf = VPFFunction;
+        rec->kind = SymFunction;
+        rec->type = TypeInt;
+
+        rec->func.num_params = 0;
+        rec->func.param_types = NULL;
+
+        rec->num_linenos = 1;
+        rec->linenos = malloc(sizeof(int) * 1);
+        rec->linenos[0] = -1;
+        st_insert(state.sym, "input", rec);
+    }
 
     bool error = buildSymtabImpl(t, &state);
     st_free(state.sym);

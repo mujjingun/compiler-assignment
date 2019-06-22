@@ -1,5 +1,7 @@
 void main(void) {
     int arr[5];
-    arr[2] = 121312;
+    int a;
+    a = input();
+    arr[2] = a;
     output(arr[2]);
 }
