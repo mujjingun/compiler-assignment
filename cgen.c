@@ -16,14 +16,30 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num)
     case ExprIndex:
         break;
 
-    case ExprCall:
-        //printSubTree(node->children[i], level + 1);
-        //fprintf(out, "");
-        break;
+    case ExprCall:{
+        char reg_name[3];
+        register_name(reg, reg_num, reg_name);
 
-    case ExprArgs:
-        // this should not appear
+        // push the arguments
+        int arg_size = 0;
+        for (int i = 0; i < t->num_children; ++i) {
+            expr_cgen(out, t->children[i], Temp, reg_num);
+            fprintf(out, "addiu $sp,$sp,%d\n", -4);
+            fprintf(out, "sw $%s,0($sp) # push argument %d\n", reg_name, i);
+            arg_size += 4;
+        }
+
+        // push the control link
+        fprintf(out, "addiu $sp,$sp,%d\n", -4);
+        fprintf(out, "sw $fp,0($sp) # push control link\n");
+
+        // jump to the procedure
+        fprintf(out, "jal %s\n", t->value.name);
+
+        // clean up the arguments
+        fprintf(out, "addiu $sp,$sp,%d\n\n", arg_size + 4);
         break;
+    }
 
     case ExprBinOp:
         expr_cgen(out, t->children[0], Temp, reg_num);
@@ -174,13 +190,6 @@ static void cGen(Node t, codegenState state)
             break;
         }
 
-        case StmtStmtList: {
-            for (int i = 0; i < t->num_children; i++) {
-                cGen(t->children[i], state);
-            }
-            break;
-        }
-
         case StmtCompoundStmt: {
             // calculate new stack size
             int size = 0;
@@ -244,9 +253,8 @@ void codeGen(Node syntaxTree, const char* filename)
     // write standard procedures
     fputs("output:\n"
           "li $v0,1\n"
-          "lw $a0,0($sp)\n"
+          "lw $a0,4($sp)\n"
           "syscall\n"
-          "lw $fp,0($fp)\n"
           "j $ra\n\n",
         out);
 

@@ -60,7 +60,7 @@ void load_id(FILE* out, Node t, enum Storage reg, int reg_num)
     else
     {
         int loc = t->record->loc;
-        switch(t->storage) 
+        switch(t->storage)
         {
         case Memory:
             fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
@@ -92,10 +92,48 @@ void exec_binop(FILE* out, Node t,
 
     switch(t->value.op)
     {
+    case OpLessThan:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpLessThanEq:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpGreaterThan:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpGreaterThanEq:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpEqual:
+        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu $%s, $%s, 1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpNotEqual:
+        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu $%s, $0, $%s\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
     case OpAdd:
         fprintf(out,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
         break;
-    default:
+    case OpSubtract:
+        fprintf(out,"subu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        break;
+    case OpMultiply:
+        fprintf(out, "mult $%s, $%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mflo $%s\n", rst_reg_name);
+        break;
+    case OpDivide:
+        fprintf(out, "div $0,$%s,$%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mfhi $%s\n", rst_reg_name);
+        fprintf(out, "mflo $%s\n", rst_reg_name);
         break;
     }
 }

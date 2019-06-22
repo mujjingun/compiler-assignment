@@ -30,7 +30,6 @@ enum ExprKind {
     ExprId,
     ExprIndex,
     ExprCall,
-    ExprArgs,
     ExprBinOp,
     ExprAssign,
 };
@@ -41,7 +40,6 @@ enum StmtKind {
     StmtIf,
     StmtExprStmt,
 
-    StmtStmtList,
     StmtCompoundStmt,
     StmtParamList,
     StmtParam,
