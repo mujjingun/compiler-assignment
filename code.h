@@ -14,15 +14,15 @@ void emitComment(FILE* out, const char* msg, ...);
 
 void register_name(enum Storage reg, int reg_num, char* reg_name);
 
-void load_local(Node t, enum Storage reg, int reg_num);
+void load_local(FILE* out, Node t, enum Storage reg, int reg_num);
 
-void exec_binop(Node t,
+void exec_binop(FILE* out, Node t,
                 enum Storage rst_reg, int rst_reg_num,
                 enum Storage opa_reg, int opa_reg_num,
                 enum Storage opb_reg, int opb_reg_num);
 
-void load_id(Node t, enum Storage reg, int reg_num);
+void load_id(FILE* out, Node t, enum Storage reg, int reg_num);
 
-void store_id(int loc, enum Storage reg, int reg_num);
+void store_id(FILE* out, int loc, enum Storage reg, int reg_num);
 
 #endif

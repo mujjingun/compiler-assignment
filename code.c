@@ -41,19 +41,21 @@ void register_name(enum Storage reg, int reg_num, char* reg_name)
     sprintf(reg_name, "%c%d", reg_prefix, reg_num);
 }
 
-void load_id(Node t, enum Storage reg, int reg_num)
+void load_id(FILE* out, Node t, enum Storage reg, int reg_num)
 {
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
 
     if(t->expr == ExprConst)
     {
-        fprintf(stdout, "li $%s, %d\n", reg_name, t->value.num);
+        fprintf(out, "li $%s, %d\n", reg_name, t->value.num);
     }
     else if(t->record->scope == GLOBAL_SCOPE)
     {
-        /* incomplete */
-        fprintf(stdout, "la $%s, %s", "", "");
+        char addr_reg_name[3];
+        register_name(reg, reg_num + 1, addr_reg_name);
+        fprintf(out, "la $%s, %s\n", addr_reg_name, t->value.name);
+        fprintf(out, "lw $%s, 0($%s)\n", reg_name, addr_reg_name);
     }
     else
     {
@@ -61,7 +63,7 @@ void load_id(Node t, enum Storage reg, int reg_num)
         switch(t->storage) 
         {
         case Memory:
-            fprintf(stdout, "lw $%s, %d($fp)\n", reg_name, loc);
+            fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
             break;
         default:
             break;
@@ -69,14 +71,14 @@ void load_id(Node t, enum Storage reg, int reg_num)
     }
 }
 
-void store_id(int loc, enum Storage reg, int reg_num)
+void store_id(FILE* out, int loc, enum Storage reg, int reg_num)
 {
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
-    fprintf(stdout, "lw $%s, %d($fp)\n", reg_name, loc);
+    fprintf(out, "sw $%s, %d($fp)\n", reg_name, loc);
 }
 
-void exec_binop(Node t,
+void exec_binop(FILE* out, Node t,
                 enum Storage rst_reg, int rst_reg_num,
                 enum Storage opa_reg, int opa_reg_num,
                 enum Storage opb_reg, int opb_reg_num)
@@ -90,11 +92,10 @@ void exec_binop(Node t,
 
     switch(t->value.op)
     {
-    case PLUS:
-        fprintf(stdout,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+    case OpAdd:
+        fprintf(out,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
         break;
     default:
         break;
     }
 }
-
