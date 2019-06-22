@@ -10,14 +10,36 @@ move $fp,$sp
 addiu $sp,$sp,-4
 sw $ra,0($sp)
 
-addiu $sp,$sp,-8 # allocate locals
+addiu $sp,$sp,-24 # allocate locals
 
 addiu $t0, $fp, -28
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 addiu $sp,$sp,-4
 sw $fp,0($sp) # push control link
 jal input
 addiu $sp,$sp,4
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
 move $t1,$v0
 sw $t1, 0($t0)
 li $t1, 2
@@ -26,6 +48,17 @@ addu $t0, $fp, $t1
 addiu $t0, $fp, -24
 lw $t1, -28($fp)
 sw $t1, 0($t0)
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t1, 2
 sll $t1,$t1,2
 addu $t0, $fp, $t1
@@ -37,8 +70,19 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
 move $t0,$v0
-addiu $sp,$sp,8 # free locals
+addiu $sp,$sp,24 # free locals
 
 
 # restore return address

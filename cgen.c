@@ -99,6 +99,12 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         char reg_name[3];
         register_name(reg, reg_num, reg_name);
 
+        // push temporary registers
+        fprintf(out, "addiu $sp,$sp,%d\n", -40);
+        for (int i = 0; i < 10; ++i) {
+            fprintf(out, "sw $t%d,%d($sp)\n", i, i * 4);
+        }
+
         // push the arguments
         int arg_size = 0;
         for (int i = 0; i < t->num_children; ++i) {
@@ -113,11 +119,16 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         fprintf(out, "sw $fp,0($sp) # push control link\n");
 
         // jump to the procedure
-        // TODO: preserve registers
         fprintf(out, "jal %s\n", t->value.name);
 
         // clean up the arguments
         fprintf(out, "addiu $sp,$sp,%d\n\n", arg_size + 4);
+
+        // pop temporary registers
+        for (int i = 0; i < 10; ++i) {
+            fprintf(out, "lw $t%d,%d($sp)\n", i, i * 4);
+        }
+        fprintf(out, "addiu $sp,$sp,%d\n", 40);
 
         // return value
         fprintf(out, "move $%s,$v0\n", reg_name);
@@ -277,7 +288,11 @@ static void cGen(Node t, codegenState state)
             for (int i = 0; i < t->num_children; i++) {
                 Node child = t->children[i];
                 if (child->stmt == StmtVar) {
-                    size += 4;
+                    if (child->value.var.is_array) {
+                        size += child->value.var.array_size * 4;
+                    } else {
+                        size += 4;
+                    }
                 }
             }
 
