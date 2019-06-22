@@ -106,10 +106,6 @@ static void printSubTree(Node node, int level)
             }
             break;
 
-        case ExprArgs:
-            // this should not appear
-            break;
-
         case ExprBinOp:
             iprintf(level, "Op %s\n", opToString(node->value.op));
             for (int i = 0; i < node->num_children; ++i) {
@@ -149,10 +145,6 @@ static void printSubTree(Node node, int level)
 
         case StmtExprStmt:
             printSubTree(node->children[0], level);
-            break;
-
-        case StmtStmtList:
-            // this should not appear
             break;
 
         case StmtCompoundStmt:
@@ -251,10 +243,6 @@ static void printSubTreeLatex(Node node, int level)
             iprintf(level, "]\n");
             break;
 
-        case ExprArgs:
-            // this should not appear
-            break;
-
         case ExprBinOp:
             iprintf(level, "[{%s}\n", opToString(node->value.op));
             for (int i = 0; i < node->num_children; ++i) {
@@ -299,10 +287,6 @@ static void printSubTreeLatex(Node node, int level)
 
         case StmtExprStmt:
             printSubTreeLatex(node->children[0], level);
-            break;
-
-        case StmtStmtList:
-            // this should not appear
             break;
 
         case StmtCompoundStmt:

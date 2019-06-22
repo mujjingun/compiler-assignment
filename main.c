@@ -49,11 +49,17 @@ int main(int argc, char* argv[])
             printf("%s:\n", argv[i]);
         }
 
-        char asm_filename[256];
-        int j = 0;
-        for (; j < 252 && argv[i] && argv[i][j] != '.'; ++j) {
-            asm_filename[j] = argv[i][j];
+        // decide output file name
+        int len = strlen(argv[i]);
+        int j = len;
+        while (j > 0 && argv[i][j] != '.') {
+            j--;
         }
+        if (j == 0) {
+            j = len;
+        }
+        char* asm_filename = malloc(sizeof(char) * (j + 5));
+        strncpy(asm_filename, argv[i], j);
         strcpy(asm_filename + j, ".asm");
 
         struct Scanner scanner;
@@ -84,6 +90,8 @@ int main(int argc, char* argv[])
 
             freeTree(scanner.tree);
         }
+
+        free(asm_filename);
 
         yylex_destroy(scanner.flex);
 

@@ -107,7 +107,7 @@ Node makeCallNode(int lineno, char* func)
 Node makeArgsNode(int lineno)
 {
     Node node = allocNode(lineno, NodeExpr, 0);
-    node->expr = ExprArgs;
+    node->expr = 0;
 
     return node;
 }
@@ -173,7 +173,7 @@ Node makeExprStmt(int lineno, Node expr)
 Node makeStmtListNode(int lineno)
 {
     Node node = allocNode(lineno, NodeStmt, 0);
-    node->stmt = StmtStmtList;
+    node->stmt = 0;
     return node;
 }
 

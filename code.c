@@ -41,27 +41,29 @@ void register_name(enum Storage reg, int reg_num, char* reg_name)
     sprintf(reg_name, "%c%d", reg_prefix, reg_num);
 }
 
-void load_id(Node t, enum Storage reg, int reg_num)
+void load_id(FILE* out, Node t, enum Storage reg, int reg_num)
 {
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
 
     if(t->expr == ExprConst)
     {
-        fprintf(stdout, "li $%s, %d\n", reg_name, t->value.num);
+        fprintf(out, "li $%s, %d\n", reg_name, t->value.num);
     }
     else if(t->record->scope == GLOBAL_SCOPE)
     {
-        /* incomplete */
-        fprintf(stdout, "la $%s, %s", "", "");
+        char addr_reg_name[3];
+        register_name(reg, reg_num + 1, addr_reg_name);
+        fprintf(out, "la $%s, %s\n", addr_reg_name, t->value.name);
+        fprintf(out, "lw $%s, 0($%s)\n", reg_name, addr_reg_name);
     }
     else
     {
         int loc = t->record->loc;
-        switch(t->storage) 
+        switch(t->storage)
         {
         case Memory:
-            fprintf(stdout, "lw $%s, %d($fp)\n", reg_name, loc);
+            fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
             break;
         default:
             break;
@@ -69,14 +71,14 @@ void load_id(Node t, enum Storage reg, int reg_num)
     }
 }
 
-void store_id(int loc, enum Storage reg, int reg_num)
+void store_id(FILE* out, int loc, enum Storage reg, int reg_num)
 {
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
-    fprintf(stdout, "lw $%s, %d($fp)\n", reg_name, loc);
+    fprintf(out, "sw $%s, %d($fp)\n", reg_name, loc);
 }
 
-void exec_binop(Node t,
+void exec_binop(FILE* out, Node t,
                 enum Storage rst_reg, int rst_reg_num,
                 enum Storage opa_reg, int opa_reg_num,
                 enum Storage opb_reg, int opb_reg_num)
@@ -90,11 +92,48 @@ void exec_binop(Node t,
 
     switch(t->value.op)
     {
-    case PLUS:
-        fprintf(stdout,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+    case OpLessThan:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
-    default:
+    case OpLessThanEq:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpGreaterThan:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpGreaterThanEq:
+        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpEqual:
+        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu $%s, $%s, 1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpNotEqual:
+        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu $%s, $0, $%s\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        break;
+    case OpAdd:
+        fprintf(out,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        break;
+    case OpSubtract:
+        fprintf(out,"subu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        break;
+    case OpMultiply:
+        fprintf(out, "mult $%s, $%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mflo $%s\n", rst_reg_name);
+        break;
+    case OpDivide:
+        fprintf(out, "div $0,$%s,$%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mfhi $%s\n", rst_reg_name);
+        fprintf(out, "mflo $%s\n", rst_reg_name);
         break;
     }
 }
-

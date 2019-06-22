@@ -217,6 +217,7 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
 
                 // set attributes
                 t->record = result;
+                t->storage = Memory;
                 t->attr.kind = result->kind;
                 t->attr.type = result->type;
             } else {
@@ -458,6 +459,27 @@ bool semanticAnalysis(Node t)
 
     // build the symbol table
     state.sym = st_init(freeRecord);
+
+    // add standard procedures
+    {
+        Record rec = malloc(sizeof(struct ActivationRecord));
+        rec->loc = -1;
+        rec->scope = 0;
+
+        rec->vpf = VPFFunction;
+        rec->kind = SymFunction;
+        rec->type = TypeVoid;
+
+        rec->func.num_params = 1;
+        rec->func.param_types = malloc(sizeof(enum SymbolType) * 1);
+        rec->func.param_types[0] = SymVariable;
+
+        rec->num_linenos = 1;
+        rec->linenos = malloc(sizeof(int) * 1);
+        rec->linenos[0] = -1;
+        st_insert(state.sym, "output", rec);
+    }
+
     bool error = buildSymtabImpl(t, &state);
     st_free(state.sym);
 

@@ -1,5 +1,5 @@
 # C- Compilation to SPIM Code
-# Source File: ./test_files/test.asm
+# Source File: ./test_files/tes.asm
 .align 2
 .globl main
 
@@ -37,7 +37,6 @@ li $t0, 0
 sw $t0, -48($fp)
 $_L0: # loop
 # evaluate the loop condition
-lw $t0, 4($fp)
 li $t1, 0
 # exit if the condition is false
 beq $t0,$0,$_L1
@@ -45,16 +44,10 @@ beq $t0,$0,$_L1
 # loop body
 addiu $sp,$sp,-4 # allocate locals
 
-lw $t0, 4($fp)
-lw $t3, 4($fp)
-addu $t1, $t1, $t2
 sw $t0, 8($fp)
-lw $t0, 4($fp)
 li $t1, 1
 sw $t0, 4($fp)
-lw $t0, -48($fp)
 li $t1, 1
-addu $t1, $t1, $t2
 sw $t0, -48($fp)
 # evaluate the condition
 sw $t0, 4($fp)
@@ -63,7 +56,6 @@ beq $t0,$0,$_L2
 
 # if block
 # evaluate the condition
-lw $t0, -52($fp)
 li $t1, 1
 # branch to else if the condition is false
 beq $t0,$0,$_L4
@@ -163,12 +155,10 @@ addiu $sp,$sp,-4 # allocate locals
 
 sw $t0, -12($fp)
 # evaluate the condition
-lw $t0, -12($fp)
 # branch to else if the condition is false
 beq $t0,$0,$_L12
 
 # if block
-lw $t0, -12($fp)
 sw $t0, -8($fp)
 # jump to end
 j $_L13
@@ -194,7 +184,6 @@ beq $t0,$0,$_L16
 # if block
 addiu $sp,$sp,-4 # allocate locals
 
-lw $t0, -12($fp)
 sw $t0, -28($fp)
 addiu $sp,$sp,4 # free locals
 
@@ -210,7 +199,6 @@ addiu $sp,$sp,4 # free locals
 
 j $_L14 # loop
 $_L15: # loop exit
-lw $t0, -16($fp)
 sw $t0, -20($fp)
 addiu $sp,$sp,8 # free locals
 
