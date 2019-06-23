@@ -21,8 +21,9 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    bool printLatex = false;
-    bool printAst = false;
+    bool printLatex       = false;
+    bool printAst         = false;
+    bool printSymbolTable = false;
 
     int i = 1;
     for (; i < argc; ++i) {
@@ -31,7 +32,9 @@ int main(int argc, char* argv[])
                 printLatex = true;
             } else if (strcmp(argv[i], "--ast") == 0) {
                 printAst = true;
-            }
+            } else if (strcmp(argv[i], "--symtab") == 0) {
+		printSymbolTable = true;
+	    }
         } else {
             break;
         }
@@ -82,7 +85,7 @@ int main(int argc, char* argv[])
             }
 
             // Semantic analysis
-            bool error = semanticAnalysis(scanner.tree);
+            bool error = semanticAnalysis(scanner.tree, printSymbolTable);
 
             if (!error) {
                 codeGen(scanner.tree, asm_filename);

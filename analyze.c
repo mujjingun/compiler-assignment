@@ -124,7 +124,9 @@ typedef struct BuildSymtabStateRec {
     SymTable sym;
 } * BuildSymtabState;
 
-static bool buildSymtabImpl(Node t, BuildSymtabState state)
+static bool buildSymtabImpl(Node t,
+			    BuildSymtabState state,
+			    bool printSymbolTable)
 {
     Record result;
 
@@ -134,7 +136,8 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
     case NodeStmt:
         switch (t->stmt) {
         case StmtVar:
-            if ((result = st_lookup(state->sym, t->value.var.name)) && result->scope == state->scopeLevel) {
+            if ((result = st_lookup(state->sym, t->value.var.name))
+		&& result->scope == state->scopeLevel) {
                 // aready in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.var.name, result->linenos[0]);
@@ -165,7 +168,8 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
                 error = true;
             } else {
                 // not yet in table
-                Record rec = makeRecord(t, state->functionLocCounter, state->scopeLevel);
+                Record rec = makeRecord(t, state->functionLocCounter,
+					state->scopeLevel);
                 st_insert(state->sym, t->value.func.name, rec);
 
                 state->functionLocCounter++;
@@ -262,19 +266,24 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
 
     // recursive traversal
     for (int i = 0; i < t->num_children; i++) {
-        error = buildSymtabImpl(t->children[i], state) || error;
+        error = buildSymtabImpl(t->children[i], state,
+				printSymbolTable) || error;
     }
 
     switch (t->kind) {
     case NodeStmt:
         switch (t->stmt) {
         case StmtFunction:
+	    if(printSymbolTable)
+		printFormattedSymtab(state->sym);
             st_exit_scope(state->sym);
             state->scopeLevel--;
             break;
         case StmtCompoundStmt:
             // exit scope
             if (!t->value.is_function_body) {
+		if(printSymbolTable)
+		    printFormattedSymtab(state->sym);
                 st_exit_scope(state->sym);
                 state->scopeLevel--;
             }
@@ -296,7 +305,8 @@ typedef struct TypeCheckStateRec {
     enum TypeKind currReturnType;
 } * TypeCheckState;
 
-static bool typeCheckImpl(Node t, TypeCheckState state)
+static bool typeCheckImpl(Node t,
+			  TypeCheckState state)
 {
     bool error = false;
 
@@ -450,7 +460,7 @@ static void freeRecord(Record rec)
 /* Function semanticAnalysis constructs the symbol
  * table by preorder traversal of the syntax tree
  */
-bool semanticAnalysis(Node t)
+bool semanticAnalysis(Node t, bool printSymTable)
 {
     struct BuildSymtabStateRec state;
     state.functionLocCounter = 0;
@@ -497,7 +507,11 @@ bool semanticAnalysis(Node t)
         st_insert(state.sym, "input", rec);
     }
 
-    bool error = buildSymtabImpl(t, &state);
+    bool error = buildSymtabImpl(t, &state, printSymTable);
+
+    if(printSymTable)
+	printFormattedSymtab(state.sym);
+
     st_free(state.sym);
 
     // type checking
