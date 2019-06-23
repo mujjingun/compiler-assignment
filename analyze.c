@@ -180,7 +180,7 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
             state->paramLocCounter = t->children[0]->num_children * 4;
             break;
         case StmtParam:
-            if ((result = st_lookup(state->sym, t->value.param.name))) {
+            if ((result = st_lookup(state->sym, t->value.param.name)) && result->scope == state->scopeLevel) {
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.param.name, result->linenos[0]);
@@ -478,6 +478,23 @@ bool semanticAnalysis(Node t)
         rec->linenos = malloc(sizeof(int) * 1);
         rec->linenos[0] = -1;
         st_insert(state.sym, "output", rec);
+    }
+    {
+        Record rec = malloc(sizeof(struct ActivationRecord));
+        rec->loc = -1;
+        rec->scope = 0;
+
+        rec->vpf = VPFFunction;
+        rec->kind = SymFunction;
+        rec->type = TypeInt;
+
+        rec->func.num_params = 0;
+        rec->func.param_types = NULL;
+
+        rec->num_linenos = 1;
+        rec->linenos = malloc(sizeof(int) * 1);
+        rec->linenos[0] = -1;
+        st_insert(state.sym, "input", rec);
     }
 
     bool error = buildSymtabImpl(t, &state);

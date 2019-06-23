@@ -12,6 +12,17 @@ sw $ra,0($sp)
 
 addiu $sp,$sp,0 # allocate locals
 
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 slt $t0, $t0, $t1
@@ -23,6 +34,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 slt $t0, $t0, $t1
@@ -34,6 +68,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 slt $t0, $t0, $t1
@@ -45,6 +102,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 slt $t0, $t1, $t0
@@ -57,6 +137,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 slt $t0, $t1, $t0
@@ -69,6 +172,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 slt $t0, $t1, $t0
@@ -81,6 +207,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 slt $t0, $t1, $t0
@@ -92,6 +241,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 slt $t0, $t1, $t0
@@ -103,6 +275,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 slt $t0, $t1, $t0
@@ -114,6 +309,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 slt $t0, $t0, $t1
@@ -126,6 +344,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 slt $t0, $t0, $t1
@@ -138,6 +379,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 slt $t0, $t0, $t1
@@ -150,6 +414,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 xor $t0, $t0, $t1
@@ -162,6 +449,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 xor $t0, $t0, $t1
@@ -174,6 +484,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 xor $t0, $t0, $t1
@@ -186,6 +519,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 xor $t0, $t0, $t1
@@ -198,6 +554,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 xor $t0, $t0, $t1
@@ -210,6 +589,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 xor $t0, $t0, $t1
@@ -222,6 +624,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 addu $t0, $t0, $t1
@@ -232,6 +657,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 addu $t0, $t0, $t1
@@ -242,6 +690,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 addu $t0, $t0, $t1
@@ -252,6 +723,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 subu $t0, $t0, $t1
@@ -262,6 +756,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 subu $t0, $t0, $t1
@@ -272,6 +789,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 subu $t0, $t0, $t1
@@ -282,6 +822,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 mult $t0, $t1
@@ -293,6 +856,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 mult $t0, $t1
@@ -304,6 +890,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 mult $t0, $t1
@@ -315,6 +924,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 2
 div $0,$t0,$t1
@@ -327,6 +959,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 1
 div $0,$t0,$t1
@@ -339,6 +994,29 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
+addiu $sp,$sp,-40
+sw $t0,0($sp)
+sw $t1,4($sp)
+sw $t2,8($sp)
+sw $t3,12($sp)
+sw $t4,16($sp)
+sw $t5,20($sp)
+sw $t6,24($sp)
+sw $t7,28($sp)
+sw $t8,32($sp)
+sw $t9,36($sp)
 li $t0, 1
 li $t1, 0
 div $0,$t0,$t1
@@ -351,6 +1029,18 @@ sw $fp,0($sp) # push control link
 jal output
 addiu $sp,$sp,8
 
+lw $t0,0($sp)
+lw $t1,4($sp)
+lw $t2,8($sp)
+lw $t3,12($sp)
+lw $t4,16($sp)
+lw $t5,20($sp)
+lw $t6,24($sp)
+lw $t7,28($sp)
+lw $t8,32($sp)
+lw $t9,36($sp)
+addiu $sp,$sp,40
+move $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 
@@ -367,8 +1057,16 @@ output:
 li $v0,1
 lw $a0,4($sp)
 syscall
+li $v0,4
+la $a0,_Newline
+syscall
+j $ra
+
+input:
+li $v0,5
+syscall
 j $ra
 
 .data
-glo: .word 1
+_Newline: .asciiz "\n"
 # End of code.
