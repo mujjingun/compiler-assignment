@@ -12,7 +12,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         char reg_name[3];
         register_name(reg, reg_num, reg_name);
 
-        fprintf(out, "li $%s, %d\n", reg_name, t->value.num);
+        fprintf(out, "li    $%s, %d\n", reg_name, t->value.num);
         break;
     }
 
@@ -22,7 +22,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
 
         if (is_addr) {
             if (t->record->scope == 0) {
-                fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
+                fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
             } else {
                 int loc = t->record->loc;
                 switch (t->storage) {
@@ -36,10 +36,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         } else {
             if (t->record->scope == 0) {
                 if (t->record->kind == SymArray) {
-                    fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
+                    fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
                 } else {
-                    fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
-                    fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                    fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
+                    fprintf(out, "lw    $%s, 0($%s)\n", reg_name, reg_name);
                 }
             } else {
                 int loc = t->record->loc;
@@ -50,10 +50,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
                             fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
                         }
                         else {
-                            fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                            fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
                         }
                     } else {
-                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
                     }
                     break;
                 default:
@@ -68,25 +68,25 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         char idx_reg_name[3];
         register_name(reg, reg_num + 1, idx_reg_name);
         expr_cgen(out, t->children[0], reg, reg_num + 1, false);
-        fprintf(out, "sll $%s,$%s,2\n", idx_reg_name, idx_reg_name);
+        fprintf(out, "sll   $%s,$%s,2\n", idx_reg_name, idx_reg_name);
 
         char reg_name[3];
         register_name(reg, reg_num, reg_name);
 
         if (is_addr) {
             if (t->record->scope == 0) {
-                fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
-                fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
+                fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
             } else {
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
                     if (loc < 0) {
-                        fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
+                        fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
                         fprintf(out, "addiu $%s, $%s, %d\n", reg_name, reg_name, loc);
                     } else {
-                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
-                        fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
+                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
                     }
                     break;
                 default:
@@ -95,20 +95,20 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
             }
         } else {
             if (t->record->scope == 0) {
-                fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
-                fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
-                fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
+                fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                fprintf(out, "lw    $%s, 0($%s)\n", reg_name, reg_name);
             } else {
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
                     if (loc < 0) {
-                        fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
-                        fprintf(out, "lw $%s, %d($%s)\n", reg_name, loc, reg_name);
+                        fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
+                        fprintf(out, "lw    $%s, %d($%s)\n", reg_name, loc, reg_name);
                     } else {
-                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
-                        fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
-                        fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
+                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                        fprintf(out, "lw    $%s, 0($%s)\n", reg_name, reg_name);
                     }
                     break;
                 default:
@@ -126,7 +126,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         // push temporary registers
         fprintf(out, "addiu $sp,$sp,%d\n", -40);
         for (int i = 0; i < 10; ++i) {
-            fprintf(out, "sw $t%d,%d($sp)\n", i, i * 4);
+            fprintf(out, "sw    $t%d,%d($sp)\n", i, i * 4);
         }
 
         // push the arguments
@@ -134,28 +134,28 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         for (int i = 0; i < t->num_children; ++i) {
             expr_cgen(out, t->children[i], Temp, reg_num, false);
             fprintf(out, "addiu $sp,$sp,%d\n", -4);
-            fprintf(out, "sw $%s,0($sp) # push argument %d\n", reg_name, i);
+            fprintf(out, "sw    $%s,0($sp) # push argument %d\n", reg_name, i);
             arg_size += 4;
         }
 
         // push the control link
         fprintf(out, "addiu $sp,$sp,%d\n", -4);
-        fprintf(out, "sw $fp,0($sp) # push control link\n");
+        fprintf(out, "sw    $fp,0($sp) # push control link\n");
 
         // jump to the procedure
-        fprintf(out, "jal %s\n", t->value.name);
+        fprintf(out, "jal   %s\n", t->value.name);
 
         // clean up the arguments
         fprintf(out, "addiu $sp,$sp,%d\n\n", arg_size + 4);
 
         // pop temporary registers
         for (int i = 0; i < 10; ++i) {
-            fprintf(out, "lw $t%d,%d($sp)\n", i, i * 4);
+            fprintf(out, "lw    $t%d,%d($sp)\n", i, i * 4);
         }
         fprintf(out, "addiu $sp,$sp,%d\n", 40);
 
         // return value
-        fprintf(out, "move $%s,$v0\n", reg_name);
+        fprintf(out, "move  $%s,$v0\n", reg_name);
         break;
     }
 
@@ -177,7 +177,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         // value
         expr_cgen(out, t->children[1], Temp, reg_num + 1, false);
 
-        fprintf(out, "sw $%s, 0($%s)\n", reg_name, addr_reg_name);
+        fprintf(out, "sw    $%s, 0($%s)\n", reg_name, addr_reg_name);
         break;
     }
     }
@@ -216,13 +216,13 @@ static void cGen(Node t, codegenState state)
             expr_cgen(out, t->children[0], Temp, 0, false);
 
             emitComment(out, "branch to else if the condition is false");
-            fprintf(out, "beq $t0,$0,$_L%d\n\n", else_label);
+            fprintf(out, "beq   $t0,$0,$_L%d\n\n", else_label);
 
             emitComment(out, "if block");
             cGen(t->children[1], state);
 
             emitComment(out, "jump to end");
-            fprintf(out, "j $_L%d\n\n", end_label);
+            fprintf(out, "j     $_L%d\n\n", end_label);
 
             emitComment(out, "else");
             fprintf(out, "$_L%d:\n", else_label);
@@ -247,12 +247,12 @@ static void cGen(Node t, codegenState state)
             expr_cgen(out, t->children[0], Temp, 0, false);
 
             emitComment(out, "exit if the condition is false");
-            fprintf(out, "beq $t0,$0,$_L%d\n\n", exit_label);
+            fprintf(out, "beq   $t0,$0,$_L%d\n\n", exit_label);
 
             emitComment(out, "loop body");
             cGen(t->children[1], state);
 
-            fprintf(out, "j $_L%d # loop\n", loop_label);
+            fprintf(out, "j     $_L%d # loop\n", loop_label);
 
             fprintf(out, "$_L%d: # loop exit\n", exit_label);
 
@@ -261,7 +261,7 @@ static void cGen(Node t, codegenState state)
 
         case StmtReturn:
             expr_cgen(out, t->children[0], Temp, 0, false);
-            fprintf(out, "move $v0, $t0 # set return value\n");
+            fprintf(out, "move  $v0, $t0 # set return value\n");
             break;
 
         case StmtDeclList: {
@@ -281,11 +281,11 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "%s:\n", t->value.func.name);
 
             emitComment(out, "set frame pointer");
-            fprintf(out, "move $fp,$sp\n");
+            fprintf(out, "move  $fp,$sp\n");
 
             emitComment(out, "push the return address");
             fprintf(out, "addiu $sp,$sp,%d\n", -4);
-            fprintf(out, "sw $ra,0($sp)\n\n");
+            fprintf(out, "sw    $ra,0($sp)\n\n");
 
             for (int i = 0; i < t->num_children; i++) {
                 cGen(t->children[i], state);
@@ -293,16 +293,16 @@ static void cGen(Node t, codegenState state)
 
             fprintf(out, "\n");
             emitComment(out, "restore return address");
-            fprintf(out, "lw $ra,-4($fp)\n");
+            fprintf(out, "lw    $ra,-4($fp)\n");
 
             emitComment(out, "copy the fp to the sp");
-            fprintf(out, "move $sp,$fp\n");
+            fprintf(out, "move  $sp,$fp\n");
 
             emitComment(out, "load the control link into the fp");
-            fprintf(out, "lw $fp,0($fp)\n");
+            fprintf(out, "lw    $fp,0($fp)\n");
 
             emitComment(out, "jump to the return address");
-            fprintf(out, "j $ra\n\n");
+            fprintf(out, "j     $ra\n\n");
             break;
         }
 
@@ -372,18 +372,18 @@ void codeGen(Node syntaxTree, const char* filename)
 
     // write standard procedures
     fputs("output:\n"
-          "li $v0,1\n"
-          "lw $a0,4($sp)\n"
+          "li    $v0,1\n"
+          "lw    $a0,4($sp)\n"
           "syscall\n"
-          "li $v0,4\n"
-          "la $a0,_Newline\n"
+          "li    $v0,4\n"
+          "la    $a0,_Newline\n"
           "syscall\n"
-          "j $ra\n\n",
+          "j     $ra\n\n",
         out);
     fputs("input:\n"
-          "li $v0,5\n"
+          "li    $v0,5\n"
           "syscall\n"
-          "j $ra\n\n",
+          "j     $ra\n\n",
         out);
 
     // write data
