@@ -36,12 +36,18 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         } else {
             if (t->record->scope == 0) {
                 fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
-                fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                if (t->record->kind != SymArray) {
+                    fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                }
             } else {
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
-                    fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                    if (t->record->kind == SymArray) {
+                        fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                    } else {
+                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                    }
                     break;
                 default:
                     break;
@@ -68,8 +74,13 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
-                    fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
-                    fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                    if (loc < 0) {
+                        fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
+                        fprintf(out, "addiu $%s, $%s, %d\n", reg_name, reg_name, loc);
+                    } else {
+                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                        fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                    }
                     break;
                 default:
                     break;
@@ -84,8 +95,14 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
-                    fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
-                    fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                    if (loc < 0) {
+                        fprintf(out, "addu $%s, $fp, $%s\n", reg_name, idx_reg_name);
+                        fprintf(out, "lw $%s, %d($%s)\n", reg_name, loc, reg_name);
+                    } else {
+                        fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                        fprintf(out, "addu $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                        fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
+                    }
                     break;
                 default:
                     break;
