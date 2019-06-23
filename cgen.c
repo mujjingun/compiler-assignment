@@ -5,7 +5,29 @@
 
 #include <stdio.h>
 
-static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_addr)
+typedef struct debugSymbolsStateRec {
+    FILE* source;
+    int currentlineo;
+    char buffer[128];
+} debugSymbolState;
+
+static void printSourceLine(FILE* out, debugSymbolState* debugSyms, int n)
+{
+    int offset = n - debugSyms->currentlineo;
+    if(offset != 0)
+    {
+	memset(debugSyms->buffer, 0, sizeof(debugSyms->buffer));
+	fetchSourceLine(debugSyms->source, offset, debugSyms->buffer,
+			sizeof(debugSyms->buffer));
+	debugSyms->currentlineo = n;
+	debugSyms->buffer[strcspn(debugSyms->buffer, "\n")] = 0;
+    }
+    fprintf(out, "\n# %s\n", debugSyms->buffer);
+}
+
+static void expr_cgen(FILE* out, Node t, enum Storage reg,
+		      int reg_num, bool is_addr,
+		      debugSymbolState* debugSymbols)
 {
     switch (t->expr) {
     case ExprConst: {
@@ -65,9 +87,12 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
     }
 
     case ExprIndex: {
+	if(debugSymbols)
+	    printSourceLine(out, debugSymbols, t->lineno); 
+
         char idx_reg_name[3];
         register_name(reg, reg_num + 1, idx_reg_name);
-        expr_cgen(out, t->children[0], reg, reg_num + 1, false);
+        expr_cgen(out, t->children[0], reg, reg_num + 1, false, debugSymbols);
         fprintf(out, "sll   $%s,$%s,2\n", idx_reg_name, idx_reg_name);
 
         char reg_name[3];
@@ -120,6 +145,9 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
     }
 
     case ExprCall: {
+	if(debugSymbols)
+	    printSourceLine(out, debugSymbols, t->lineno); 
+
         char reg_name[3];
         register_name(reg, reg_num, reg_name);
 
@@ -132,7 +160,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         // push the arguments
         int arg_size = 0;
         for (int i = 0; i < t->num_children; ++i) {
-            expr_cgen(out, t->children[i], Temp, reg_num, false);
+            expr_cgen(out, t->children[i], Temp, reg_num, false, debugSymbols);
             fprintf(out, "addiu $sp,$sp,%d\n", -4);
             fprintf(out, "sw    $%s,0($sp) # push argument %d\n", reg_name, i);
             arg_size += 4;
@@ -146,7 +174,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
         fprintf(out, "jal   %s\n", t->value.name);
 
         // clean up the arguments
-        fprintf(out, "addiu $sp,$sp,%d\n\n", arg_size + 4);
+        fprintf(out, "addiu $sp,$sp,%d\n", arg_size + 4);
 
         // pop temporary registers
         for (int i = 0; i < 10; ++i) {
@@ -160,22 +188,28 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
     }
 
     case ExprBinOp:
-        expr_cgen(out, t->children[0], Temp, reg_num, false);
-        expr_cgen(out, t->children[1], Temp, reg_num + 1, false);
+	if(debugSymbols)
+	    printSourceLine(out, debugSymbols, t->lineno); 
+
+        expr_cgen(out, t->children[0], Temp, reg_num, false, debugSymbols);
+        expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
         exec_binop(out, t, Temp, reg_num, Temp, reg_num, Temp, reg_num + 1);
         t->storage = Temp;
         break;
 
     case ExprAssign: {
+	if(debugSymbols)
+	    printSourceLine(out, debugSymbols, t->lineno); 
+
         char addr_reg_name[3], reg_name[3];
         register_name(reg, reg_num, addr_reg_name);
         register_name(reg, reg_num + 1, reg_name);
 
         // asignee address
-        expr_cgen(out, t->children[0], Temp, reg_num, true);
+        expr_cgen(out, t->children[0], Temp, reg_num, true, debugSymbols);
 
         // value
-        expr_cgen(out, t->children[1], Temp, reg_num + 1, false);
+        expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
 
         fprintf(out, "sw    $%s, 0($%s)\n", reg_name, addr_reg_name);
         break;
@@ -189,10 +223,10 @@ typedef struct codegenStateRec {
     int label_ctr;
 } * codegenState;
 
-static void cGen(Node t, codegenState state)
+static void cGen(Node t, codegenState state, debugSymbolState* debugSymbols)
 {
-    FILE* out = state->out;
-    FILE* data = state->data;
+    FILE* out	      = state->out;
+    FILE* data	      = state->data;
 
     switch (t->kind) {
     case NodeStmt: {
@@ -213,13 +247,13 @@ static void cGen(Node t, codegenState state)
             int end_label = state->label_ctr++;
 
             emitComment(out, "evaluate the condition");
-            expr_cgen(out, t->children[0], Temp, 0, false);
+            expr_cgen(out, t->children[0], Temp, 0, false, debugSymbols);
 
             emitComment(out, "branch to else if the condition is false");
             fprintf(out, "beq   $t0,$0,$_L%d\n\n", else_label);
 
             emitComment(out, "if block");
-            cGen(t->children[1], state);
+            cGen(t->children[1], state, debugSymbols);
 
             emitComment(out, "jump to end");
             fprintf(out, "j     $_L%d\n\n", end_label);
@@ -228,7 +262,7 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "$_L%d:\n", else_label);
 
             if (t->num_children == 3) {
-                cGen(t->children[2], state);
+                cGen(t->children[2], state, debugSymbols);
             }
 
             emitComment(out, "end of if statement");
@@ -244,13 +278,13 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "$_L%d: # loop\n", loop_label);
 
             emitComment(out, "evaluate the loop condition");
-            expr_cgen(out, t->children[0], Temp, 0, false);
+            expr_cgen(out, t->children[0], Temp, 0, false, debugSymbols);
 
             emitComment(out, "exit if the condition is false");
             fprintf(out, "beq   $t0,$0,$_L%d\n\n", exit_label);
 
             emitComment(out, "loop body");
-            cGen(t->children[1], state);
+            cGen(t->children[1], state, debugSymbols);
 
             fprintf(out, "j     $_L%d # loop\n", loop_label);
 
@@ -260,20 +294,20 @@ static void cGen(Node t, codegenState state)
         }
 
         case StmtReturn:
-            expr_cgen(out, t->children[0], Temp, 0, false);
+            expr_cgen(out, t->children[0], Temp, 0, false, debugSymbols);
             fprintf(out, "move  $v0, $t0 # set return value\n");
             break;
 
         case StmtDeclList: {
             for (int i = 0; i < t->num_children; i++) {
-                cGen(t->children[i], state);
+                cGen(t->children[i], state, debugSymbols);
             }
             break;
         }
 
         case StmtExprStmt:
             for (int i = 0; i < t->num_children; i++) {
-                cGen(t->children[i], state);
+                cGen(t->children[i], state, debugSymbols);
             }
             break;
 
@@ -288,7 +322,7 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "sw    $ra,0($sp)\n\n");
 
             for (int i = 0; i < t->num_children; i++) {
-                cGen(t->children[i], state);
+                cGen(t->children[i], state, debugSymbols);
             }
 
             fprintf(out, "\n");
@@ -324,7 +358,7 @@ static void cGen(Node t, codegenState state)
             fprintf(out, "addiu $sp,$sp,%d # allocate locals\n\n", -size);
 
             for (int i = 0; i < t->num_children; i++) {
-                cGen(t->children[i], state);
+                cGen(t->children[i], state, debugSymbols);
             }
 
             // pop stack
@@ -339,13 +373,14 @@ static void cGen(Node t, codegenState state)
     }
 
     case NodeExpr: {
-        expr_cgen(out, t, Temp, 0, false);
+	expr_cgen(out, t, Temp, 0, false, debugSymbols);
         break;
     }
     }
 }
 
-void codeGen(Node syntaxTree, const char* filename)
+void codeGen(Node syntaxTree, const char* filename,
+	     bool writeDebug, FILE* source)
 {
     FILE* out = fopen(filename, "w");
     if (!out) {
@@ -364,11 +399,18 @@ void codeGen(Node syntaxTree, const char* filename)
     fputs(".align 2\n", out);
     fputs(".globl main\n\n", out);
 
+    debugSymbolState debugSymbols;
+    if(writeDebug)
+    {
+	debugSymbols.currentlineo = 0;
+	debugSymbols.source       = source;
+    }
+
     struct codegenStateRec rec;
     rec.out = out;
     rec.data = data;
     rec.label_ctr = 0;
-    cGen(syntaxTree, &rec);
+    cGen(syntaxTree, &rec, writeDebug ? &debugSymbols : NULL);
 
     // write standard procedures
     fputs("output:\n"

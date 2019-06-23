@@ -137,3 +137,11 @@ void exec_binop(FILE* out, Node t,
         break;
     }
 }
+
+
+void fetchSourceLine(FILE* fp, int n, char* output, int maxLength)
+{
+    for(int i = 0; i < n && fgets(output, maxLength, fp); ++i) 
+	;//printf("# %s", output);
+}
+    

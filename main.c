@@ -1,3 +1,4 @@
+
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -17,13 +18,14 @@ void yyerror(yyscan_t scanner, char const* s)
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        printf("Usage: %s [--ast] [--latex] <source> [<source2> ...]\n", argv[0]);
+        printf("Usage: %s [--ast] [--latex] ] [--symtab] [--debug] <source> [<source2> ...]\n", argv[0]);
         return 0;
     }
 
     bool printLatex       = false;
     bool printAst         = false;
     bool printSymbolTable = false;
+    bool debugSymbols     = false;
 
     int i = 1;
     for (; i < argc; ++i) {
@@ -34,6 +36,8 @@ int main(int argc, char* argv[])
                 printAst = true;
             } else if (strcmp(argv[i], "--symtab") == 0) {
 		printSymbolTable = true;
+            } else if (strcmp(argv[i], "--debug") == 0) {
+		debugSymbols = true;
 	    }
         } else {
             break;
@@ -72,7 +76,18 @@ int main(int argc, char* argv[])
         yyset_in(fp, scanner.flex);
         yyset_extra(&scanner, scanner.flex);
 
-        int parse_result = yyparse(scanner.flex);
+	int parse_result = yyparse(scanner.flex);
+
+	/* resetting file pointer in case debug symbols are required */
+	if(debugSymbols)
+	{
+	    fclose(fp);
+	    if ((fp = fopen(argv[i], "r")) == NULL) {
+		fprintf(stderr, "Error: Cannot open file \"%s\"\n", argv[i]);
+		return 1;
+	    }
+	}
+
         if (parse_result != 0) {
             fprintf(stderr, "Error: Parse failed\n");
         } else {
@@ -88,17 +103,15 @@ int main(int argc, char* argv[])
             bool error = semanticAnalysis(scanner.tree, printSymbolTable);
 
             if (!error) {
-                codeGen(scanner.tree, asm_filename);
+                codeGen(scanner.tree, asm_filename, debugSymbols, fp);
             }
 
             freeTree(scanner.tree);
         }
 
         free(asm_filename);
-
         yylex_destroy(scanner.flex);
-
-        fclose(fp);
+	fclose(fp);
 
         // print newline
         puts("");
