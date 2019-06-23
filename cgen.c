@@ -35,8 +35,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
             }
         } else {
             if (t->record->scope == 0) {
-                fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
-                if (t->record->kind != SymArray) {
+                if (t->record->kind == SymArray) {
+                    fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
+                } else {
+                    fprintf(out, "la $%s, %s\n", reg_name, t->value.name);
                     fprintf(out, "lw $%s, 0($%s)\n", reg_name, reg_name);
                 }
             } else {
@@ -44,7 +46,12 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg, int reg_num, bool is_
                 switch (t->storage) {
                 case Memory:
                     if (t->record->kind == SymArray) {
-                        fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                        if (loc < 0) {
+                            fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                        }
+                        else {
+                            fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+                        }
                     } else {
                         fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
                     }

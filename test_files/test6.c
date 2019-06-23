@@ -1,5 +1,15 @@
 int x[10];
 
+void print(int x[])
+{
+    int i;
+    i = 0;
+    while (i < 10) {
+        output(x[i]);
+        i = i + 1;
+    }
+}
+
 int minloc(int a[], int low, int high) {
     int i; int x; int k;
     k = low;
@@ -38,9 +48,5 @@ void main(void) {
         i = i + 1;
     }
     sort(x,0,10);
-    i = 0;
-    while(i < 10) {
-        output(x[i]);
-        i = i + 1;
-    }
+    print(x);
 }

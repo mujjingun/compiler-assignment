@@ -180,7 +180,7 @@ static bool buildSymtabImpl(Node t, BuildSymtabState state)
             state->paramLocCounter = t->children[0]->num_children * 4;
             break;
         case StmtParam:
-            if ((result = st_lookup(state->sym, t->value.param.name))) {
+            if ((result = st_lookup(state->sym, t->value.param.name)) && result->scope == state->scopeLevel) {
                 // already in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.param.name, result->linenos[0]);
