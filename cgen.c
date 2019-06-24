@@ -296,6 +296,18 @@ static void cGen(Node t, codegenState state, debugSymbolState* debugSymbols)
         case StmtReturn:
             expr_cgen(out, t->children[0], Temp, 0, false, debugSymbols);
             fprintf(out, "move  $v0, $t0 # set return value\n");
+
+            emitComment(out, "restore return address");
+            fprintf(out, "lw    $ra,-4($fp)\n");
+
+            emitComment(out, "copy the fp to the sp");
+            fprintf(out, "move  $sp,$fp\n");
+
+            emitComment(out, "load the control link into the fp");
+            fprintf(out, "lw    $fp,0($fp)\n");
+
+            emitComment(out, "jump to the return address");
+            fprintf(out, "j     $ra\n\n");
             break;
 
         case StmtDeclList: {
