@@ -205,7 +205,8 @@ Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id)
     return node;
 }
 
-Node makeFunctionNode(int lineno, enum TypeKind return_type, char* id, Node params, Node body)
+Node makeFunctionNode(int lineno, enum TypeKind return_type,
+		      char* id, Node params, Node body)
 {
     Node node = allocNode(lineno, NodeStmt, 2);
     node->stmt = StmtFunction;
