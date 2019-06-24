@@ -1,5 +1,5 @@
 # C- Compilation to SPIM Code
-# Source File: test_files/test6.asm
+# Source File: test_files/test6.tm
 .align 2
 .globl main
 
@@ -12,11 +12,15 @@ sw    $ra,0($sp)
 
 addiu $sp,$sp,-4 # allocate locals
 
+
+#     i = 0;
 addiu $t0, $fp, -8
 li    $t1, 0
 sw    $t1, 0($t0)
 $_L0: # loop
 # evaluate the loop condition
+
+#     while (i < 10) {
 lw    $t0, -8($fp)
 li    $t1, 10
 slt   $t0, $t0, $t1
@@ -27,41 +31,55 @@ beq   $t0,$0,$_L1
 # loop body
 addiu $sp,$sp,0 # allocate locals
 
-addiu $sp,$sp,-40
-sw    $t0,0($sp)
-sw    $t1,4($sp)
-sw    $t2,8($sp)
-sw    $t3,12($sp)
-sw    $t4,16($sp)
-sw    $t5,20($sp)
-sw    $t6,24($sp)
-sw    $t7,28($sp)
-sw    $t8,32($sp)
-sw    $t9,36($sp)
-lw    $t1, -8($fp)
-sll   $t1,$t1,2
-lw    $t0, 4($fp)
-addu  $t0, $t0, $t1
-lw    $t0, 0($t0)
-addiu $sp,$sp,-4
-sw    $t0,0($sp) # push argument 0
+
+#         output(x[i]);
+addiu $sp, $sp,-56
+sw    $t0, 0($sp)
+sw    $t1, 4($sp)
+sw    $t2, 8($sp)
+sw    $t3, 12($sp)
+sw    $t4, 16($sp)
+sw    $t5, 20($sp)
+sw    $t6, 24($sp)
+sw    $t7, 28($sp)
+sw    $t8, 32($sp)
+sw    $t9, 36($sp)
+sw    $a0, 40($sp)
+sw    $a1, 44($sp)
+sw    $a2, 48($sp)
+sw    $a3, 52($sp)
+
+#         output(x[i]);
+lw    $t5, -8($fp)
+sll   $t5,$t5,2
+addu  $t4, $a0, $t5
+lw    $t4, 0($t4)
+move  $t0, $t4
+move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   output
-addiu $sp,$sp,8
-lw    $t0,0($sp)
-lw    $t1,4($sp)
-lw    $t2,8($sp)
-lw    $t3,12($sp)
-lw    $t4,16($sp)
-lw    $t5,20($sp)
-lw    $t6,24($sp)
-lw    $t7,28($sp)
-lw    $t8,32($sp)
-lw    $t9,36($sp)
+lw    $t0, 0($sp)
+lw    $t1, 4($sp)
+lw    $t2, 8($sp)
+lw    $t3, 12($sp)
+lw    $t4, 16($sp)
+lw    $t5, 20($sp)
+lw    $t6, 24($sp)
+lw    $t7, 28($sp)
+lw    $t8, 32($sp)
+lw    $t9, 36($sp)
+lw    $a0, 40($sp)
+lw    $a1, 44($sp)
+lw    $a2, 48($sp)
+lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t0,$v0
+move  $t4,$v0
+
+#         i = i + 1;
 addiu $t0, $fp, -8
+
+#         i = i + 1;
 lw    $t1, -8($fp)
 li    $t2, 1
 addu   $t1, $t1, $t2
@@ -91,25 +109,36 @@ sw    $ra,0($sp)
 
 addiu $sp,$sp,-12 # allocate locals
 
+
+#     k = low;
 addiu $t0, $fp, -16
-lw    $t1, 8($fp)
+move  $t1, $a1
 sw    $t1, 0($t0)
+
+#     x = a[low];
 addiu $t0, $fp, -12
-lw    $t2, 8($fp)
+
+#     x = a[low];
+move  $t2, $a1
 sll   $t2,$t2,2
-lw    $t1, 12($fp)
-addu  $t1, $t1, $t2
+addu  $t1, $a2, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
+
+#     i = low + 1;
 addiu $t0, $fp, -8
-lw    $t1, 8($fp)
+
+#     i = low + 1;
+move  $t1, $a1
 li    $t2, 1
 addu   $t1, $t1, $t2
 sw    $t1, 0($t0)
 $_L2: # loop
 # evaluate the loop condition
+
+#     while (i < high)
 lw    $t0, -8($fp)
-lw    $t1, 4($fp)
+move  $t1, $a0
 slt   $t0, $t0, $t1
 andi  $t0, $t0, 0x00ff
 # exit if the condition is false
@@ -119,10 +148,13 @@ beq   $t0,$0,$_L3
 addiu $sp,$sp,0 # allocate locals
 
 # evaluate the condition
+
+#         if (a[i] < x)
+
+#         if (a[i] < x)
 lw    $t1, -8($fp)
 sll   $t1,$t1,2
-lw    $t0, 12($fp)
-addu  $t0, $t0, $t1
+addu  $t0, $a2, $t1
 lw    $t0, 0($t0)
 lw    $t1, -12($fp)
 slt   $t0, $t0, $t1
@@ -133,13 +165,18 @@ beq   $t0,$0,$_L4
 # if block
 addiu $sp,$sp,0 # allocate locals
 
+
+#             x = a[i];
 addiu $t0, $fp, -12
+
+#             x = a[i];
 lw    $t2, -8($fp)
 sll   $t2,$t2,2
-lw    $t1, 12($fp)
-addu  $t1, $t1, $t2
+addu  $t1, $a2, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
+
+#             k = i;
 addiu $t0, $fp, -16
 lw    $t1, -8($fp)
 sw    $t1, 0($t0)
@@ -153,7 +190,11 @@ $_L4:
 # end of if statement
 $_L5:
 
+
+#         i = i + 1;
 addiu $t0, $fp, -8
+
+#         i = i + 1;
 lw    $t1, -8($fp)
 li    $t2, 1
 addu   $t1, $t1, $t2
@@ -194,13 +235,19 @@ sw    $ra,0($sp)
 
 addiu $sp,$sp,-8 # allocate locals
 
+
+#     i = low;
 addiu $t0, $fp, -8
-lw    $t1, 8($fp)
+move  $t1, $a1
 sw    $t1, 0($t0)
 $_L6: # loop
 # evaluate the loop condition
+
+#     while (i < high - 1) {
 lw    $t0, -8($fp)
-lw    $t1, 4($fp)
+
+#     while (i < high - 1) {
+move  $t1, $a0
 li    $t2, 1
 subu   $t1, $t1, $t2
 slt   $t0, $t0, $t1
@@ -211,68 +258,93 @@ beq   $t0,$0,$_L7
 # loop body
 addiu $sp,$sp,-4 # allocate locals
 
+
+#         k = minloc(a,i,high);
 addiu $t0, $fp, -12
-addiu $sp,$sp,-40
-sw    $t0,0($sp)
-sw    $t1,4($sp)
-sw    $t2,8($sp)
-sw    $t3,12($sp)
-sw    $t4,16($sp)
-sw    $t5,20($sp)
-sw    $t6,24($sp)
-sw    $t7,28($sp)
-sw    $t8,32($sp)
-sw    $t9,36($sp)
-lw    $t1, 12($fp)
-addiu $sp,$sp,-4
-sw    $t1,0($sp) # push argument 0
-lw    $t1, -8($fp)
-addiu $sp,$sp,-4
-sw    $t1,0($sp) # push argument 1
-lw    $t1, 4($fp)
-addiu $sp,$sp,-4
-sw    $t1,0($sp) # push argument 2
+
+#         k = minloc(a,i,high);
+addiu $sp, $sp,-56
+sw    $t0, 0($sp)
+sw    $t1, 4($sp)
+sw    $t2, 8($sp)
+sw    $t3, 12($sp)
+sw    $t4, 16($sp)
+sw    $t5, 20($sp)
+sw    $t6, 24($sp)
+sw    $t7, 28($sp)
+sw    $t8, 32($sp)
+sw    $t9, 36($sp)
+sw    $a0, 40($sp)
+sw    $a1, 44($sp)
+sw    $a2, 48($sp)
+sw    $a3, 52($sp)
+move  $t5, $a2
+move  $t1, $t5
+lw    $t5, -8($fp)
+move  $t2, $t5
+move  $t5, $a0
+move  $t3, $t5
+move  $a0, $t1
+move  $a1, $t2
+move  $a2, $t3
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   minloc
-addiu $sp,$sp,16
-lw    $t0,0($sp)
-lw    $t1,4($sp)
-lw    $t2,8($sp)
-lw    $t3,12($sp)
-lw    $t4,16($sp)
-lw    $t5,20($sp)
-lw    $t6,24($sp)
-lw    $t7,28($sp)
-lw    $t8,32($sp)
-lw    $t9,36($sp)
+lw    $t0, 0($sp)
+lw    $t1, 4($sp)
+lw    $t2, 8($sp)
+lw    $t3, 12($sp)
+lw    $t4, 16($sp)
+lw    $t5, 20($sp)
+lw    $t6, 24($sp)
+lw    $t7, 28($sp)
+lw    $t8, 32($sp)
+lw    $t9, 36($sp)
+lw    $a0, 40($sp)
+lw    $a1, 44($sp)
+lw    $a2, 48($sp)
+lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t1,$v0
+move  $t5,$v0
 sw    $t1, 0($t0)
+
+#         t=a[k];
 addiu $t0, $fp, -16
+
+#         t=a[k];
 lw    $t2, -12($fp)
 sll   $t2,$t2,2
-lw    $t1, 12($fp)
-addu  $t1, $t1, $t2
+addu  $t1, $a2, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
+
+#         a[k]=a[i];
+
+#         a[k]=a[i];
 lw    $t1, -12($fp)
 sll   $t1,$t1,2
-lw    $t0, 12($fp)
-addu  $t0, $t0, $t1
+addu  $t0, $a2, $t1
+
+#         a[k]=a[i];
 lw    $t2, -8($fp)
 sll   $t2,$t2,2
-lw    $t1, 12($fp)
-addu  $t1, $t1, $t2
+addu  $t1, $a2, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
+
+#         a[i] = t;
+
+#         a[i] = t;
 lw    $t1, -8($fp)
 sll   $t1,$t1,2
-lw    $t0, 12($fp)
-addu  $t0, $t0, $t1
+addu  $t0, $a2, $t1
 lw    $t1, -16($fp)
 sw    $t1, 0($t0)
+
+#         i = i + 1;
 addiu $t0, $fp, -8
+
+#         i = i + 1;
 lw    $t1, -8($fp)
 li    $t2, 1
 addu   $t1, $t1, $t2
@@ -302,11 +374,15 @@ sw    $ra,0($sp)
 
 addiu $sp,$sp,-4 # allocate locals
 
+
+#     i = 0;
 addiu $t0, $fp, -8
 li    $t1, 0
 sw    $t1, 0($t0)
 $_L8: # loop
 # evaluate the loop condition
+
+#     while (i < 10) {
 lw    $t0, -8($fp)
 li    $t1, 10
 slt   $t0, $t0, $t1
@@ -317,39 +393,56 @@ beq   $t0,$0,$_L9
 # loop body
 addiu $sp,$sp,0 # allocate locals
 
+
+#         x[i] = input();
+
+#         x[i] = input();
 lw    $t1, -8($fp)
 sll   $t1,$t1,2
 la    $t0, x
 addu  $t0, $t0, $t1
-addiu $sp,$sp,-40
-sw    $t0,0($sp)
-sw    $t1,4($sp)
-sw    $t2,8($sp)
-sw    $t3,12($sp)
-sw    $t4,16($sp)
-sw    $t5,20($sp)
-sw    $t6,24($sp)
-sw    $t7,28($sp)
-sw    $t8,32($sp)
-sw    $t9,36($sp)
+
+#         x[i] = input();
+addiu $sp, $sp,-56
+sw    $t0, 0($sp)
+sw    $t1, 4($sp)
+sw    $t2, 8($sp)
+sw    $t3, 12($sp)
+sw    $t4, 16($sp)
+sw    $t5, 20($sp)
+sw    $t6, 24($sp)
+sw    $t7, 28($sp)
+sw    $t8, 32($sp)
+sw    $t9, 36($sp)
+sw    $a0, 40($sp)
+sw    $a1, 44($sp)
+sw    $a2, 48($sp)
+sw    $a3, 52($sp)
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   input
-addiu $sp,$sp,4
-lw    $t0,0($sp)
-lw    $t1,4($sp)
-lw    $t2,8($sp)
-lw    $t3,12($sp)
-lw    $t4,16($sp)
-lw    $t5,20($sp)
-lw    $t6,24($sp)
-lw    $t7,28($sp)
-lw    $t8,32($sp)
-lw    $t9,36($sp)
+lw    $t0, 0($sp)
+lw    $t1, 4($sp)
+lw    $t2, 8($sp)
+lw    $t3, 12($sp)
+lw    $t4, 16($sp)
+lw    $t5, 20($sp)
+lw    $t6, 24($sp)
+lw    $t7, 28($sp)
+lw    $t8, 32($sp)
+lw    $t9, 36($sp)
+lw    $a0, 40($sp)
+lw    $a1, 44($sp)
+lw    $a2, 48($sp)
+lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t1,$v0
+move  $t5,$v0
 sw    $t1, 0($t0)
+
+#         i = i + 1;
 addiu $t0, $fp, -8
+
+#         i = i + 1;
 lw    $t1, -8($fp)
 li    $t2, 1
 addu   $t1, $t1, $t2
@@ -358,72 +451,90 @@ addiu $sp,$sp,0 # free locals
 
 j     $_L8 # loop
 $_L9: # loop exit
-addiu $sp,$sp,-40
-sw    $t0,0($sp)
-sw    $t1,4($sp)
-sw    $t2,8($sp)
-sw    $t3,12($sp)
-sw    $t4,16($sp)
-sw    $t5,20($sp)
-sw    $t6,24($sp)
-sw    $t7,28($sp)
-sw    $t8,32($sp)
-sw    $t9,36($sp)
-la    $t0, x
-addiu $sp,$sp,-4
-sw    $t0,0($sp) # push argument 0
-li    $t0, 0
-addiu $sp,$sp,-4
-sw    $t0,0($sp) # push argument 1
-li    $t0, 10
-addiu $sp,$sp,-4
-sw    $t0,0($sp) # push argument 2
+
+#     sort(x,0,10);
+addiu $sp, $sp,-56
+sw    $t0, 0($sp)
+sw    $t1, 4($sp)
+sw    $t2, 8($sp)
+sw    $t3, 12($sp)
+sw    $t4, 16($sp)
+sw    $t5, 20($sp)
+sw    $t6, 24($sp)
+sw    $t7, 28($sp)
+sw    $t8, 32($sp)
+sw    $t9, 36($sp)
+sw    $a0, 40($sp)
+sw    $a1, 44($sp)
+sw    $a2, 48($sp)
+sw    $a3, 52($sp)
+la    $t4, x
+move  $t0, $t4
+li    $t4, 0
+move  $t1, $t4
+li    $t4, 10
+move  $t2, $t4
+move  $a0, $t0
+move  $a1, $t1
+move  $a2, $t2
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   sort
-addiu $sp,$sp,16
-lw    $t0,0($sp)
-lw    $t1,4($sp)
-lw    $t2,8($sp)
-lw    $t3,12($sp)
-lw    $t4,16($sp)
-lw    $t5,20($sp)
-lw    $t6,24($sp)
-lw    $t7,28($sp)
-lw    $t8,32($sp)
-lw    $t9,36($sp)
+lw    $t0, 0($sp)
+lw    $t1, 4($sp)
+lw    $t2, 8($sp)
+lw    $t3, 12($sp)
+lw    $t4, 16($sp)
+lw    $t5, 20($sp)
+lw    $t6, 24($sp)
+lw    $t7, 28($sp)
+lw    $t8, 32($sp)
+lw    $t9, 36($sp)
+lw    $a0, 40($sp)
+lw    $a1, 44($sp)
+lw    $a2, 48($sp)
+lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t0,$v0
-addiu $sp,$sp,-40
-sw    $t0,0($sp)
-sw    $t1,4($sp)
-sw    $t2,8($sp)
-sw    $t3,12($sp)
-sw    $t4,16($sp)
-sw    $t5,20($sp)
-sw    $t6,24($sp)
-sw    $t7,28($sp)
-sw    $t8,32($sp)
-sw    $t9,36($sp)
-la    $t0, x
-addiu $sp,$sp,-4
-sw    $t0,0($sp) # push argument 0
+move  $t4,$v0
+
+#     print(x);
+addiu $sp, $sp,-56
+sw    $t0, 0($sp)
+sw    $t1, 4($sp)
+sw    $t2, 8($sp)
+sw    $t3, 12($sp)
+sw    $t4, 16($sp)
+sw    $t5, 20($sp)
+sw    $t6, 24($sp)
+sw    $t7, 28($sp)
+sw    $t8, 32($sp)
+sw    $t9, 36($sp)
+sw    $a0, 40($sp)
+sw    $a1, 44($sp)
+sw    $a2, 48($sp)
+sw    $a3, 52($sp)
+la    $t4, x
+move  $t0, $t4
+move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   print
-addiu $sp,$sp,8
-lw    $t0,0($sp)
-lw    $t1,4($sp)
-lw    $t2,8($sp)
-lw    $t3,12($sp)
-lw    $t4,16($sp)
-lw    $t5,20($sp)
-lw    $t6,24($sp)
-lw    $t7,28($sp)
-lw    $t8,32($sp)
-lw    $t9,36($sp)
+lw    $t0, 0($sp)
+lw    $t1, 4($sp)
+lw    $t2, 8($sp)
+lw    $t3, 12($sp)
+lw    $t4, 16($sp)
+lw    $t5, 20($sp)
+lw    $t6, 24($sp)
+lw    $t7, 28($sp)
+lw    $t8, 32($sp)
+lw    $t9, 36($sp)
+lw    $a0, 40($sp)
+lw    $a1, 44($sp)
+lw    $a2, 48($sp)
+lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t0,$v0
+move  $t4,$v0
 addiu $sp,$sp,4 # free locals
 
 
@@ -438,7 +549,6 @@ j     $ra
 
 output:
 li    $v0,1
-lw    $a0,4($sp)
 syscall
 li    $v0,4
 la    $a0,_Newline

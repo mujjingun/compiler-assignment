@@ -84,10 +84,12 @@ Git을 통하여 상호 협력하여 개발을 진행한다.
 "\texttt{globals.h}" -> {"\texttt{util.h}", "\texttt{lex.l}", "\texttt{parser.y}", "\texttt{main.c}", "\texttt{analyze.c}"},
 "\texttt{lex.yy.h}" -> {"\texttt{parser.y}", "\texttt{util.c}",  "\texttt{main.c}"},
 "\texttt{util.h}" -> {"\texttt{main.c}", "\texttt{util.c}"},
-"\texttt{scan.h}" -> {"\texttt{scan.c}", "\texttt{globals.h}", "\texttt{lex.l}", "\texttt{main.c}", "\texttt{parser.y}", "\texttt{scan.c}", "\texttt{util.h}", "\texttt{analyze.h}"},
+"\texttt{scan.h}" -> {"\texttt{scan.c}", "\texttt{globals.h}", "\texttt{lex.l}", "\texttt{main.c}", "\texttt{parser.y}", "\texttt{scan.c}", "\texttt{util.h}", "\texttt{analyze.h}", "\texttt{cgen.c}"},
 "\texttt{parser.tab.h}" -> {"\texttt{globals.h}"},
-"\texttt{analyze.h}" -> {"\texttt{analyze.c}", "\texttt{main.c}"},
+"\texttt{analyze.h}" -> {"\texttt{analyze.c}", "\texttt{cgen.c}", "\texttt{main.c}"},
 "\texttt{symtab.h}" -> {"\texttt{symtab.c}", "\texttt{analyze.h}", "\texttt{main.c}"},
+"\texttt{cgen.h}" -> {"\texttt{cgen.c}", "\texttt{main.c}"},
+"\texttt{code.h}" -> {"\texttt{cgen.c}"},
 };
 
 \subsection{분석 내용}
@@ -194,12 +196,6 @@ void main(void) {
 \end{lstlisting}
 
 결과는 [그림 1]과 같았다.
-
-\begin{figure}[h!]
-\includegraphics[width=\linewidth]{testresult.png}
-\caption{Output}
-\label{fig:output}
-\end{figure}
 
 또한 Semantic Error처리 확인을 위해 16개의 서로 다른 에러가 나오는 테스트 파일을 만들어 Julia 언어로 Coverage를 테스트하는 스크립트를 만들어 테스트하였다.
 

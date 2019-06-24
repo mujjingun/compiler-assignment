@@ -2,7 +2,7 @@ int arr[10];
 int brr[20];
 
 void f(void) {
-    int a;
+    ;
 }
 
 int func(int parA[], int parB) {
@@ -18,16 +18,6 @@ int func(int parA[], int parB) {
             if (wvar == 1)
                 i = 0;
         else i = 1;
-    }
-
-    if (1) {
-        int second;
-        int third;
-    }
-
-    if (0) {
-        int fourth;
-        int fifth;
     }
 
     return parA[2];

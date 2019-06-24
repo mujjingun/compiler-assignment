@@ -14,20 +14,19 @@ typedef struct debugSymbolsStateRec {
 static void printSourceLine(FILE* out, debugSymbolState* debugSyms, int n)
 {
     int offset = n - debugSyms->currentlineo;
-    if(offset != 0)
-    {
-	memset(debugSyms->buffer, 0, sizeof(debugSyms->buffer));
-	fetchSourceLine(debugSyms->source, offset, debugSyms->buffer,
-			sizeof(debugSyms->buffer));
-	debugSyms->currentlineo = n;
-	debugSyms->buffer[strcspn(debugSyms->buffer, "\n")] = 0;
+    if (offset != 0) {
+        memset(debugSyms->buffer, 0, sizeof(debugSyms->buffer));
+        fetchSourceLine(debugSyms->source, offset, debugSyms->buffer,
+            sizeof(debugSyms->buffer));
+        debugSyms->currentlineo = n;
+        debugSyms->buffer[strcspn(debugSyms->buffer, "\n")] = 0;
     }
     fprintf(out, "\n# %s\n", debugSyms->buffer);
 }
 
 static void expr_cgen(FILE* out, Node t, enum Storage reg,
-		      int reg_num, bool is_addr,
-		      debugSymbolState* debugSymbols)
+    int reg_num, bool is_addr,
+    debugSymbolState* debugSymbols)
 {
     switch (t->expr) {
     case ExprConst: {
@@ -47,28 +46,17 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                 fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
             } else {
                 int loc = t->record->loc;
-		if(loc > 0)
-		{
-		    int argnum = (loc - 4) / 4;
-		    char other_reg_name[3];
-		    register_name(Argument, argnum, other_reg_name);
-		    fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
-		}
-		else
-		{
-		    switch (t->storage) {
-		    case Memory:
-			fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
-			break;
-		    default:
-			break;
-		    }
-		}
-
-	    }
-	} else {
-	    if (t->record->scope == 0) {
-		if (t->record->kind == SymArray) {
+                switch (t->storage) {
+                case Memory:
+                    fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                    break;
+                default:
+                    break;
+                }
+            }
+        } else {
+            if (t->record->scope == 0) {
+                if (t->record->kind == SymArray) {
                     fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
                 } else {
                     fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
@@ -78,19 +66,20 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
-                    if (t->record->kind == SymArray && loc < 0) {
+                    if (loc < 0) {
+                        if (t->record->kind == SymArray) {
+                            // local array
                             fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+                        } else {
+                            // local var
+                            fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
+                        }
                     } else {
-                        if (loc > 0) {
-			    int argnum = (loc - 4) / 4;
-			    char other_reg_name[4];
-			    register_name(Argument, argnum, other_reg_name);
-			    fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
-			}
-			else
-			{
-			    fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
-			}
+                        // argument
+                        int argnum = (loc - 4) / 4;
+                        char other_reg_name[3];
+                        register_name(Argument, argnum, other_reg_name);
+                        fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
                     }
                     break;
                 default:
@@ -102,12 +91,12 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
     }
 
     case ExprIndex: {
-	if(debugSymbols)
-	    printSourceLine(out, debugSymbols, t->lineno); 
+        if (debugSymbols)
+            printSourceLine(out, debugSymbols, t->lineno);
 
         char idx_reg_name[3];
         register_name(reg, reg_num + 1, idx_reg_name);
-        expr_cgen(out, t->children[0], reg, reg_num + 1, false, debugSymbols);
+        expr_cgen(out, t->children[0], Temp, reg_num + 1, false, debugSymbols);
         fprintf(out, "sll   $%s,$%s,2\n", idx_reg_name, idx_reg_name);
 
         char reg_name[3];
@@ -125,8 +114,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                         fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
                         fprintf(out, "addiu $%s, $%s, %d\n", reg_name, reg_name, loc);
                     } else {
-                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
-                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                        int argnum = (loc - 4) / 4;
+                        char other_reg_name[3];
+                        register_name(Argument, argnum, other_reg_name);
+                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, other_reg_name, idx_reg_name);
                     }
                     break;
                 default:
@@ -146,8 +137,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                         fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
                         fprintf(out, "lw    $%s, %d($%s)\n", reg_name, loc, reg_name);
                     } else {
-                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
-                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, reg_name, idx_reg_name);
+                        int argnum = (loc - 4) / 4;
+                        char other_reg_name[3];
+                        register_name(Argument, argnum, other_reg_name);
+                        fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, other_reg_name, idx_reg_name);
                         fprintf(out, "lw    $%s, 0($%s)\n", reg_name, reg_name);
                     }
                     break;
@@ -160,25 +153,30 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
     }
 
     case ExprCall: {
-	if(debugSymbols)
-	    printSourceLine(out, debugSymbols, t->lineno); 
+        if (debugSymbols)
+            printSourceLine(out, debugSymbols, t->lineno);
 
         char reg_name[3];
-        register_name(reg, reg_num, reg_name);
+        register_name(reg, reg_num + 4, reg_name);
 
-        // push temporary registers
-        fprintf(out, "addiu $sp,$sp,%d\n", -40);
+        // push temporary, current argument registers
+        fprintf(out, "addiu $sp, $sp,%d\n", -56);
         for (int i = 0; i < 10; ++i) {
-            fprintf(out, "sw    $t%d,%d($sp)\n", i, i * 4);
+            fprintf(out, "sw    $t%d, %d($sp)\n", i, i * 4);
+        }
+        for (int i = 0; i < 4; ++i) {
+            fprintf(out, "sw    $a%d, %d($sp)\n", i, (i + 10) * 4);
         }
 
-        // push the arguments
-        int arg_size = 0;
+        // $t[reg_num:reg_num+4] = calculate_argments()
+        // $a[0:4]               = $t[reg_num:reg_num+4]
         for (int i = 0; i < t->num_children; ++i) {
-            expr_cgen(out, t->children[i], Temp, reg_num, false, debugSymbols);
-            fprintf(out, "addiu $sp,$sp,%d\n", -4);
-            fprintf(out, "sw    $%s,0($sp) # push argument %d\n", reg_name, i);
-            arg_size += 4;
+            expr_cgen(out, t->children[i], Temp, reg_num + 4,
+                false, debugSymbols);
+            fprintf(out, "move  $t%d, $%s\n", reg_num + i, reg_name);
+        }
+        for (int i = 0; i < t->num_children; ++i) {
+            fprintf(out, "move  $a%d, $t%d\n", i, reg_num + i);
         }
 
         // push the control link
@@ -188,12 +186,12 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         // jump to the procedure
         fprintf(out, "jal   %s\n", t->value.name);
 
-        // clean up the arguments
-        fprintf(out, "addiu $sp,$sp,%d\n", arg_size + 4);
-
         // pop temporary registers
         for (int i = 0; i < 10; ++i) {
-            fprintf(out, "lw    $t%d,%d($sp)\n", i, i * 4);
+            fprintf(out, "lw    $t%d, %d($sp)\n", i, i * 4);
+        }
+        for (int i = 0; i < 4; ++i) {
+            fprintf(out, "lw    $a%d, %d($sp)\n", i, (i + 10) * 4);
         }
         fprintf(out, "addiu $sp,$sp,%d\n", 40);
 
@@ -203,8 +201,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
     }
 
     case ExprBinOp:
-	if(debugSymbols)
-	    printSourceLine(out, debugSymbols, t->lineno); 
+        if (debugSymbols)
+            printSourceLine(out, debugSymbols, t->lineno);
 
         expr_cgen(out, t->children[0], Temp, reg_num, false, debugSymbols);
         expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
@@ -213,20 +211,33 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         break;
 
     case ExprAssign: {
-	if(debugSymbols)
-	    printSourceLine(out, debugSymbols, t->lineno); 
+        if (debugSymbols)
+            printSourceLine(out, debugSymbols, t->lineno);
 
         char addr_reg_name[3], reg_name[3];
         register_name(reg, reg_num, addr_reg_name);
         register_name(reg, reg_num + 1, reg_name);
 
-        // asignee address
-        expr_cgen(out, t->children[0], Temp, reg_num, true, debugSymbols);
+        if (t->children[0]->expr == ExprId && t->children[0]->record->loc > 0) {
+            // special-case argument as lhs
+            int loc = t->children[0]->record->loc;
+            int argnum = (loc - 4) / 4;
+            char other_reg_name[3];
+            register_name(Argument, argnum, other_reg_name);
 
-        // value
-        expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
+            // value
+            expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
 
-        fprintf(out, "sw    $%s, 0($%s)\n", reg_name, addr_reg_name);
+            fprintf(out, "move $%s, $%s\n", other_reg_name, reg_name);
+        } else {
+            // asignee address
+            expr_cgen(out, t->children[0], Temp, reg_num, true, debugSymbols);
+
+            // value
+            expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);
+
+            fprintf(out, "sw    $%s, 0($%s)\n", reg_name, addr_reg_name);
+        }
         break;
     }
     }
@@ -240,8 +251,8 @@ typedef struct codegenStateRec {
 
 static void cGen(Node t, codegenState state, debugSymbolState* debugSymbols)
 {
-    FILE* out	      = state->out;
-    FILE* data	      = state->data;
+    FILE* out = state->out;
+    FILE* data = state->data;
 
     switch (t->kind) {
     case NodeStmt: {
@@ -400,14 +411,14 @@ static void cGen(Node t, codegenState state, debugSymbolState* debugSymbols)
     }
 
     case NodeExpr: {
-	expr_cgen(out, t, Temp, 0, false, debugSymbols);
+        expr_cgen(out, t, Temp, 0, false, debugSymbols);
         break;
     }
     }
 }
 
 void codeGen(Node syntaxTree, const char* filename,
-	     bool writeDebug, FILE* source)
+    bool writeDebug, FILE* source)
 {
     FILE* out = fopen(filename, "w");
     if (!out) {
@@ -427,10 +438,9 @@ void codeGen(Node syntaxTree, const char* filename,
     fputs(".globl main\n\n", out);
 
     debugSymbolState debugSymbols;
-    if(writeDebug)
-    {
-	debugSymbols.currentlineo = 0;
-	debugSymbols.source       = source;
+    if (writeDebug) {
+        debugSymbols.currentlineo = 0;
+        debugSymbols.source = source;
     }
 
     struct codegenStateRec rec;
@@ -442,7 +452,6 @@ void codeGen(Node syntaxTree, const char* filename,
     // write standard procedures
     fputs("output:\n"
           "li    $v0,1\n"
-          "lw    $a0,4($sp)\n"
           "syscall\n"
           "li    $v0,4\n"
           "la    $a0,_Newline\n"
