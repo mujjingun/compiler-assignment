@@ -48,14 +48,14 @@ void load_id(FILE* out, Node t, enum Storage reg, int reg_num)
 
     if(t->expr == ExprConst)
     {
-        fprintf(out, "li $%s, %d\n", reg_name, t->value.num);
+        fprintf(out, "li    $%s, %d\n", reg_name, t->value.num);
     }
     else if(t->record->scope == GLOBAL_SCOPE)
     {
         char addr_reg_name[3];
         register_name(reg, reg_num + 1, addr_reg_name);
-        fprintf(out, "la $%s, %s\n", addr_reg_name, t->value.name);
-        fprintf(out, "lw $%s, 0($%s)\n", reg_name, addr_reg_name);
+        fprintf(out, "la    $%s, %s\n", addr_reg_name, t->value.name);
+        fprintf(out, "lw    $%s, 0($%s)\n", reg_name, addr_reg_name);
     }
     else
     {
@@ -63,7 +63,7 @@ void load_id(FILE* out, Node t, enum Storage reg, int reg_num)
         switch(t->storage)
         {
         case Memory:
-            fprintf(out, "lw $%s, %d($fp)\n", reg_name, loc);
+            fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
             break;
         default:
             break;
@@ -75,7 +75,7 @@ void store_id(FILE* out, int loc, enum Storage reg, int reg_num)
 {
     char reg_name[3];
     register_name(reg, reg_num, reg_name);
-    fprintf(out, "sw $%s, %d($fp)\n", reg_name, loc);
+    fprintf(out, "sw    $%s, %d($fp)\n", reg_name, loc);
 }
 
 void exec_binop(FILE* out, Node t,
@@ -93,47 +93,55 @@ void exec_binop(FILE* out, Node t,
     switch(t->value.op)
     {
     case OpLessThan:
-        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "slt   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpLessThanEq:
-        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
-        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "slt   $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "xori  $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpGreaterThan:
-        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "slt   $%s, $%s, $%s\n", rst_reg_name, opb_reg_name, opa_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpGreaterThanEq:
-        fprintf(out, "slt $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
-        fprintf(out, "xori $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "slt   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "xori  $%s, $%s, 0x1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpEqual:
-        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
-        fprintf(out, "sltu $%s, $%s, 1\n", rst_reg_name, rst_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "xor   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu  $%s, $%s, 1\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpNotEqual:
-        fprintf(out, "xor $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
-        fprintf(out, "sltu $%s, $0, $%s\n", rst_reg_name, rst_reg_name);
-        fprintf(out, "andi $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "xor   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out, "sltu  $%s, $0, $%s\n", rst_reg_name, rst_reg_name);
+        fprintf(out, "andi  $%s, $%s, 0x00ff\n", rst_reg_name, rst_reg_name);
         break;
     case OpAdd:
-        fprintf(out,"addu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out,"addu   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
         break;
     case OpSubtract:
-        fprintf(out,"subu $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
+        fprintf(out,"subu   $%s, $%s, $%s\n", rst_reg_name, opa_reg_name, opb_reg_name);
         break;
     case OpMultiply:
-        fprintf(out, "mult $%s, $%s\n", opa_reg_name, opb_reg_name);
-        fprintf(out, "mflo $%s\n", rst_reg_name);
+        fprintf(out, "mult  $%s, $%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mflo  $%s\n", rst_reg_name);
         break;
     case OpDivide:
-        fprintf(out, "div $0,$%s,$%s\n", opa_reg_name, opb_reg_name);
-        fprintf(out, "mfhi $%s\n", rst_reg_name);
-        fprintf(out, "mflo $%s\n", rst_reg_name);
+        fprintf(out, "div   $0,$%s,$%s\n", opa_reg_name, opb_reg_name);
+        fprintf(out, "mfhi  $%s\n", rst_reg_name);
+        fprintf(out, "mflo  $%s\n", rst_reg_name);
         break;
     }
 }
+
+
+void fetchSourceLine(FILE* fp, int n, char* output, int maxLength)
+{
+    for(int i = 0; i < n && fgets(output, maxLength, fp); ++i) 
+	;//printf("# %s", output);
+}
+    

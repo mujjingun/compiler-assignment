@@ -33,7 +33,7 @@ struct ActivationRecord {
 /* Function buildSymtab constructs the symbol 
  * table by preorder traversal of the syntax tree
  */
-bool semanticAnalysis(Node tree);
+bool semanticAnalysis(Node tree, bool printSymbolTable);
 
 void printFormattedSymtab(SymTable tab);
 

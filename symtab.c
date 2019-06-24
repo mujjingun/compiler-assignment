@@ -171,7 +171,9 @@ Record st_lookup(SymTable state, char* name)
         return bucket->record;
 }
 
-static void printHashTable(LocalSymbolTable table, const char *heading, void (*print)(const char*, Record))
+static void printHashTable(LocalSymbolTable table,
+			   const char *heading,
+			   void (*print)(const char*, Record))
 {
     printf("\n%s\n", heading);
     for (int i = 0; i < SIZE; ++i) {
@@ -187,12 +189,9 @@ static void printHashTable(LocalSymbolTable table, const char *heading, void (*p
  * listing of the symbol table contents 
  * to the listing file
  */
-void printSymTab(SymTable state, const char *heading, void (*print)(const char*, Record))
+void printSymTab(SymTable state,
+		 const char *heading,
+		 void (*print)(const char*, Record))
 {
-    LocalSymbolTable localTable = state->root;
-    while(localTable)
-    {
-        printHashTable(localTable, heading, print);
-        localTable = localTable->next;
-    }
+    printHashTable(state->currentScope, heading, print);
 } /* printSymTab */

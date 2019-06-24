@@ -25,4 +25,7 @@ void load_id(FILE* out, Node t, enum Storage reg, int reg_num);
 
 void store_id(FILE* out, int loc, enum Storage reg, int reg_num);
 
+void fetchSourceLine(FILE* fp, int n, char* output, int maxLength);
+
+
 #endif
