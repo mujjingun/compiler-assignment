@@ -47,17 +47,28 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                 fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
             } else {
                 int loc = t->record->loc;
-                switch (t->storage) {
-                case Memory:
-                    fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
-                    break;
-                default:
-                    break;
-                }
-            }
-        } else {
-            if (t->record->scope == 0) {
-                if (t->record->kind == SymArray) {
+		if(loc > 0)
+		{
+		    int argnum = (loc - 4) / 4;
+		    char other_reg_name[3];
+		    register_name(Argument, argnum, other_reg_name);
+		    fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
+		}
+		else
+		{
+		    switch (t->storage) {
+		    case Memory:
+			fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
+			break;
+		    default:
+			break;
+		    }
+		}
+
+	    }
+	} else {
+	    if (t->record->scope == 0) {
+		if (t->record->kind == SymArray) {
                     fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
                 } else {
                     fprintf(out, "la    $%s, %s\n", reg_name, t->value.name);
@@ -67,15 +78,19 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                 int loc = t->record->loc;
                 switch (t->storage) {
                 case Memory:
-                    if (t->record->kind == SymArray) {
-                        if (loc < 0) {
+                    if (t->record->kind == SymArray && loc < 0) {
                             fprintf(out, "addiu $%s, $fp, %d\n", reg_name, loc);
-                        }
-                        else {
-                            fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
-                        }
                     } else {
-                        fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
+                        if (loc > 0) {
+			    int argnum = (loc - 4) / 4;
+			    char other_reg_name[4];
+			    register_name(Argument, argnum, other_reg_name);
+			    fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
+			}
+			else
+			{
+			    fprintf(out, "lw    $%s, %d($fp)\n", reg_name, loc);
+			}
                     }
                     break;
                 default:

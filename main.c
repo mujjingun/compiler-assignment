@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         }
         char* asm_filename = malloc(sizeof(char) * (j + 5));
         strncpy(asm_filename, argv[i], j);
-        strcpy(asm_filename + j, ".asm");
+        strcpy(asm_filename + j, ".tm");
 
         struct Scanner scanner;
 
