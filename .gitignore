@@ -5,3 +5,4 @@ build/
 *.aux
 *.pdf
 *.gz
+*.asm
