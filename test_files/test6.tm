@@ -566,3 +566,5 @@ j     $ra
 _Newline: .asciiz "\n"
 x: .word 10
 # End of code.
+# Instruction Count: 424
+

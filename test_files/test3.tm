@@ -368,3 +368,5 @@ j     $ra
 .data
 _Newline: .asciiz "\n"
 # End of code.
+# Instruction Count: 303
+

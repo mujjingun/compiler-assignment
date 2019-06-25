@@ -469,3 +469,5 @@ arr: .word 10
 brr: .word 20
 crr: .word 30
 # End of code.
+# Instruction Count: 315
+

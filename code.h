@@ -12,6 +12,13 @@ __attribute__((__format__(__printf__, 2, 3)))
 #endif
 void emitComment(FILE* out, const char* msg, ...);
 
+#ifdef __GNUC__
+__attribute__((__format__(__printf__, 2, 3)))
+#endif
+void emitInstruction(FILE* out, const char* msg, ...);
+
+int resetInstrCnt(void);
+
 void register_name(enum Storage reg, int reg_num, char* reg_name);
 
 void load_local(FILE* out, Node t, enum Storage reg, int reg_num);

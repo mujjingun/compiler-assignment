@@ -443,3 +443,5 @@ j     $ra
 _Newline: .asciiz "\n"
 garr: .word 10
 # End of code.
+# Instruction Count: 383
+
