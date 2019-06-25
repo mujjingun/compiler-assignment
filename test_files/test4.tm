@@ -65,10 +65,9 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     return a * fact(a - 1);
-move  $t5, $a0
-li    $t6, 1
-subu   $t5, $t5, $t6
-move  $t1, $t5
+move  $t1, $a0
+li    $t2, 1
+subu   $t1, $t1, $t2
 move  $a0, $t1
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -87,7 +86,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t1,$v0
 mult  $t0, $t1
 mflo  $t0
@@ -156,9 +155,8 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-li    $t8, 5
-move  $t4, $t8
-move  $a0, $t4
+li    $t0, 5
+move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   fact
@@ -176,9 +174,8 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
-move  $t4,$v0
-move  $t0, $t4
+addiu $sp,$sp,56
+move  $t0,$v0
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -197,7 +194,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 

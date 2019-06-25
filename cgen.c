@@ -170,9 +170,9 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         // $t[reg_num:reg_num+4] = calculate_argments()
         // $a[0:4]               = $t[reg_num:reg_num+4]
         for (int i = 0; i < t->num_children; ++i) {
-            expr_cgen(out, t->children[i], Temp, reg_num + 4,
+            expr_cgen(out, t->children[i], Temp, reg_num + i,
                 false, debugSymbols);
-            fprintf(out, "move  $t%d, $%s\n", reg_num + i, reg_name);
+            //fprintf(out, "move  $t%d, $%s\n", reg_num + i, reg_name);
         }
         for (int i = 0; i < t->num_children; ++i) {
             fprintf(out, "move  $a%d, $t%d\n", i, reg_num + i);
@@ -192,7 +192,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         for (int i = 0; i < 4; ++i) {
             fprintf(out, "lw    $a%d, %d($sp)\n", i, (i + 10) * 4);
         }
-        fprintf(out, "addiu $sp,$sp,%d\n", 40);
+        fprintf(out, "addiu $sp,$sp,%d\n", 56);
 
         // return value
         fprintf(out, "move  $%s,$v0\n", ret_reg_name);

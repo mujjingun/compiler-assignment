@@ -82,10 +82,8 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-move  $t6, $a0
-move  $t2, $t6
-lw    $t6, -48($fp)
-move  $t3, $t6
+move  $t2, $a0
+lw    $t3, -48($fp)
 move  $a0, $t2
 move  $a1, $t3
 addiu $sp,$sp,-4
@@ -105,7 +103,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t2,$v0
 mult  $t1, $t2
 mflo  $t1
@@ -412,10 +410,8 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-la    $t5, arr
-move  $t1, $t5
-li    $t5, 45
-move  $t2, $t5
+la    $t1, arr
+li    $t2, 45
 move  $a0, $t1
 move  $a1, $t2
 addiu $sp,$sp,-4
@@ -435,7 +431,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t1,$v0
 sw    $t1, 0($t0)
 addiu $sp,$sp,4 # free locals

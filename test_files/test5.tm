@@ -49,7 +49,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t1,$v0
 sw    $t1, 0($t0)
 
@@ -81,11 +81,10 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(arr[2]);
-li    $t5, 2
-sll   $t5,$t5,2
-addu  $t4, $fp, $t5
-lw    $t4, -24($t4)
-move  $t0, $t4
+li    $t1, 2
+sll   $t1,$t1,2
+addu  $t0, $fp, $t1
+lw    $t0, -24($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -104,7 +103,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 addiu $sp,$sp,24 # free locals
 

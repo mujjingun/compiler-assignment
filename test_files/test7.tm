@@ -31,11 +31,10 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(arr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-addu  $t4, $a0, $t5
-lw    $t4, 0($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+addu  $t0, $a0, $t1
+lw    $t0, 0($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -54,7 +53,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     arr[5] = 123123;
@@ -84,11 +83,10 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(arr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-addu  $t4, $a0, $t5
-lw    $t4, 0($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+addu  $t0, $a0, $t1
+lw    $t0, 0($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -107,7 +105,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
@@ -159,12 +157,11 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(garr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-la    $t4, garr
-addu  $t4, $t4, $t5
-lw    $t4, 0($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+la    $t0, garr
+addu  $t0, $t0, $t1
+lw    $t0, 0($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -183,7 +180,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     modify(garr);
@@ -202,8 +199,7 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-la    $t4, garr
-move  $t0, $t4
+la    $t0, garr
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -222,7 +218,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     output(garr[5]);
@@ -243,12 +239,11 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(garr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-la    $t4, garr
-addu  $t4, $t4, $t5
-lw    $t4, 0($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+la    $t0, garr
+addu  $t0, $t0, $t1
+lw    $t0, 0($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -267,7 +262,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     larr[5] = 7;
@@ -298,11 +293,10 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(larr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-addu  $t4, $fp, $t5
-lw    $t4, -44($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+addu  $t0, $fp, $t1
+lw    $t0, -44($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -321,7 +315,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     modify(larr);
@@ -340,8 +334,7 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-addiu $t4, $fp, -44
-move  $t0, $t4
+addiu $t0, $fp, -44
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -360,7 +353,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     output(larr[5]);
@@ -381,11 +374,10 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(larr[5]);
-li    $t5, 5
-sll   $t5,$t5,2
-addu  $t4, $fp, $t5
-lw    $t4, -44($t4)
-move  $t0, $t4
+li    $t1, 5
+sll   $t1,$t1,2
+addu  $t0, $fp, $t1
+lw    $t0, -44($t0)
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -404,7 +396,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 addiu $sp,$sp,40 # free locals
 

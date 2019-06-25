@@ -121,14 +121,12 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(exp(0-2, 10)); /* 1024  */
-li    $t8, 0
-li    $t9, 2
-subu   $t8, $t8, $t9
-move  $t4, $t8
-li    $t8, 10
-move  $t5, $t8
-move  $a0, $t4
-move  $a1, $t5
+li    $t0, 0
+li    $t1, 2
+subu   $t0, $t0, $t1
+li    $t1, 10
+move  $a0, $t0
+move  $a1, $t1
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   exp
@@ -146,9 +144,8 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
-move  $t4,$v0
-move  $t0, $t4
+addiu $sp,$sp,56
+move  $t0,$v0
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -167,7 +164,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     output(exp(0-2, 11)); /* -2048 */
@@ -205,14 +202,12 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(exp(0-2, 11)); /* -2048 */
-li    $t8, 0
-li    $t9, 2
-subu   $t8, $t8, $t9
-move  $t4, $t8
-li    $t8, 11
-move  $t5, $t8
-move  $a0, $t4
-move  $a1, $t5
+li    $t0, 0
+li    $t1, 2
+subu   $t0, $t0, $t1
+li    $t1, 11
+move  $a0, $t0
+move  $a1, $t1
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   exp
@@ -230,9 +225,8 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
-move  $t4,$v0
-move  $t0, $t4
+addiu $sp,$sp,56
+move  $t0,$v0
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -251,7 +245,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 
 #     output(exp(0-2, 12)); /* 4096 */
@@ -289,14 +283,12 @@ sw    $a2, 48($sp)
 sw    $a3, 52($sp)
 
 #     output(exp(0-2, 12)); /* 4096 */
-li    $t8, 0
-li    $t9, 2
-subu   $t8, $t8, $t9
-move  $t4, $t8
-li    $t8, 12
-move  $t5, $t8
-move  $a0, $t4
-move  $a1, $t5
+li    $t0, 0
+li    $t1, 2
+subu   $t0, $t0, $t1
+li    $t1, 12
+move  $a0, $t0
+move  $a1, $t1
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
 jal   exp
@@ -314,9 +306,8 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
-move  $t4,$v0
-move  $t0, $t4
+addiu $sp,$sp,56
+move  $t0,$v0
 move  $a0, $t0
 addiu $sp,$sp,-4
 sw    $fp,0($sp) # push control link
@@ -335,7 +326,7 @@ lw    $a0, 40($sp)
 lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
-addiu $sp,$sp,40
+addiu $sp,$sp,56
 move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
