@@ -76,9 +76,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                         }
                     } else {
                         // argument
-                        int argnum = (loc - 4) / 4;
                         char other_reg_name[3];
-                        register_name(Argument, argnum, other_reg_name);
+                        register_name(Argument, loc, other_reg_name);
                         fprintf(out, "move  $%s, $%s\n", reg_name, other_reg_name);
                     }
                     break;
@@ -114,9 +113,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                         fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
                         fprintf(out, "addiu $%s, $%s, %d\n", reg_name, reg_name, loc);
                     } else {
-                        int argnum = (loc - 4) / 4;
                         char other_reg_name[3];
-                        register_name(Argument, argnum, other_reg_name);
+                        register_name(Argument, loc, other_reg_name);
                         fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, other_reg_name, idx_reg_name);
                     }
                     break;
@@ -137,9 +135,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
                         fprintf(out, "addu  $%s, $fp, $%s\n", reg_name, idx_reg_name);
                         fprintf(out, "lw    $%s, %d($%s)\n", reg_name, loc, reg_name);
                     } else {
-                        int argnum = (loc - 4) / 4;
                         char other_reg_name[3];
-                        register_name(Argument, argnum, other_reg_name);
+                        register_name(Argument, loc, other_reg_name);
                         fprintf(out, "addu  $%s, $%s, $%s\n", reg_name, other_reg_name, idx_reg_name);
                         fprintf(out, "lw    $%s, 0($%s)\n", reg_name, reg_name);
                     }
@@ -156,6 +153,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         if (debugSymbols)
             printSourceLine(out, debugSymbols, t->lineno);
 
+        char ret_reg_name[3];
+        register_name(reg, reg_num, ret_reg_name);
         char reg_name[3];
         register_name(reg, reg_num + 4, reg_name);
 
@@ -196,7 +195,7 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         fprintf(out, "addiu $sp,$sp,%d\n", 40);
 
         // return value
-        fprintf(out, "move  $%s,$v0\n", reg_name);
+        fprintf(out, "move  $%s,$v0\n", ret_reg_name);
         break;
     }
 
@@ -221,9 +220,8 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         if (t->children[0]->expr == ExprId && t->children[0]->record->loc > 0) {
             // special-case argument as lhs
             int loc = t->children[0]->record->loc;
-            int argnum = (loc - 4) / 4;
             char other_reg_name[3];
-            register_name(Argument, argnum, other_reg_name);
+            register_name(Argument, loc, other_reg_name);
 
             // value
             expr_cgen(out, t->children[1], Temp, reg_num + 1, false, debugSymbols);

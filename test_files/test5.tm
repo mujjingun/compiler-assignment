@@ -50,7 +50,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t5,$v0
+move  $t1,$v0
 sw    $t1, 0($t0)
 
 #     arr[2] = a;
@@ -105,7 +105,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,24 # free locals
 
 

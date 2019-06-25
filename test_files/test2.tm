@@ -55,7 +55,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 < 1); /* 0 */
 addiu $sp, $sp,-56
@@ -99,7 +99,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 < 0); /* 0 */
 addiu $sp, $sp,-56
@@ -143,7 +143,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 <= 2); /* 1 */
 addiu $sp, $sp,-56
@@ -188,7 +188,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 <= 1); /* 1 */
 addiu $sp, $sp,-56
@@ -233,7 +233,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 <= 0); /* 0 */
 addiu $sp, $sp,-56
@@ -278,7 +278,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 > 2); /* 0 */
 addiu $sp, $sp,-56
@@ -322,7 +322,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 > 1); /* 0 */
 addiu $sp, $sp,-56
@@ -366,7 +366,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 > 0); /* 1 */
 addiu $sp, $sp,-56
@@ -410,7 +410,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 >= 2); /* 0 */
 addiu $sp, $sp,-56
@@ -455,7 +455,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 >= 1); /* 1 */
 addiu $sp, $sp,-56
@@ -500,7 +500,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 >= 0); /* 1 */
 addiu $sp, $sp,-56
@@ -545,7 +545,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 == 2); /* 0 */
 addiu $sp, $sp,-56
@@ -590,7 +590,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 == 1); /* 1 */
 addiu $sp, $sp,-56
@@ -635,7 +635,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 == 0); /* 0 */
 addiu $sp, $sp,-56
@@ -680,7 +680,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 != 2); /* 1 */
 addiu $sp, $sp,-56
@@ -725,7 +725,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 != 1); /* 0 */
 addiu $sp, $sp,-56
@@ -770,7 +770,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 != 0); /* 1 */
 addiu $sp, $sp,-56
@@ -815,7 +815,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 + 2); /* 3 */
 addiu $sp, $sp,-56
@@ -858,7 +858,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 + 1); /* 2 */
 addiu $sp, $sp,-56
@@ -901,7 +901,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 + 0); /* 1 */
 addiu $sp, $sp,-56
@@ -944,7 +944,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 - 2); /* -1 */
 addiu $sp, $sp,-56
@@ -987,7 +987,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 - 1); /* 0  */
 addiu $sp, $sp,-56
@@ -1030,7 +1030,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 - 0); /* 1  */
 addiu $sp, $sp,-56
@@ -1073,7 +1073,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 * 2); /* 2 */
 addiu $sp, $sp,-56
@@ -1117,7 +1117,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 * 1); /* 1 */
 addiu $sp, $sp,-56
@@ -1161,7 +1161,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 * 0); /* 0 */
 addiu $sp, $sp,-56
@@ -1205,7 +1205,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 / 2); /* 0     */
 addiu $sp, $sp,-56
@@ -1250,7 +1250,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 / 1); /* 1     */
 addiu $sp, $sp,-56
@@ -1295,7 +1295,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(1 / 0); /* error */
 addiu $sp, $sp,-56
@@ -1340,7 +1340,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 

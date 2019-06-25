@@ -181,7 +181,7 @@ static bool buildSymtabImpl(Node t,
 
             // initialize loc counters
             state->localLocCounter = -4;
-            state->paramLocCounter = t->children[0]->num_children * 4;
+            state->paramLocCounter = 0;
             break;
         case StmtParam:
             if ((result = st_lookup(state->sym, t->value.param.name)) && result->scope == state->scopeLevel) {
@@ -194,7 +194,7 @@ static bool buildSymtabImpl(Node t,
                 Record rec = makeRecord(t, state->paramLocCounter, state->scopeLevel);
                 st_insert(state->sym, t->value.param.name, rec);
 
-                state->paramLocCounter -= 4;
+                state->paramLocCounter++;
             }
             break;
         case StmtCompoundStmt:

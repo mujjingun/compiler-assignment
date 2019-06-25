@@ -74,7 +74,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #         i = i + 1;
 addiu $t0, $fp, -8
@@ -121,7 +121,7 @@ addiu $t0, $fp, -12
 #     x = a[low];
 move  $t2, $a1
 sll   $t2,$t2,2
-addu  $t1, $a2, $t2
+addu  $t1, $a0, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
 
@@ -138,7 +138,7 @@ $_L2: # loop
 
 #     while (i < high)
 lw    $t0, -8($fp)
-move  $t1, $a0
+move  $t1, $a2
 slt   $t0, $t0, $t1
 andi  $t0, $t0, 0x00ff
 # exit if the condition is false
@@ -154,7 +154,7 @@ addiu $sp,$sp,0 # allocate locals
 #         if (a[i] < x)
 lw    $t1, -8($fp)
 sll   $t1,$t1,2
-addu  $t0, $a2, $t1
+addu  $t0, $a0, $t1
 lw    $t0, 0($t0)
 lw    $t1, -12($fp)
 slt   $t0, $t0, $t1
@@ -172,7 +172,7 @@ addiu $t0, $fp, -12
 #             x = a[i];
 lw    $t2, -8($fp)
 sll   $t2,$t2,2
-addu  $t1, $a2, $t2
+addu  $t1, $a0, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
 
@@ -247,7 +247,7 @@ $_L6: # loop
 lw    $t0, -8($fp)
 
 #     while (i < high - 1) {
-move  $t1, $a0
+move  $t1, $a2
 li    $t2, 1
 subu   $t1, $t1, $t2
 slt   $t0, $t0, $t1
@@ -278,11 +278,11 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-move  $t5, $a2
+move  $t5, $a0
 move  $t1, $t5
 lw    $t5, -8($fp)
 move  $t2, $t5
-move  $t5, $a0
+move  $t5, $a2
 move  $t3, $t5
 move  $a0, $t1
 move  $a1, $t2
@@ -305,7 +305,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t5,$v0
+move  $t1,$v0
 sw    $t1, 0($t0)
 
 #         t=a[k];
@@ -314,7 +314,7 @@ addiu $t0, $fp, -16
 #         t=a[k];
 lw    $t2, -12($fp)
 sll   $t2,$t2,2
-addu  $t1, $a2, $t2
+addu  $t1, $a0, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
 
@@ -323,12 +323,12 @@ sw    $t1, 0($t0)
 #         a[k]=a[i];
 lw    $t1, -12($fp)
 sll   $t1,$t1,2
-addu  $t0, $a2, $t1
+addu  $t0, $a0, $t1
 
 #         a[k]=a[i];
 lw    $t2, -8($fp)
 sll   $t2,$t2,2
-addu  $t1, $a2, $t2
+addu  $t1, $a0, $t2
 lw    $t1, 0($t1)
 sw    $t1, 0($t0)
 
@@ -337,7 +337,7 @@ sw    $t1, 0($t0)
 #         a[i] = t;
 lw    $t1, -8($fp)
 sll   $t1,$t1,2
-addu  $t0, $a2, $t1
+addu  $t0, $a0, $t1
 lw    $t1, -16($fp)
 sw    $t1, 0($t0)
 
@@ -436,7 +436,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t5,$v0
+move  $t1,$v0
 sw    $t1, 0($t0)
 
 #         i = i + 1;
@@ -495,7 +495,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     print(x);
 addiu $sp, $sp,-56
@@ -534,7 +534,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,4 # free locals
 
 

@@ -42,7 +42,7 @@ $_L0: # loop
 # evaluate the loop condition
 
 #     while (parB == 0) {
-move  $t0, $a0
+move  $t0, $a1
 li    $t1, 0
 xor   $t0, $t0, $t1
 sltu  $t0, $t0, 1
@@ -59,12 +59,12 @@ addiu $sp,$sp,-4 # allocate locals
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
 lw    $t1, -48($fp)
 sll   $t1,$t1,2
-addu  $t0, $a1, $t1
+addu  $t0, $a0, $t1
 
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
 
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
-move  $t1, $a0
+move  $t1, $a1
 
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
 addiu $sp, $sp,-56
@@ -82,7 +82,7 @@ sw    $a0, 40($sp)
 sw    $a1, 44($sp)
 sw    $a2, 48($sp)
 sw    $a3, 52($sp)
-move  $t6, $a1
+move  $t6, $a0
 move  $t2, $t6
 lw    $t6, -48($fp)
 move  $t3, $t6
@@ -106,7 +106,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t6,$v0
+move  $t2,$v0
 mult  $t1, $t2
 mflo  $t1
 
@@ -115,7 +115,7 @@ mflo  $t1
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
 lw    $t3, -48($fp)
 sll   $t3,$t3,2
-addu  $t2, $a1, $t3
+addu  $t2, $a0, $t3
 lw    $t2, 0($t2)
 
 #         parA[i] = parB * func(parA, i) * (parA[i] + parA[i+1]/parB);
@@ -127,9 +127,9 @@ lw    $t4, -48($fp)
 li    $t5, 1
 addu   $t4, $t4, $t5
 sll   $t4,$t4,2
-addu  $t3, $a1, $t4
+addu  $t3, $a0, $t4
 lw    $t3, 0($t3)
-move  $t4, $a0
+move  $t4, $a1
 div   $0,$t3,$t4
 mfhi  $t3
 mflo  $t3
@@ -141,10 +141,10 @@ sw    $t1, 0($t0)
 #         parB = parB - 1;
 
 #         parB = parB - 1;
-move  $t1, $a0
+move  $t1, $a1
 li    $t2, 1
 subu   $t1, $t1, $t2
-move $a0, $t1
+move $a1, $t1
 
 #         i = i + 1;
 addiu $t0, $fp, -48
@@ -161,9 +161,9 @@ sw    $t1, 0($t0)
 #         if(parB = parA[12])
 li    $t2, 12
 sll   $t2,$t2,2
-addu  $t1, $a1, $t2
+addu  $t1, $a0, $t2
 lw    $t1, 0($t1)
-move $a0, $t1
+move $a1, $t1
 # branch to else if the condition is false
 beq   $t0,$0,$_L2
 
@@ -214,7 +214,7 @@ $_L1: # loop exit
 #     return parA[2];
 li    $t1, 2
 sll   $t1,$t1,2
-addu  $t0, $a1, $t1
+addu  $t0, $a0, $t1
 lw    $t0, 0($t0)
 move  $v0, $t0 # set return value
 # restore return address
@@ -436,7 +436,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t5,$v0
+move  $t1,$v0
 sw    $t1, 0($t0)
 addiu $sp,$sp,4 # free locals
 

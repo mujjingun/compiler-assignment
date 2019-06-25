@@ -55,7 +55,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     arr[5] = 123123;
 
@@ -108,7 +108,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 
@@ -184,7 +184,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     modify(garr);
 addiu $sp, $sp,-56
@@ -223,7 +223,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(garr[5]);
 addiu $sp, $sp,-56
@@ -268,7 +268,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     larr[5] = 7;
 
@@ -322,7 +322,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     modify(larr);
 addiu $sp, $sp,-56
@@ -361,7 +361,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(larr[5]);
 addiu $sp, $sp,-56
@@ -405,7 +405,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,40 # free locals
 
 

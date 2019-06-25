@@ -21,7 +21,7 @@ $_L0: # loop
 # evaluate the loop condition
 
 #     while (b > 0) {
-move  $t0, $a0
+move  $t0, $a1
 li    $t1, 0
 slt   $t0, $t1, $t0
 andi  $t0, $t0, 0x00ff
@@ -37,7 +37,7 @@ addiu $t0, $fp, -8
 
 #         r = r * a;
 lw    $t1, -8($fp)
-move  $t2, $a1
+move  $t2, $a0
 mult  $t1, $t2
 mflo  $t1
 sw    $t1, 0($t0)
@@ -45,10 +45,10 @@ sw    $t1, 0($t0)
 #         b = b - 1;
 
 #         b = b - 1;
-move  $t1, $a0
+move  $t1, $a1
 li    $t2, 1
 subu   $t1, $t1, $t2
-move $a0, $t1
+move $a1, $t1
 addiu $sp,$sp,0 # free locals
 
 j     $_L0 # loop
@@ -147,7 +147,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t8,$v0
+move  $t4,$v0
 move  $t0, $t4
 move  $a0, $t0
 addiu $sp,$sp,-4
@@ -168,7 +168,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(exp(0-2, 11)); /* -2048 */
 addiu $sp, $sp,-56
@@ -231,7 +231,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t8,$v0
+move  $t4,$v0
 move  $t0, $t4
 move  $a0, $t0
 addiu $sp,$sp,-4
@@ -252,7 +252,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 
 #     output(exp(0-2, 12)); /* 4096 */
 addiu $sp, $sp,-56
@@ -315,7 +315,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t8,$v0
+move  $t4,$v0
 move  $t0, $t4
 move  $a0, $t0
 addiu $sp,$sp,-4
@@ -336,7 +336,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 

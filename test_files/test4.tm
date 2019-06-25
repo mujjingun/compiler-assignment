@@ -88,7 +88,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t5,$v0
+move  $t1,$v0
 mult  $t0, $t1
 mflo  $t0
 move  $v0, $t0 # set return value
@@ -177,7 +177,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t8,$v0
+move  $t4,$v0
 move  $t0, $t4
 move  $a0, $t0
 addiu $sp,$sp,-4
@@ -198,7 +198,7 @@ lw    $a1, 44($sp)
 lw    $a2, 48($sp)
 lw    $a3, 52($sp)
 addiu $sp,$sp,40
-move  $t4,$v0
+move  $t0,$v0
 addiu $sp,$sp,0 # free locals
 
 
