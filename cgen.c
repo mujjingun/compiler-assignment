@@ -185,6 +185,10 @@ static void expr_cgen(FILE* out, Node t, enum Storage reg,
         // jump to the procedure
         fprintf(out, "jal   %s\n", t->value.name);
 
+        // pop the control link
+        fprintf(out, "sw    $fp,0($sp) # pop control link\n");
+        fprintf(out, "addiu $sp,$sp,%d\n", 4);
+
         // pop temporary registers
         for (int i = 0; i < 10; ++i) {
             fprintf(out, "lw    $t%d, %d($sp)\n", i, i * 4);
