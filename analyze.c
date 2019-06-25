@@ -71,6 +71,9 @@ static Record makeRecord(Node node, int loc, int scope)
 
 static void RecordAddLineno(Record rec, int lineno)
 {
+    if (rec->linenos == NULL) {
+        return;
+    }
     if (rec->linenos[rec->num_linenos - 1] != lineno) {
         rec->num_linenos++;
         rec->linenos = realloc(rec->linenos, sizeof(int) * rec->num_linenos);
@@ -125,8 +128,8 @@ typedef struct BuildSymtabStateRec {
 } * BuildSymtabState;
 
 static bool buildSymtabImpl(Node t,
-			    BuildSymtabState state,
-			    bool printSymbolTable)
+    BuildSymtabState state,
+    bool printSymbolTable)
 {
     Record result;
 
@@ -137,7 +140,7 @@ static bool buildSymtabImpl(Node t,
         switch (t->stmt) {
         case StmtVar:
             if ((result = st_lookup(state->sym, t->value.var.name))
-		&& result->scope == state->scopeLevel) {
+                && result->scope == state->scopeLevel) {
                 // aready in table
                 idError(t, "Identifier '%s' already declared on line %d",
                     t->value.var.name, result->linenos[0]);
@@ -169,7 +172,8 @@ static bool buildSymtabImpl(Node t,
             } else {
                 // not yet in table
                 Record rec = makeRecord(t, state->functionLocCounter,
-					state->scopeLevel);
+                    state->scopeLevel);
+                t->record = rec;
                 st_insert(state->sym, t->value.func.name, rec);
 
                 state->functionLocCounter++;
@@ -192,6 +196,7 @@ static bool buildSymtabImpl(Node t,
             } else {
                 // loc is set in reverse
                 Record rec = makeRecord(t, state->paramLocCounter, state->scopeLevel);
+                t->record = rec;
                 st_insert(state->sym, t->value.param.name, rec);
 
                 state->paramLocCounter++;
@@ -267,23 +272,24 @@ static bool buildSymtabImpl(Node t,
     // recursive traversal
     for (int i = 0; i < t->num_children; i++) {
         error = buildSymtabImpl(t->children[i], state,
-				printSymbolTable) || error;
+                    printSymbolTable)
+            || error;
     }
 
     switch (t->kind) {
     case NodeStmt:
         switch (t->stmt) {
         case StmtFunction:
-	    if(printSymbolTable)
-		printFormattedSymtab(state->sym);
+            if (printSymbolTable)
+                printFormattedSymtab(state->sym);
             st_exit_scope(state->sym);
             state->scopeLevel--;
             break;
         case StmtCompoundStmt:
             // exit scope
             if (!t->value.is_function_body) {
-		if(printSymbolTable)
-		    printFormattedSymtab(state->sym);
+                if (printSymbolTable)
+                    printFormattedSymtab(state->sym);
                 st_exit_scope(state->sym);
                 state->scopeLevel--;
             }
@@ -306,7 +312,7 @@ typedef struct TypeCheckStateRec {
 } * TypeCheckState;
 
 static bool typeCheckImpl(Node t,
-			  TypeCheckState state)
+    TypeCheckState state)
 {
     bool error = false;
 
@@ -448,15 +454,6 @@ static bool typeCheckImpl(Node t,
     return error;
 }
 
-static void freeRecord(Record rec)
-{
-    if (rec->kind == SymFunction) {
-        free(rec->func.param_types);
-    }
-    free(rec->linenos);
-    free(rec);
-}
-
 /* Function semanticAnalysis constructs the symbol
  * table by preorder traversal of the syntax tree
  */
@@ -468,49 +465,48 @@ bool semanticAnalysis(Node t, bool printSymTable)
     state.scopeLevel = 0;
 
     // build the symbol table
-    state.sym = st_init(freeRecord);
+    state.sym = st_init();
 
     // add standard procedures
     {
-        Record rec = malloc(sizeof(struct ActivationRecord));
-        rec->loc = -1;
-        rec->scope = 0;
+        static struct ActivationRecord rec;
+        static enum SymbolType params[1];
+        rec.loc = -1;
+        rec.scope = 0;
 
-        rec->vpf = VPFFunction;
-        rec->kind = SymFunction;
-        rec->type = TypeVoid;
+        rec.vpf = VPFFunction;
+        rec.kind = SymFunction;
+        rec.type = TypeVoid;
 
-        rec->func.num_params = 1;
-        rec->func.param_types = malloc(sizeof(enum SymbolType) * 1);
-        rec->func.param_types[0] = SymVariable;
+        rec.func.num_params = 1;
+        rec.func.param_types = params;
+        rec.func.param_types[0] = SymVariable;
 
-        rec->num_linenos = 1;
-        rec->linenos = malloc(sizeof(int) * 1);
-        rec->linenos[0] = -1;
-        st_insert(state.sym, "output", rec);
+        rec.num_linenos = 1;
+        rec.linenos = NULL;
+        st_insert(state.sym, "output", &rec);
     }
     {
-        Record rec = malloc(sizeof(struct ActivationRecord));
-        rec->loc = -1;
-        rec->scope = 0;
+        static struct ActivationRecord rec;
+        rec.loc = -1;
+        rec.scope = 0;
 
-        rec->vpf = VPFFunction;
-        rec->kind = SymFunction;
-        rec->type = TypeInt;
+        rec.vpf = VPFFunction;
+        rec.kind = SymFunction;
+        rec.type = TypeInt;
 
-        rec->func.num_params = 0;
-        rec->func.param_types = NULL;
+        rec.func.num_params = 0;
+        rec.func.param_types = NULL;
 
-        rec->num_linenos = 1;
-        rec->linenos = malloc(sizeof(int) * 1);
-        rec->linenos[0] = -1;
-        st_insert(state.sym, "input", rec);
+        rec.num_linenos = 1;
+        rec.linenos = NULL;
+        st_insert(state.sym, "input", &rec);
     }
 
     bool error = buildSymtabImpl(t, &state, printSymTable);
 
-    if(printSymTable)
-	printFormattedSymtab(state.sym);
+    if (printSymTable)
+        printFormattedSymtab(state.sym);
 
     st_free(state.sym);
 

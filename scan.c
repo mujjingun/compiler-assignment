@@ -1,4 +1,5 @@
 #include "scan.h"
+#include "analyze.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@ static Node allocNode(int lineno, enum NodeKind kind, int num_children)
     node->kind = kind;
     node->lineno = lineno;
     node->num_children = num_children;
+    node->record = NULL;
 
     if (num_children > 0) {
         node->children = malloc(sizeof(Node) * num_children);
@@ -206,7 +208,7 @@ Node makeParamNode(int lineno, enum TypeKind type, bool is_array, char* id)
 }
 
 Node makeFunctionNode(int lineno, enum TypeKind return_type,
-		      char* id, Node params, Node body)
+    char* id, Node params, Node body)
 {
     Node node = allocNode(lineno, NodeStmt, 2);
     node->stmt = StmtFunction;
@@ -274,6 +276,14 @@ void freeNode(Node node)
 
     if (node->attr.func.num_params > 0) {
         free(node->attr.func.param_types);
+    }
+
+    if (node->kind == NodeStmt && node->record) {
+        if (node->record->kind == SymFunction) {
+            free(node->record->func.param_types);
+        }
+        free(node->record->linenos);
+        free(node->record);
     }
 
     free(node->children);

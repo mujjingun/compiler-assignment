@@ -58,14 +58,13 @@ struct SymTableStateRec
     LocalSymbolTable root;            // global root of symbol table
     LocalSymbolTable lastConstructed; // local symbol table previously constructed
     LocalSymbolTable currentScope;    // current local scope symbol table
-    void (*freeRecord)(Record);       // destructor for the record
 
 };
 
 /* 
  * initialize symbol table
  */
-SymTable st_init(void (*freeRecord)(Record))
+SymTable st_init()
 {
     SymTable state = malloc(sizeof(struct SymTableStateRec));
 
@@ -78,18 +77,16 @@ SymTable st_init(void (*freeRecord)(Record))
     state->currentScope     = table;
     state->lastConstructed  = table;
     state->root             = table;
-    state->freeRecord       = freeRecord;
 
     return state;
 }
 
-static void freeHashTable(SymTable state, BucketList table[])
+static void freeHashTable(BucketList table[])
 {
     for (int i = 0; i < SIZE; ++i) {
         BucketList p = table[i];
         while (p != NULL) {
             BucketList t = p->next;
-            //state->freeRecord(p->record);
             free(p);
             p = t;
         }
@@ -102,7 +99,7 @@ void st_free(SymTable state)
     while(localTable)
     {
         LocalSymbolTable t = localTable->next;
-        freeHashTable(state, localTable->hashTable);
+        freeHashTable(localTable->hashTable);
         free(localTable);
         localTable = t;
     }

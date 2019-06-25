@@ -17,7 +17,7 @@ typedef struct SymTableStateRec* SymTable;
 /* 
  * initialize symbol table
  */
-SymTable st_init(void (*freeRecord)(Record));
+SymTable st_init();
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
